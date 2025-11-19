@@ -25,7 +25,7 @@ def normalize_number(raw_input: str) -> str:
 def login_prompt(api_key: str):
     clear_screen()
     theme = get_theme()
-    console.print(Panel("🔐 Login ke MyXL", border_style=theme["border_info"], expand=True))
+    console.print(Panel("🔐 Login ke MyXL", border_style=theme["border_info"], padding=(1, 2), expand=True))
     raw_input = console.input("Masukkan nomor XL (08xx / 628xx / +628xx): ").strip()
     phone_number = normalize_number(raw_input)
 
