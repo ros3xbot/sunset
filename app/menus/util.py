@@ -9,6 +9,8 @@ from rich.align import Align
 from rich import box
 from app.config.theme_config import get_theme, get_theme_style
 
+console = Console()
+
 def clear_screen():
     print("Clearing screen...")
     os.system('cls' if os.name == 'nt' else 'clear')
