@@ -2,6 +2,12 @@ from html.parser import HTMLParser
 import os
 import re
 import textwrap
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.align import Align
+from rich import box
+from app.config.theme_config import get_theme, get_theme_style
 
 def clear_screen():
     print("Clearing screen...")
@@ -86,3 +92,82 @@ def format_quota_byte(quota_byte: int) -> str:
         return f"{quota_byte / KB:.2f} KB"
     else:
         return f"{quota_byte} B"
+
+def get_rupiah(value) -> str:
+    value_str = str(value).strip()
+    value_str = re.sub(r"^Rp\s?", "", value_str)
+    match = re.match(r"([\d,]+)(.*)", value_str)
+    if not match:
+        return value_str
+
+    raw_number = match.group(1).replace(",", "")
+    suffix = match.group(2).strip()
+
+    try:
+        number = int(raw_number)
+    except ValueError:
+        return value_str
+
+    formatted_number = f"{number:,}".replace(",", ".")
+    formatted = f"{formatted_number},-"
+    return f"{formatted} {suffix}" if suffix else formatted
+
+def nav_range(label: str, count: int) -> str:
+    if count <= 0:
+        return f"{label} (tidak tersedia)"
+    if count == 1:
+        return f"{label} 1"
+    return f"{label} 1–{count}"
+
+def live_loading(text: str, theme: dict):
+    return console.status(f"[{theme['text_sub']}]{text}[/{theme['text_sub']}]", spinner="dots")
+
+def simple_number():
+    theme = get_theme()
+    active_user = AuthInstance.get_active_user()
+
+    if not active_user:
+        text = f"[bold {get_theme_style('text_err')}]Tidak ada akun aktif saat ini.[/]"
+    else:
+        number = active_user.get("number", "-")
+        text = f"[bold {get_theme_style('text_body')}]Akun yang sedang aktif ✨ {number} ✨[/]"
+
+    console.print(Panel(
+        Align.center(text),
+        border_style=get_theme_style("border_warning"),
+        padding=(0, 0),
+        expand=True
+    ))
+
+def print_panel(title, content, border_style=None):
+    style = border_style or get_theme_style("border_info")
+    console.print(Panel(content, title=title, title_align="left", border_style=style))
+
+def print_success(title, content):
+    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_success")))
+
+def print_error(title, content):
+    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_error")))
+
+def print_warning(title, content):
+    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_warning")))
+
+def print_title(text):
+    console.print(Panel(
+        Align.center(f"[bold {get_theme_style('text_title')}]{text}[/{get_theme_style('text_title')}]"),
+        border_style=get_theme_style("border_primary"),
+        padding=(0, 1),
+        expand=True
+    ))
+
+def print_key_value(label, value):
+    console.print(f"[{get_theme_style('text_key')}]{label}:[/] [{get_theme_style('text_value')}]{value}[/{get_theme_style('text_value')}]")
+
+def print_info(label, value):
+    console.print(f"[{get_theme_style('text_sub')}]{label}:[/{get_theme_style('text_sub')}] [{get_theme_style('text_body')}]{value}[/{get_theme_style('text_body')}]")
+
+def print_menu(title, options):
+    table = Table(title=title, box=box.SIMPLE, show_header=False)
+    for key, label in options.items():
+        table.add_row(f"[{get_theme_style('text_key')}]{key}[/{get_theme_style('text_key')}]", f"[{get_theme_style('text_value')}]{label}[/{get_theme_style('text_value')}]")
+    console.print(table)
