@@ -90,7 +90,6 @@ class Auth:
                 "refresh_token": refresh_token
             })
         
-        # Save to file
         self.write_tokens_to_file()
 
         # Set active user to newly added
