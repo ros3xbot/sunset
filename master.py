@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 
 import sys, json, random
@@ -9,10 +10,21 @@ from rich.panel import Panel
 from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 
-# Service & client imports
 from app.service.git import check_for_updates, ensure_git
-from app.menus.util import clear_screen, pause, print_panel, print_error, print_warning, get_rupiah
-from app.client.engsel import get_balance, get_tiering_info, get_quota, dashboard_segments
+from app.menus.util import (
+    clear_screen,
+    pause,
+    print_panel,
+    print_error,
+    print_warning,
+    get_rupiah,
+)
+from app.client.engsel import (
+    get_balance,
+    get_tiering_info,
+    get_quota,
+    dashboard_segments,
+)
 from app.client.famplan import validate_msisdn
 from app.client.registration import dukcapil
 from app.service.auth import AuthInstance
@@ -20,7 +32,11 @@ from app.service.sentry import enter_sentry_mode
 from app.menus.payment import show_transaction_history
 from app.menus.bookmark import show_bookmark_menu
 from app.menus.account import show_account_menu
-from app.menus.package import fetch_my_packages, get_packages_by_family, show_package_details
+from app.menus.package import (
+    fetch_my_packages,
+    get_packages_by_family,
+    show_package_details,
+)
 from app.menus.hot import show_hot_menu, show_hot_menu2
 from app.menus.purchase import purchase_by_family
 from app.menus.famplan import show_family_info
@@ -41,7 +57,9 @@ def show_main_menu(profile, display_quota, segments):
     clear_screen()
     theme = get_theme()
 
-    expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime("%Y-%m-%d %H:%M:%S")
+    expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
     pulsa_str = get_rupiah(profile["balance"])
 
     # Panel informasi akun
@@ -49,12 +67,25 @@ def show_main_menu(profile, display_quota, segments):
     info_table.add_column(justify="left", style=get_theme_style("text_body"))
     info_table.add_column(justify="left", style=get_theme_style("text_value"))
 
-    info_table.add_row("Nomor", f": 📞 [bold {get_theme_style('text_body')}]{profile['number']}[/]")
-    info_table.add_row("Type", f": 🧾 [{get_theme_style('text_body')}]{profile['subscription_type']} ({profile['subscriber_id']})[/]")
-    info_table.add_row("Pulsa", f": 💰 Rp [{get_theme_style('text_money')}]{pulsa_str}[/]")
-    info_table.add_row("Kuota", f": 📊 [{get_theme_style('text_date')}]{display_quota}[/]")
-    info_table.add_row("Tiering", f": 🏅 [{get_theme_style('text_date')}]{profile['point_info']}[/]")
-    info_table.add_row("Masa Aktif", f": ⏳ [{get_theme_style('text_date')}]{expired_at_dt}[/]")
+    info_table.add_row(
+        "Nomor", f": 📞 [bold {get_theme_style('text_body')}]{profile['number']}[/]"
+    )
+    info_table.add_row(
+        "Type",
+        f": 🧾 [{get_theme_style('text_body')}]{profile['subscription_type']} ({profile['subscriber_id']})[/]",
+    )
+    info_table.add_row(
+        "Pulsa", f": 💰 Rp [{get_theme_style('text_money')}]{pulsa_str}[/]"
+    )
+    info_table.add_row(
+        "Kuota", f": 📊 [{get_theme_style('text_date')}]{display_quota}[/]"
+    )
+    info_table.add_row(
+        "Tiering", f": 🏅 [{get_theme_style('text_date')}]{profile['point_info']}[/]"
+    )
+    info_table.add_row(
+        "Masa Aktif", f": ⏳ [{get_theme_style('text_date')}]{expired_at_dt}[/]"
+    )
 
     console.print(
         Panel(
@@ -63,7 +94,7 @@ def show_main_menu(profile, display_quota, segments):
             title_align="center",
             border_style=get_theme_style("border_info"),
             padding=(1, 2),
-            expand=True
+            expand=True,
         )
     )
 
@@ -93,17 +124,21 @@ def show_main_menu(profile, display_quota, segments):
                 Align.center(special_text),
                 border_style=theme["border_warning"],
                 padding=(0, 2),
-                width=panel_width
+                width=panel_width,
             )
         )
 
-        console.print(Align.center(
-            f"[{theme['text_sub']}]Pilih [11] untuk lihat semua paket spesial[/{theme['text_sub']}]"
-        ))
+        console.print(
+            Align.center(
+                f"[{theme['text_sub']}]Pilih [11] untuk lihat semua paket spesial[/{theme['text_sub']}]"
+            )
+        )
 
     # Menu utama
     menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-    menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
+    menu_table.add_column(
+        "Kode", justify="right", style=get_theme_style("text_key"), width=6
+    )
     menu_table.add_column("Aksi", style=get_theme_style("text_body"))
 
     menu_table.add_row("1", "🔐 Login/Ganti akun")
@@ -116,7 +151,7 @@ def show_main_menu(profile, display_quota, segments):
     menu_table.add_row("8", "📜 Riwayat Transaksi")
     menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
     menu_table.add_row("10", "👥 Circle")
-    #menu_table.add_row("11", "🏬 Store Segments")
+    # menu_table.add_row("11", "🏬 Store Segments")
     menu_table.add_row("12", "📂 Store Family List")
     menu_table.add_row("13", "📦 Store Packages")
     menu_table.add_row("14", "🎁 Redeemables")
@@ -136,9 +171,10 @@ def show_main_menu(profile, display_quota, segments):
             title_align="center",
             border_style=get_theme_style("border_primary"),
             padding=(0, 1),
-            expand=True
+            expand=True,
         )
     )
+
 
 # ============================
 # Main loop
@@ -150,12 +186,16 @@ def main():
 
         if active_user is not None:
             # Balance
-            balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
+            balance = get_balance(
+                AuthInstance.api_key, active_user["tokens"]["id_token"]
+            )
             balance_remaining = balance.get("remaining")
             balance_expired_at = balance.get("expired_at")
 
             # Quota
-            quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
+            quota = (
+                get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
+            )
             remaining = quota.get("remaining", 0)
             total = quota.get("total", 0)
             has_unlimited = quota.get("has_unlimited", False)
@@ -165,7 +205,8 @@ def main():
                 total_gb = total / 1e9
                 display_quota = (
                     f"{remaining_gb:.2f}/{total_gb:.2f} GB (Unlimited)"
-                    if has_unlimited else f"{remaining_gb:.2f}/{total_gb:.2f} GB"
+                    if has_unlimited
+                    else f"{remaining_gb:.2f}/{total_gb:.2f} GB"
                 )
             else:
                 display_quota = "-"
@@ -173,7 +214,9 @@ def main():
             # Tiering
             point_info = "Points: N/A | Tier: N/A"
             if active_user["subscription_type"] == "PREPAID":
-                tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
+                tiering_data = get_tiering_info(
+                    AuthInstance.api_key, active_user["tokens"]
+                )
                 tier = tiering_data.get("tier", 0)
                 current_point = tiering_data.get("current_point", 0)
                 point_info = f"Points: {current_point} | Tier: {tier}"
@@ -181,7 +224,9 @@ def main():
             # Segments
             id_token = active_user["tokens"]["id_token"]
             access_token = active_user["tokens"]["access_token"]
-            segments = dashboard_segments(AuthInstance.api_key, id_token, access_token) or {}
+            segments = (
+                dashboard_segments(AuthInstance.api_key, id_token, access_token) or {}
+            )
 
             profile = {
                 "number": active_user["number"],
@@ -189,7 +234,7 @@ def main():
                 "subscription_type": active_user["subscription_type"],
                 "balance": balance_remaining,
                 "balance_expired_at": balance_expired_at,
-                "point_info": point_info
+                "point_info": point_info,
             }
 
             # tampilkan menu
@@ -219,10 +264,7 @@ def main():
                 if option_code == "99":
                     continue
                 show_package_details(
-                    AuthInstance.api_key,
-                    active_user["tokens"],
-                    option_code,
-                    False
+                    AuthInstance.api_key, active_user["tokens"], option_code, False
                 )
             elif choice == "6":
                 family_code = input("Enter family code (or '99' to cancel): ")
@@ -234,15 +276,21 @@ def main():
                 if family_code == "99":
                     continue
 
-                start_from_option = input("Start purchasing from option number (default 1): ")
+                start_from_option = input(
+                    "Start purchasing from option number (default 1): "
+                )
                 try:
                     start_from_option = int(start_from_option)
                 except ValueError:
                     start_from_option = 1
 
-                use_decoy = input("Use decoy package? (y/n): ").lower() == 'y'
-                pause_on_success = input("Pause on each successful purchase? (y/n): ").lower() == 'y'
-                delay_seconds = input("Delay seconds between purchases (0 for no delay): ")
+                use_decoy = input("Use decoy package? (y/n): ").lower() == "y"
+                pause_on_success = (
+                    input("Pause on each successful purchase? (y/n): ").lower() == "y"
+                )
+                delay_seconds = input(
+                    "Delay seconds between purchases (0 for no delay): "
+                )
                 try:
                     delay_seconds = int(delay_seconds)
                 except ValueError:
@@ -252,7 +300,7 @@ def main():
                     use_decoy,
                     pause_on_success,
                     delay_seconds,
-                    start_from_option
+                    start_from_option,
                 )
             elif choice == "8":
                 show_transaction_history(AuthInstance.api_key, active_user["tokens"])
@@ -262,21 +310,21 @@ def main():
                 show_circle_info(AuthInstance.api_key, active_user["tokens"])
             elif choice == "11":
                 input_11 = input("Is enterprise store? (y/n): ").lower()
-                is_enterprise = input_11 == 'y'
+                is_enterprise = input_11 == "y"
                 show_store_segments_menu(is_enterprise)
             elif choice == "12":
                 input_12_1 = input("Is enterprise? (y/n): ").lower()
-                is_enterprise = input_12_1 == 'y'
-                show_family_list_menu(profile['subscription_type'], is_enterprise)
+                is_enterprise = input_12_1 == "y"
+                show_family_list_menu(profile["subscription_type"], is_enterprise)
             elif choice == "13":
                 input_13_1 = input("Is enterprise? (y/n): ").lower()
-                is_enterprise = input_13_1 == 'y'
-                
-                show_store_packages_menu(profile['subscription_type'], is_enterprise)
+                is_enterprise = input_13_1 == "y"
+
+                show_store_packages_menu(profile["subscription_type"], is_enterprise)
             elif choice == "14":
                 input_14_1 = input("Is enterprise? (y/n): ").lower()
-                is_enterprise = input_14_1 == 'y'
-                
+                is_enterprise = input_14_1 == "y"
+
                 show_redeemables_menu(is_enterprise)
             elif choice == "00":
                 show_bookmark_menu()
@@ -293,7 +341,7 @@ def main():
                 msisdn = input("Enter msisdn (628xxxx): ")
                 nik = input("Enter NIK: ")
                 kk = input("Enter KK: ")
-                
+
                 res = dukcapil(
                     AuthInstance.api_key,
                     msisdn,
@@ -319,7 +367,6 @@ def main():
                 print("Invalid choice. Please try again.")
                 pause()
         else:
-            # Not logged in
             selected_user_number = show_account_menu()
             if selected_user_number:
                 AuthInstance.set_active_user(selected_user_number)
