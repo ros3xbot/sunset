@@ -12,6 +12,21 @@ from app.config.theme_config import get_theme, get_theme_style
 console = Console()
 
 
+def print_banner():
+    theme = get_theme()
+    banner_text = Align.center(
+        "[bold]myXL CLI v8.9.1 sunset[/]",
+        vertical="middle"
+    )
+    console.print(Panel(
+        banner_text,
+        border_style=theme["border_primary"],
+        style=theme["text_title"],
+        padding=(1, 2),
+        expand=True,
+        box=box.DOUBLE
+    ))
+
 def simple_number():
     from app.service.auth import AuthInstance
     theme = get_theme()
@@ -28,21 +43,6 @@ def simple_number():
         border_style=get_theme_style("border_warning"),
         padding=(0, 0),
         expand=True
-    ))
-
-def print_banner():
-    theme = get_theme()
-    banner_text = Align.center(
-        "[bold]myXL CLI v8.9.1 sunset[/]",
-        vertical="middle"
-    )
-    console.print(Panel(
-        banner_text,
-        border_style=theme["border_primary"],
-        style=theme["text_title"],
-        padding=(0, 2),
-        expand=True,
-        #box=box.DOUBLE
     ))
 
 def clear_screen():
