@@ -23,7 +23,7 @@ from app.menus.purchase import purchase_n_times, purchase_n_times_by_option_code
 from app.menus.util import format_quota_byte
 from app.service.decoy import DecoyInstance
 
-console = Console
+console = Console()
 
 
 def show_package_details(api_key, tokens, package_option_code, is_enterprise, option_order = -1):
