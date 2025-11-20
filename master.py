@@ -46,15 +46,15 @@ def show_main_menu(profile, display_quota, segments):
 
     # Panel informasi akun
     info_table = Table.grid(padding=(0, 1))
-    info_table.add_column(justify="left", style=get_theme_style("text_key"))
+    info_table.add_column(justify="left", style=get_theme_style("text_body"))
     info_table.add_column(justify="left", style=get_theme_style("text_value"))
 
-    info_table.add_row("📞 Nomor", f": [bold {get_theme_style('text_body')}]{profile['number']}[/]")
-    info_table.add_row("🧾 Type", f": [{get_theme_style('text_body')}]{profile['subscription_type']} ({profile['subscriber_id']})[/]")
-    info_table.add_row("💰 Pulsa", f": Rp [{get_theme_style('text_money')}]{pulsa_str}[/]")
-    info_table.add_row("📊 Kuota", f": [{get_theme_style('text_date')}]{display_quota}[/]")
-    info_table.add_row("🏅 Tiering", f": [{get_theme_style('text_date')}]{profile['point_info']}[/]")
-    info_table.add_row("⏳ Masa Aktif", f": [{get_theme_style('text_date')}]{expired_at_dt}[/]")
+    info_table.add_row("Nomor", f": 📞 [bold {get_theme_style('text_body')}]{profile['number']}[/]")
+    info_table.add_row("Type", f": 🧾 [{get_theme_style('text_body')}]{profile['subscription_type']} ({profile['subscriber_id']})[/]")
+    info_table.add_row("Pulsa", f": 💰 Rp [{get_theme_style('text_money')}]{pulsa_str}[/]")
+    info_table.add_row("Kuota", f": 📊 [{get_theme_style('text_date')}]{display_quota}[/]")
+    info_table.add_row("Tiering", f": 🏅 [{get_theme_style('text_date')}]{profile['point_info']}[/]")
+    info_table.add_row("Masa Aktif", f": ⏳ [{get_theme_style('text_date')}]{expired_at_dt}[/]")
 
     console.print(
         Panel(
@@ -110,10 +110,13 @@ def show_main_menu(profile, display_quota, segments):
     menu_table.add_row("9", "⭐ Family Plan/Akrab Organizer")
     menu_table.add_row("10", "👥 Circle")
     menu_table.add_row("11", "🎁 Paket Spesial For You")
-    menu_table.add_row("12", "🏬 Store Segments")
-    menu_table.add_row("13", "📂 Store Family List")
-    menu_table.add_row("14", "📦 Store Packages")
-    menu_table.add_row("15", "🎁 Redeemables")
+    #menu_table.add_row("11", "🏬 Store Segments")
+    menu_table.add_row("12", "📂 Store Family List")
+    menu_table.add_row("13", "📦 Store Packages")
+    menu_table.add_row("14", "🎁 Redeemables")
+    menu_table.add_row("R", "🎁 Register")
+    menu_table.add_row("N", "🎁 Notifikasi")
+    menu_table.add_row("V", "🎁 Validate MSISDN")
     menu_table.add_row("00", "⭐ Bookmark Paket")
     menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("77", "📢 Info Unlock Code")
@@ -169,7 +172,7 @@ def main():
                 current_point = tiering_data.get("current_point", 0)
                 point_info = f"Points: {current_point} | Tier: {tier}"
 
-            # Segments (pakai id_token + access_token)
+            # Segments
             id_token = active_user["tokens"]["id_token"]
             access_token = active_user["tokens"]["access_token"]
             segments = dashboard_segments(AuthInstance.api_key, id_token, access_token) or {}
@@ -188,8 +191,10 @@ def main():
 
             choice = input("Pilih menu: ")
 
-            # Handler menu (sama seperti versi sebelumnya)
-            if choice == "1":
+            # Testing shortcuts
+            if choice.lower() == "t":
+                pause()
+            elif choice == "1":
                 selected_user_number = show_account_menu()
                 if selected_user_number:
                     AuthInstance.set_active_user(selected_user_number)
@@ -198,27 +203,37 @@ def main():
                 continue
             elif choice == "2":
                 fetch_my_packages()
+                continue
             elif choice == "3":
                 show_hot_menu()
             elif choice == "4":
                 show_hot_menu2()
             elif choice == "5":
                 option_code = input("Enter option code (or '99' to cancel): ")
-                if option_code != "99":
-                    show_package_details(AuthInstance.api_key, active_user["tokens"], option_code, False)
+                if option_code == "99":
+                    continue
+                show_package_details(
+                    AuthInstance.api_key,
+                    active_user["tokens"],
+                    option_code,
+                    False
+                )
             elif choice == "6":
                 family_code = input("Enter family code (or '99' to cancel): ")
-                if family_code != "99":
-                    get_packages_by_family(family_code)
+                if family_code == "99":
+                    continue
+                get_packages_by_family(family_code)
             elif choice == "7":
                 family_code = input("Enter family code (or '99' to cancel): ")
                 if family_code == "99":
                     continue
+
                 start_from_option = input("Start purchasing from option number (default 1): ")
                 try:
                     start_from_option = int(start_from_option)
                 except ValueError:
                     start_from_option = 1
+
                 use_decoy = input("Use decoy package? (y/n): ").lower() == 'y'
                 pause_on_success = input("Pause on each successful purchase? (y/n): ").lower() == 'y'
                 delay_seconds = input("Delay seconds between purchases (0 for no delay): ")
@@ -226,7 +241,13 @@ def main():
                     delay_seconds = int(delay_seconds)
                 except ValueError:
                     delay_seconds = 0
-                purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
+                purchase_by_family(
+                    family_code,
+                    use_decoy,
+                    pause_on_success,
+                    delay_seconds,
+                    start_from_option
+                )
             elif choice == "8":
                 show_transaction_history(AuthInstance.api_key, active_user["tokens"])
             elif choice == "9":
@@ -234,16 +255,22 @@ def main():
             elif choice == "10":
                 show_circle_info(AuthInstance.api_key, active_user["tokens"])
             elif choice == "11":
-                # menu spesial resmi
-                show_store_segments_menu(False)
+                input_11 = input("Is enterprise store? (y/n): ").lower()
+                is_enterprise = input_11 == 'y'
+                show_store_segments_menu(is_enterprise)
             elif choice == "12":
-                is_enterprise = input("Is enterprise? (y/n): ").lower() == 'y'
+                input_12_1 = input("Is enterprise? (y/n): ").lower()
+                is_enterprise = input_12_1 == 'y'
                 show_family_list_menu(profile['subscription_type'], is_enterprise)
             elif choice == "13":
-                is_enterprise = input("Is enterprise? (y/n): ").lower() == 'y'
+                input_13_1 = input("Is enterprise? (y/n): ").lower()
+                is_enterprise = input_13_1 == 'y'
+                
                 show_store_packages_menu(profile['subscription_type'], is_enterprise)
             elif choice == "14":
-                is_enterprise = input("Is enterprise? (y/n): ").lower() == 'y'
+                input_14_1 = input("Is enterprise? (y/n): ").lower()
+                is_enterprise = input_14_1 == 'y'
+                
                 show_redeemables_menu(is_enterprise)
             elif choice == "00":
                 show_bookmark_menu()
@@ -260,17 +287,27 @@ def main():
                 msisdn = input("Enter msisdn (628xxxx): ")
                 nik = input("Enter NIK: ")
                 kk = input("Enter KK: ")
-                res = dukcapil(AuthInstance.api_key, msisdn, kk, nik)
+                
+                res = dukcapil(
+                    AuthInstance.api_key,
+                    msisdn,
+                    kk,
+                    nik,
+                )
                 print(json.dumps(res, indent=2))
                 pause()
             elif choice.lower() == "v":
                 msisdn = input("Enter the msisdn to validate (628xxxx): ")
-                res = validate_msisdn(AuthInstance.api_key, active_user["tokens"], msisdn)
+                res = validate_msisdn(
+                    AuthInstance.api_key,
+                    active_user["tokens"],
+                    msisdn,
+                )
                 print(json.dumps(res, indent=2))
                 pause()
             elif choice.lower() == "n":
                 show_notification_menu()
-            elif choice.lower() == "s":
+            elif choice == "s":
                 enter_sentry_mode()
             else:
                 print("Invalid choice. Please try again.")
@@ -282,6 +319,7 @@ def main():
                 AuthInstance.set_active_user(selected_user_number)
             else:
                 print("No user selected or failed to load user.")
+
 
 if __name__ == "__main__":
     try:
