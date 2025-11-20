@@ -11,7 +11,7 @@ from rich.box import MINIMAL_DOUBLE_HEAD
 
 # Service & client imports
 from app.service.git import check_for_updates, ensure_git
-from app.menus.util import clear_screen, pause
+from app.menus.util import pause
 from app.client.engsel import get_balance, get_tiering_info, get_quota, dashboard_segments
 from app.client.famplan import validate_msisdn
 from app.client.registration import dukcapil
@@ -168,8 +168,10 @@ def main():
                 current_point = tiering_data.get("current_point", 0)
                 point_info = f"Points: {current_point} | Tier: {tier}"
 
-            # Segments
-            segments = dashboard_segments(AuthInstance.api_key, active_user["tokens"]) or {}
+            # Segments (pakai id_token + access_token)
+            id_token = active_user["tokens"]["id_token"]
+            access_token = active_user["tokens"]["access_token"]
+            segments = dashboard_segments(AuthInstance.api_key, id_token, access_token) or {}
 
             profile = {
                 "number": active_user["number"],
@@ -185,7 +187,7 @@ def main():
 
             choice = input("Pilih menu: ")
 
-            # Handler menu
+            # Handler menu (sama seperti versi sebelumnya)
             if choice == "1":
                 selected_user_number = show_account_menu()
                 if selected_user_number:
