@@ -122,7 +122,7 @@ def show_main_menu(profile, display_quota, segments):
     menu_table.add_row("14", "🎁 Redeemables")
     menu_table.add_row("R", "📝 Register")
     menu_table.add_row("N", "🔔 Notifikasi")
-    menu_table.add_row("V", "📱 Validate MSISDN")
+    menu_table.add_row("V", "✅ Validate MSISDN")
     menu_table.add_row("00", "⭐ Bookmark Paket")
     menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("77", "📢 Info Unlock Code")
