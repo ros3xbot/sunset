@@ -98,7 +98,7 @@ def show_main_menu(profile, display_quota, segments):
         )
 
         console.print(Align.center(
-            f"[{theme['text_sub']}]Pilih [S] untuk lihat semua paket spesial[/{theme['text_sub']}]"
+            f"[{theme['text_sub']}]Pilih [11] untuk lihat semua paket spesial[/{theme['text_sub']}]"
         ))
 
     # Menu utama
@@ -111,19 +111,19 @@ def show_main_menu(profile, display_quota, segments):
     menu_table.add_row("3", "🔥 Beli Paket HOT")
     menu_table.add_row("4", "🔥 Beli Paket HOT-2")
     menu_table.add_row("5", "🔍 Beli Paket Berdasarkan Option Code")
-    menu_table.add_row("6", "🔍 Beli Paket Berdasarkan Family Code")
+    menu_table.add_row("6", "🧩 Beli Paket Berdasarkan Family Code")
     menu_table.add_row("7", "🛒 Beli Semua Paket di Family Code")
     menu_table.add_row("8", "📜 Riwayat Transaksi")
-    menu_table.add_row("9", "⭐ Family Plan/Akrab Organizer")
+    menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
     menu_table.add_row("10", "👥 Circle")
     menu_table.add_row("11", "🎁 Paket Spesial For You")
     #menu_table.add_row("11", "🏬 Store Segments")
     menu_table.add_row("12", "📂 Store Family List")
     menu_table.add_row("13", "📦 Store Packages")
-    menu_table.add_row("14", "🎁 Redeemables")
-    menu_table.add_row("R", "🎁 Register")
-    menu_table.add_row("N", "🎁 Notifikasi")
-    menu_table.add_row("V", "🎁 Validate MSISDN")
+    menu_table.add_row("14", "🎟️ Redeemables")
+    menu_table.add_row("R", "📝 Register")
+    menu_table.add_row("N", "🔔 Notifikasi")
+    menu_table.add_row("V", "📱 Validate MSISDN")
     menu_table.add_row("00", "⭐ Bookmark Paket")
     menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("77", "📢 Info Unlock Code")
