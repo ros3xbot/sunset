@@ -31,6 +31,7 @@ def login_prompt(api_key: str):
         padding=(1, 2),
         expand=True
     ))
+    console.print(f"Masukkan nomor XL (08xx / 628xx / +628xx): ")
     raw_input = console.input("Masukkan nomor XL (08xx / 628xx / +628xx): ").strip()
     phone_number = normalize_number(raw_input)
 
