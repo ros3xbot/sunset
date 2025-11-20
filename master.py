@@ -89,7 +89,7 @@ def show_main_menu(profile, display_quota, segments):
             Panel(
                 Align.center(special_text),
                 border_style=get_theme_style("border_warning"),
-                padding=(1, 2),
+                padding=(0, 2),
                 expand=True
             )
         )
