@@ -12,6 +12,7 @@ from rich.box import MINIMAL_DOUBLE_HEAD
 from app.service.git import check_for_updates, ensure_git
 from app.menus.util import (
     clear_screen,
+    clear_sc,
     pause,
     print_panel,
     print_error,
@@ -55,7 +56,7 @@ console = Console()
 
 
 def show_main_menu(profile, display_quota, segments):
-    clear_screen()
+    clear_sc()
     theme = get_theme()
 
     expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime(
