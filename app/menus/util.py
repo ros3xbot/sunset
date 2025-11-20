@@ -55,7 +55,7 @@ def clear_screen():
 
     print(ascii_art)
     print_banner()
-    show_simple_number_panel()
+    simple_number()
 
 def pause():
     input("\nPress enter to continue...")
