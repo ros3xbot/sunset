@@ -66,7 +66,7 @@ def show_main_menu(profile, display_quota, segments):
     # Panel informasi akun ✨
     info_table = Table.grid(padding=(0, 1))
     info_table.add_column(justify="left", style=get_theme_style("text_body"))
-    info_table.add_column(justify="left", style=get_theme_style("text_value"))
+    info_table.add_column(justify="left", style=get_theme_style("text_body"))
 
     info_table.add_row(" Nomor", f": 📞 [bold {theme['text_body']}]{profile['number']}[/]")
     info_table.add_row(" Type", f": 🧾 [{theme['text_body']}]{profile['subscription_type']} ({profile['subscriber_id']})[/]")
