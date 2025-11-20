@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from app.service.git import check_for_updates
+from app.service.git import check_for_updates, ensure_git
 load_dotenv()
 
 import sys, json
@@ -67,7 +67,7 @@ def show_main_menu(profile):
 
 show_menu = True
 def main():
-    
+    ensure_git()
     while True:
         active_user = AuthInstance.get_active_user()
 
