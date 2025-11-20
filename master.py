@@ -122,8 +122,8 @@ def show_main_menu(profile, display_quota, segments):
 
     menu_table.add_row("1", "🔐 Login/Ganti akun")
     menu_table.add_row("2", "📑 Lihat Paket Saya")
-    menu_table.add_row("3", "🔥 Beli Paket HOT")
-    menu_table.add_row("4", "🔥 Beli Paket HOT-2")
+    menu_table.add_row("3", "🔥 Beli Paket Hot Promo")
+    menu_table.add_row("4", "🔥 Beli Paket Hot Promo-2")
     menu_table.add_row("5", "🔍 Beli Paket Berdasarkan Option Code")
     menu_table.add_row("6", "🧩 Beli Paket Berdasarkan Family Code")
     menu_table.add_row("7", "🛒 Beli Semua Paket di Family Code")
