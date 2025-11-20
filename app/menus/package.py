@@ -25,22 +25,6 @@ from app.service.decoy import DecoyInstance
 
 console = Console
 
-def simple_number():
-    theme = get_theme()
-    active_user = AuthInstance.get_active_user()
-
-    if not active_user:
-        text = f"[bold {get_theme_style('text_err')}]Tidak ada akun aktif saat ini.[/]"
-    else:
-        number = active_user.get("number", "-")
-        text = f"[bold {get_theme_style('text_body')}]Akun yang sedang aktif ✨ {number} ✨[/]"
-
-    console.print(Panel(
-        Align.center(text),
-        border_style=get_theme_style("border_warning"),
-        padding=(0, 0),
-        expand=True
-    ))
 
 def show_package_details(api_key, tokens, package_option_code, is_enterprise, option_order = -1):
     active_user = AuthInstance.active_user
