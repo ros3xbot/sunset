@@ -22,9 +22,9 @@ def print_banner():
         banner_text,
         border_style=theme["border_primary"],
         style=theme["text_title"],
-        padding=(0, 2),
+        padding=(1, 2),
         expand=True,
-        #box=box.DOUBLE
+        box=box.DOUBLE
     ))
 
 def clear_screen():
