@@ -90,3 +90,4 @@ def show_panel(title, body, style="info"):
         line_style = get_theme_style("text_date") if "http" in line else get_theme_style("text_body")
         text.append(line + "\n", style=line_style)
     console.print(Panel(text, title=title, border_style=border, expand=True))
+
