@@ -11,6 +11,21 @@ from app.config.theme_config import get_theme, get_theme_style
 
 console = Console()
 
+def print_banner():
+    theme = get_theme()
+    banner_text = Align.center(
+        "[bold]myXL CLI v8.9.1 sunset[/]",
+        vertical="middle"
+    )
+    console.print(Panel(
+        banner_text,
+        border_style=theme["border_primary"],
+        style=theme["text_title"],
+        padding=(1, 2),
+        expand=True,
+        box=box.DOUBLE
+    ))
+
 def clear_screen():
     print("Clearing screen...")
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -39,6 +54,8 @@ def clear_screen():
 """
 
     print(ascii_art)
+    print_banner()
+    show_simple_number_panel()
 
 def pause():
     input("\nPress enter to continue...")
