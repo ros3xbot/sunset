@@ -66,13 +66,14 @@ def clear_sc():
     print("Clearing screen...")
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
+
+    
      __________             ___.                  
      \______   \_____ ______\_ |__   ____ ___  ___
       |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
       |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
       |______  /(____  /__|  |___  /\___  >__/\_ \
-             \/      \/          \/     \/      \/    
-"""
+             \/      \/          \/     \/      \/    """
 
     print(ascii_art)
     print_banner()
