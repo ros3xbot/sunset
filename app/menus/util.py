@@ -8,7 +8,7 @@ from rich.table import Table
 from rich.align import Align
 from rich import box
 from app.config.theme_config import get_theme, get_theme_style
-#from app.service.auth import AuthInstance
+from app.menus.package import simple_number
 
 console = Console()
 
@@ -22,9 +22,9 @@ def print_banner():
         banner_text,
         border_style=theme["border_primary"],
         style=theme["text_title"],
-        padding=(1, 2),
+        padding=(0, 2),
         expand=True,
-        box=box.DOUBLE
+        #box=box.DOUBLE
     ))
 
 def clear_screen():
@@ -56,7 +56,7 @@ def clear_screen():
 
     print(ascii_art)
     print_banner()
-    #simple_number()
+    simple_number()
 
 def pause():
     input("\nPress enter to continue...")
@@ -141,23 +141,6 @@ def nav_range(label: str, count: int) -> str:
 
 def live_loading(text: str, theme: dict):
     return console.status(f"[{theme['text_sub']}]{text}[/{theme['text_sub']}]", spinner="dots")
-
-def simple_number():
-    theme = get_theme()
-    active_user = AuthInstance.get_active_user()
-
-    if not active_user:
-        text = f"[bold {get_theme_style('text_err')}]Tidak ada akun aktif saat ini.[/]"
-    else:
-        number = active_user.get("number", "-")
-        text = f"[bold {get_theme_style('text_body')}]Akun yang sedang aktif ✨ {number} ✨[/]"
-
-    console.print(Panel(
-        Align.center(text),
-        border_style=get_theme_style("border_warning"),
-        padding=(0, 0),
-        expand=True
-    ))
 
 def print_panel(title, content, border_style=None):
     style = border_style or get_theme_style("border_info")
