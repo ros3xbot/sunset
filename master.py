@@ -189,6 +189,7 @@ def main():
                 "balance": balance.get("remaining"),
                 "balance_expired_at": balance.get("expired_at"),
                 "point_info": point_info,
+            }
 
             # tampilkan menu utama
             show_main_menu(profile, display_quota, segments)
