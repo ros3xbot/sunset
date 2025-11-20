@@ -68,12 +68,12 @@ def show_main_menu(profile, display_quota, segments):
     info_table.add_column(justify="left", style=get_theme_style("text_body"))
     info_table.add_column(justify="left", style=get_theme_style("text_value"))
 
-    info_table.add_row("📞 Nomor", f"[bold {get_theme_style('text_body')}]{profile['number']}[/]")
-    info_table.add_row("🧾 Type", f"[{get_theme_style('text_body')}]{profile['subscription_type']} ({profile['subscriber_id']})[/]")
-    info_table.add_row("💰 Pulsa", f"Rp [{get_theme_style('text_money')}]{pulsa_str}[/]")
-    info_table.add_row("📊 Kuota", f"[{get_theme_style('text_date')}]{display_quota}[/]")
-    info_table.add_row("🏅 Tiering", f"[{get_theme_style('text_date')}]{profile['point_info']}[/]")
-    info_table.add_row("⏳ Masa Aktif", f"[{get_theme_style('text_date')}]{expired_at_dt}[/]")
+    info_table.add_row("Nomor", 📞 f"[bold {get_theme_style('text_body')}]{profile['number']}[/]")
+    info_table.add_row("Type", 🧾 f"[{get_theme_style('text_body')}]{profile['subscription_type']} ({profile['subscriber_id']})[/]")
+    info_table.add_row("Pulsa", 💰 f"Rp [{get_theme_style('text_money')}]{pulsa_str}[/]")
+    info_table.add_row("Kuota", 📊 f"[{get_theme_style('text_date')}]{display_quota}[/]")
+    info_table.add_row("Tiering", 🏅 f"[{get_theme_style('text_date')}]{profile['point_info']}[/]")
+    info_table.add_row("Masa Aktif", ⏳ f"[{get_theme_style('text_date')}]{expired_at_dt}[/]")
 
     console.print(
         Panel(
