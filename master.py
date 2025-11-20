@@ -6,10 +6,7 @@ load_dotenv()
 import sys, json
 from datetime import datetime
 from app.menus.util import clear_screen, pause
-from app.client.engsel import (
-    get_balance,
-    get_tiering_info,
-)
+from app.client.engsel import get_balance, get_tiering_info, get_quota, dashboard_segments
 from app.client.famplan import validate_msisdn
 from app.client.registration import dukcapil
 from app.service.auth import AuthInstance
@@ -30,40 +27,107 @@ from app.menus.info import show_info_menu
 from app.menus.family_grup import show_family_grup_menu
 from app.menus.theme import show_theme_menu
 
-WIDTH = 55
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.align import Align
+from rich.box import MINIMAL_DOUBLE_HEAD
+from datetime import datetime
+import random
 
-def show_main_menu(profile):
-    clear_screen()
-    print("=" * WIDTH)
-    expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime("%Y-%m-%d")
-    print(f"Nomor: {profile['number']} | Type: {profile['subscription_type']}".center(WIDTH))
-    print(f"Pulsa: Rp {profile['balance']} | Aktif sampai: {expired_at_dt}".center(WIDTH))
-    print(f"{profile['point_info']}".center(WIDTH))
-    print("=" * WIDTH)
-    print("Menu:")
-    print("1. Login/Ganti akun")
-    print("2. Lihat Paket Saya")
-    print("3. Beli Paket 🔥 HOT 🔥")
-    print("4. Beli Paket 🔥 HOT-2 🔥")
-    print("5. Beli Paket Berdasarkan Option Code")
-    print("6. Beli Paket Berdasarkan Family Code")
-    print("7. Beli Semua Paket di Family Code (loop)")
-    print("8. Riwayat Transaksi")
-    print("9. Family Plan/Akrab Organizer")
-    print("10. Circle")
-    print("11. Store Segments")
-    print("12. Store Family List")
-    print("13. Store Packages")
-    print("14. Redemables")
-    print("R. Register")
-    print("N. Notifikasi")
-    print("V. Validate msisdn")
-    print("00. Bookmark Paket")
-    print("66. Simpan/Kelola Family Code")
-    print("77. Info Unlock Code")
-    print("88. Ganti Tema CLI")
-    print("99. Tutup aplikasi")
-    print("-------------------------------------------------------")
+console = Console()
+
+def show_main_menu(profile, display_quota, dashboard_segments):
+    console.clear()
+
+    expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime("%Y-%m-%d %H:%M:%S")
+    pulsa_str = f"{profile['balance']:,}"
+
+    # Panel informasi akun
+    info_table = Table.grid(padding=(0, 1))
+    info_table.add_column(justify="left", style="cyan")
+    info_table.add_column(justify="left", style="white")
+
+    info_table.add_row("📞 Nomor", f": [bold]{profile['number']}[/]")
+    info_table.add_row("🧾 Type", f": {profile['subscription_type']} ({profile['subscriber_id']})")
+    info_table.add_row("💰 Pulsa", f": Rp [green]{pulsa_str}[/]")
+    info_table.add_row("📊 Kuota", f": [yellow]{display_quota}[/]")
+    info_table.add_row("🏅 Tiering", f": {profile['point_info']}")
+    info_table.add_row("⏳ Masa Aktif", f": {expired_at_dt}")
+
+    console.print(
+        Panel(
+            info_table,
+            title="[bold magenta]✨ Informasi Akun ✨[/]",
+            title_align="center",
+            border_style="bright_blue",
+            padding=(1, 2),
+            expand=True
+        )
+    )
+
+    # Paket spesial preview
+    special_packages = segments.get("special_packages", [])
+    if special_packages:
+        best = random.choice(special_packages)
+        name = best.get("name", "-")
+        diskon_percent = best.get("diskon_percent", 0)
+        diskon_price = best.get("diskon_price", 0)
+        original_price = best.get("original_price", 0)
+        kuota_gb = best.get("kuota_gb", 0)
+
+        special_text = (
+            f"[bold red]🔥🔥🔥 Paket Spesial Untukmu 🔥🔥🔥[/]\n\n"
+            f"[cyan]{name}[/] ({kuota_gb} GB)\n"
+            f"Diskon {diskon_percent}% 💸 "
+            f"[strike]Rp {original_price:,}[/strike] ➡️ [green]Rp {diskon_price:,}[/]"
+        )
+
+        console.print(
+            Panel(
+                Align.center(special_text),
+                border_style="red",
+                padding=(1, 2),
+                expand=True
+            )
+        )
+
+    # Menu utama dengan MINIMAL_DOUBLE_HEAD
+    menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+    menu_table.add_column("Kode", justify="right", style="bold cyan", width=6)
+    menu_table.add_column("Aksi", style="white")
+
+    menu_table.add_row("1", "🔐 Login/Ganti akun")
+    menu_table.add_row("2", "📑 Lihat Paket Saya")
+    menu_table.add_row("3", "🔥 Beli Paket HOT")
+    menu_table.add_row("4", "🔥 Beli Paket HOT-2")
+    menu_table.add_row("5", "🔍 Beli Paket Berdasarkan Option Code")
+    menu_table.add_row("6", "🔍 Beli Paket Berdasarkan Family Code")
+    menu_table.add_row("7", "🛒 Beli Semua Paket di Family Code")
+    menu_table.add_row("8", "📜 Riwayat Transaksi")
+    menu_table.add_row("9", "⭐ Family Plan/Akrab Organizer")
+    menu_table.add_row("10", "👥 Circle")
+    menu_table.add_row("11", "🎁 Paket Spesial For You")  # shortcut resmi
+    menu_table.add_row("12", "🏬 Store Segments")
+    menu_table.add_row("13", "📂 Store Family List")
+    menu_table.add_row("14", "📦 Store Packages")
+    menu_table.add_row("15", "🎁 Redeemables")
+    menu_table.add_row("00", "⭐ Bookmark Paket")
+    menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
+    menu_table.add_row("77", "📢 Info Unlock Code")
+    menu_table.add_row("88", "🎨 Ganti Tema CLI")
+    menu_table.add_row("99", "⛔ Tutup aplikasi")
+
+    console.print(
+        Panel(
+            menu_table,
+            title="[bold magenta]✨ Menu Utama ✨[/]",
+            title_align="center",
+            border_style="bright_blue",
+            padding=(0, 1),
+            expand=True
+        )
+    )
 
 show_menu = True
 def main():
