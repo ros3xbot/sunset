@@ -43,10 +43,10 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     detail = display_html(package["package_option"]["tnc"])
     validity = package["package_option"]["validity"]
 
-    option_name = package.get("package_option", {}).get("name","") #Vidio
-    family_name = package.get("package_family", {}).get("name","") #Unlimited Turbo
-    variant_name = package.get("package_detail_variant", "").get("name","") #For Xtra Combo
-    option_name = package.get("package_option", {}).get("name","") #Vidio
+    option_name = package.get("package_option", {}).get("name","")
+    family_name = package.get("package_family", {}).get("name","")
+    variant_name = package.get("package_detail_variant", "").get("name","")
+    option_name = package.get("package_option", {}).get("name","")
     
     title = f"{family_name} - {variant_name} - {option_name}".strip()
     
@@ -116,34 +116,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     print("-------------------------------------------------------")
     addons = get_addons(api_key, tokens, package_option_code)
     
-
     bonuses = addons.get("bonuses", [])
-    
-    # Pick 1st bonus if available, need more testing
-    # if len(bonuses) > 0:
-    #     payment_items.append(
-    #         PaymentItem(
-    #             item_code=bonuses[0]["package_option_code"],
-    #             product_type="",
-    #             item_price=0,
-    #             item_name=bonuses[0]["name"],
-    #             tax=0,
-    #             token_confirmation="",
-    #         )
-    #     )
-    
-    # Pick all bonuses, need more testing
-    # for bonus in bonuses:
-    #     payment_items.append(
-    #         PaymentItem(
-    #             item_code=bonus["package_option_code"],
-    #             product_type="",
-    #             item_price=0,
-    #             item_name=bonus["name"],
-    #             tax=0,
-    #             token_confirmation="",
-    #         )
-    #     )
 
     print(f"Addons:\n{json.dumps(addons, indent=2)}")
     print("-------------------------------------------------------")
