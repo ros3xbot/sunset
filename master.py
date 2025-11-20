@@ -32,37 +32,36 @@ from app.menus.store.redemables import show_redeemables_menu
 from app.menus.info import show_info_menu
 from app.menus.family_grup import show_family_grup_menu
 from app.menus.theme import show_theme_menu
-from app.config.theme_config import get_theme
+from app.config.theme_config import get_theme, get_theme_style
 
 console = Console()
 
-# ============================
-# Tampilan menu utama (Rich)
-# ============================
+
 def show_main_menu(profile, display_quota, segments):
     clear_screen()
+    theme = get_theme()
 
     expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime("%Y-%m-%d %H:%M:%S")
-    pulsa_str = f"{profile['balance']:,}"
+    pulsa_str = get_rupiah(profile["balance"])
 
     # Panel informasi akun
     info_table = Table.grid(padding=(0, 1))
-    info_table.add_column(justify="left", style="cyan")
-    info_table.add_column(justify="left", style="white")
+    info_table.add_column(justify="left", style=get_theme_style("text_key"))
+    info_table.add_column(justify="left", style=get_theme_style("text_value"))
 
-    info_table.add_row("📞 Nomor", f": [bold]{profile['number']}[/]")
-    info_table.add_row("🧾 Type", f": {profile['subscription_type']} ({profile['subscriber_id']})")
-    info_table.add_row("💰 Pulsa", f": Rp [green]{pulsa_str}[/]")
-    info_table.add_row("📊 Kuota", f": [yellow]{display_quota}[/]")
-    info_table.add_row("🏅 Tiering", f": {profile['point_info']}")
-    info_table.add_row("⏳ Masa Aktif", f": {expired_at_dt}")
+    info_table.add_row("📞 Nomor", f": [bold {get_theme_style('text_body')}]{profile['number']}[/]")
+    info_table.add_row("🧾 Type", f": [{get_theme_style('text_body')}]{profile['subscription_type']} ({profile['subscriber_id']})[/]")
+    info_table.add_row("💰 Pulsa", f": Rp [{get_theme_style('text_money')}]{pulsa_str}[/]")
+    info_table.add_row("📊 Kuota", f": [{get_theme_style('text_date')}]{display_quota}[/]")
+    info_table.add_row("🏅 Tiering", f": [{get_theme_style('text_date')}]{profile['point_info']}[/]")
+    info_table.add_row("⏳ Masa Aktif", f": [{get_theme_style('text_date')}]{expired_at_dt}[/]")
 
     console.print(
         Panel(
             info_table,
-            title="[bold magenta]✨ Informasi Akun ✨[/]",
+            title=f"[{get_theme_style('text_title')}]✨ Informasi Akun ✨[/]",
             title_align="center",
-            border_style="bright_blue",
+            border_style=get_theme_style("border_info"),
             padding=(1, 2),
             expand=True
         )
@@ -79,25 +78,26 @@ def show_main_menu(profile, display_quota, segments):
         kuota_gb = best.get("kuota_gb", 0)
 
         special_text = (
-            f"[bold red]🔥🔥🔥 Paket Spesial Untukmu 🔥🔥🔥[/]\n\n"
-            f"[cyan]{name}[/] ({kuota_gb} GB)\n"
+            f"[bold {get_theme_style('text_title')}]🔥🔥🔥 Paket Spesial Untukmu 🔥🔥🔥[/]\n\n"
+            f"[{get_theme_style('text_body')}]{name} ({kuota_gb} GB)[/{get_theme_style('text_body')}]\n"
             f"Diskon {diskon_percent}% 💸 "
-            f"[strike]Rp {original_price:,}[/strike] ➡️ [green]Rp {diskon_price:,}[/]"
+            f"Rp[{get_theme_style('text_err')}][strike]{get_rupiah(original_price)}[/strike][/{get_theme_style('text_err')}] ➡️ "
+            f"Rp[{get_theme_style('text_money')}]{get_rupiah(diskon_price)}[/{get_theme_style('text_money')}]"
         )
 
         console.print(
             Panel(
                 Align.center(special_text),
-                border_style="red",
+                border_style=get_theme_style("border_warning"),
                 padding=(1, 2),
                 expand=True
             )
         )
 
-    # Menu utama dengan MINIMAL_DOUBLE_HEAD
+    # Menu utama
     menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-    menu_table.add_column("Kode", justify="right", style="bold cyan", width=6)
-    menu_table.add_column("Aksi", style="white")
+    menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
+    menu_table.add_column("Aksi", style=get_theme_style("text_body"))
 
     menu_table.add_row("1", "🔐 Login/Ganti akun")
     menu_table.add_row("2", "📑 Lihat Paket Saya")
@@ -123,9 +123,9 @@ def show_main_menu(profile, display_quota, segments):
     console.print(
         Panel(
             menu_table,
-            title="[bold magenta]✨ Menu Utama ✨[/]",
+            title=f"[{get_theme_style('text_title')}]✨ Menu Utama ✨[/]",
             title_align="center",
-            border_style="bright_blue",
+            border_style=get_theme_style("border_primary"),
             padding=(0, 1),
             expand=True
         )
