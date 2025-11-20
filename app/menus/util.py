@@ -8,11 +8,12 @@ from rich.table import Table
 from rich.align import Align
 from rich import box
 from app.config.theme_config import get_theme, get_theme_style
-from app.service.auth import AuthInstance
 
 console = Console()
 
+
 def simple_number():
+    from app.service.auth import AuthInstance
     theme = get_theme()
     active_user = AuthInstance.get_active_user()
 
