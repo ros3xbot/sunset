@@ -11,7 +11,7 @@ from rich.box import MINIMAL_DOUBLE_HEAD
 
 # Service & client imports
 from app.service.git import check_for_updates, ensure_git
-from app.menus.util import pause
+from app.menus.util import clear_screen, pause, print_panel, print_error, print_warning, get_rupiah
 from app.client.engsel import get_balance, get_tiering_info, get_quota, dashboard_segments
 from app.client.famplan import validate_msisdn
 from app.client.registration import dukcapil
@@ -32,6 +32,7 @@ from app.menus.store.redemables import show_redeemables_menu
 from app.menus.info import show_info_menu
 from app.menus.family_grup import show_family_grup_menu
 from app.menus.theme import show_theme_menu
+from app.config.theme_config import get_theme
 
 console = Console()
 
@@ -39,7 +40,7 @@ console = Console()
 # Tampilan menu utama (Rich)
 # ============================
 def show_main_menu(profile, display_quota, segments):
-    console.clear()
+    clear_screen()
 
     expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime("%Y-%m-%d %H:%M:%S")
     pulsa_str = f"{profile['balance']:,}"
