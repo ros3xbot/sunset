@@ -8,9 +8,26 @@ from rich.table import Table
 from rich.align import Align
 from rich import box
 from app.config.theme_config import get_theme, get_theme_style
-from app.menus.package import simple_number
+from app.service.auth import AuthInstance
 
 console = Console()
+
+def simple_number():
+    theme = get_theme()
+    active_user = AuthInstance.get_active_user()
+
+    if not active_user:
+        text = f"[bold {get_theme_style('text_err')}]Tidak ada akun aktif saat ini.[/]"
+    else:
+        number = active_user.get("number", "-")
+        text = f"[bold {get_theme_style('text_body')}]Akun yang sedang aktif ✨ {number} ✨[/]"
+
+    console.print(Panel(
+        Align.center(text),
+        border_style=get_theme_style("border_warning"),
+        padding=(0, 0),
+        expand=True
+    ))
 
 def print_banner():
     theme = get_theme()
