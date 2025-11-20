@@ -515,3 +515,27 @@ def dashboard_segments(
     res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
 
     return res
+
+def get_quota(api_key: str, id_token: str) -> dict | None:
+    path = "api/v8/packages/quota-summary"
+
+    payload = {
+        "is_enterprise": False,
+        "lang": "en"
+    }
+
+    try:
+        res = send_api_request(api_key, path, payload, id_token, "POST")
+    except Exception:
+        return None
+
+    if isinstance(res, dict):
+        quota = res.get("data", {}).get("quota", {}).get("data")
+        if quota:
+            return {
+                "remaining": quota.get("remaining", 0),
+                "total": quota.get("total", 0),
+                "has_unlimited": quota.get("has_unlimited", False)
+            }
+
+    return None
