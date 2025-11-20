@@ -31,8 +31,8 @@ def login_prompt(api_key: str):
         padding=(1, 2),
         expand=True
     ))
-    console.print(f"Masukkan nomor XL, Support (08xx / 628xx / +628xx) ")
-    raw_input = console.input("Nomor : ").strip()
+    console.print(f" Masukkan nomor XL, Support (08xx / 628xx / +628xx) ")
+    raw_input = console.input(" Nomor : ").strip()
     phone_number = normalize_number(raw_input)
 
     if not phone_number.startswith("628") or len(phone_number) < 10 or len(phone_number) > 14:
