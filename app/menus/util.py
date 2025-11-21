@@ -46,10 +46,8 @@ def simple_number():
     ))
 
 def clear_screen():
-    print("Clearing screen...")
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
-
      __________             ___.                  
      \______   \_____ ______\_ |__   ____ ___  ___
       |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
@@ -59,7 +57,14 @@ def clear_screen():
                 myXL CLI v8.9.1 sunset
     """
 
-    print(ascii_art)
+    console.print(
+        Panel(
+            ascii_art,
+            border_style=get_theme_style("border_info"),
+            style=get_theme_style("text_body"),
+            expand=True,
+        )
+    )
     #print_banner()
     simple_number()
 
