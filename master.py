@@ -204,9 +204,9 @@ def main():
                 selected_user_number = show_account_menu()
                 if selected_user_number:
                     AuthInstance.set_active_user(selected_user_number)
-                    print_success("🔐 Akun", f"Akun aktif diganti ke {selected_user_number}")
+                    print_success("🔐", f"Akun aktif diganti ke {selected_user_number}")
                 else:
-                    print_error("❌ Akun", "Tidak ada user terpilih atau gagal memuat user.")
+                    print_error("❌", "Tidak ada user terpilih atau gagal memuat user.")
                 continue
             elif choice == "2":
                 fetch_my_packages()
@@ -269,7 +269,7 @@ def main():
             elif choice == "88":
                 show_theme_menu()
             elif choice == "99":
-                print_success("⛔ Exit", "Aplikasi ditutup dengan aman.")
+                print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
                 sys.exit(0)
             elif choice.lower() == "r":
                 msisdn = input("📝 Masukkan msisdn (628xxxx): ")
@@ -294,9 +294,9 @@ def main():
             selected_user_number = show_account_menu()
             if selected_user_number:
                 AuthInstance.set_active_user(selected_user_number)
-                print_success("🔐 Akun", f"Akun aktif diganti ke {selected_user_number}")
+                print_success("🔐", f"Akun aktif diganti ke {selected_user_number}")
             else:
-                print_error("❌ Akun", "Tidak ada user terpilih atau gagal memuat user.")
+                print_error("❌", "Tidak ada user terpilih atau gagal memuat user.")
 
 
 if __name__ == "__main__":
@@ -304,8 +304,8 @@ if __name__ == "__main__":
         with live_loading("🔄 Checking for updates...", get_theme()):
             need_update = check_for_updates()
         if need_update:
-            print_warning("⬆️ Update", "Versi baru tersedia, silakan update sebelum melanjutkan.")
+            print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
             pause()
         main()
     except KeyboardInterrupt:
-        print_error("⛔ Exit", "Aplikasi dihentikan oleh pengguna.")
+        print_error("👋 Sampai jumpa!", "Aplikasi dihentikan oleh pengguna.")
