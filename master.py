@@ -308,4 +308,4 @@ if __name__ == "__main__":
             pause()
         main()
     except KeyboardInterrupt:
-        print_error("👋 Sampai jumpa!", "Aplikasi dihentikan oleh pengguna.")
+        print_error("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
