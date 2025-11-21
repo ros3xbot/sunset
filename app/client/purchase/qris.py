@@ -21,7 +21,7 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
                     topup_number: str = "",
                     stage_token: str = "") -> str | None:
     if overwrite_amount == -1 and not ask_overwrite:
-        print_error("❌ Settlement", "Either ask_overwrite must be True or overwrite_amount must be set.")
+        print_error("❌", "Either ask_overwrite must be True or overwrite_amount must be set.")
         return None
 
     token_confirmation = items[token_confirmation_idx]["token_confirmation"]
@@ -40,7 +40,7 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
             try:
                 amount_int = int(amount_str)
             except ValueError:
-                print_warning("⚠️ Settlement", "Invalid overwrite input, using original price.")
+                print_warning("⚠️", "Invalid overwrite input, using original price.")
 
     intercept_page(api_key, tokens, items[0]["item_code"], False)
 
@@ -59,7 +59,7 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
         payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
 
     if payment_res.get("status") != "SUCCESS":
-        print_error("❌ Payment Methods", "Failed to fetch payment methods.")
+        print_error("❌", "Failed to fetch payment methods.")
         print_panel("📑 Response", json.dumps(payment_res, indent=2))
         return None
 
@@ -142,14 +142,14 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            print_error("❌ Settlement", "Failed to initiate settlement.")
+            print_error("❌", "Failed to initiate settlement.")
             print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
         transaction_id = decrypted_body["data"]["transaction_code"]
-        print_success("✅ Settlement", "QRIS transaction created successfully")
+        print_success("✅", "QRIS transaction created successfully")
         return transaction_id
     except Exception as e:
-        print_error("❌ Settlement", f"Decrypt error: {e}")
+        print_error("❌", f"Decrypt error: {e}")
         print_panel("📑 Raw Response", resp.text)
         return None
 
@@ -162,11 +162,11 @@ def get_qris_code(api_key: str, tokens: dict, transaction_id: str) -> str | None
         res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
 
     if res.get("status") != "SUCCESS":
-        print_error("❌ QRIS", "Failed to fetch QRIS code.")
+        print_error("❌", "Failed to fetch QRIS code.")
         print_panel("📑 Response", json.dumps(res, indent=2))
         return None
 
-    print_success("✅ QRIS", "QRIS code fetched successfully")
+    print_success("✅", "QRIS code fetched successfully")
     return res["data"]["qr_code"]
 
 
@@ -183,12 +183,12 @@ def show_qris_payment(api_key: str, tokens: dict, items: list[PaymentItem],
                                      topup_number, stage_token)
 
     if not transaction_id:
-        print_error("❌ QRIS", "Failed to create QRIS transaction.")
+        print_error("❌", "Failed to create QRIS transaction.")
         return None
 
     qris_code = get_qris_code(api_key, tokens, transaction_id)
     if not qris_code:
-        print_error("❌ QRIS", "Failed to get QRIS code.")
+        print_error("❌", "Failed to get QRIS code.")
         return None
 
     print_panel("📲 QRIS Data", qris_code)
