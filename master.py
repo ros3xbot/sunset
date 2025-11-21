@@ -197,7 +197,7 @@ def main():
             show_main_menu(profile, display_quota, segments)
 
             #choice = input("👉 Pilih menu: ")
-            choice = input(f"[{theme['text_sub']}]👉 Pilih menu: [/{theme['text_sub']}] ").strip()
+            choice = console.input(f"[{theme['text_sub']}]👉 Pilih menu: [/{theme['text_sub']}] ").strip()
 
             # Shortcuts & navigasi
             if choice.lower() == "t":
