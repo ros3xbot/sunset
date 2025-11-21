@@ -26,9 +26,9 @@ def get_payment_methods(api_key: str, tokens: dict,
         payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
 
     if not payment_res or payment_res.get("status") != "SUCCESS":
-        print_error("❌ Payment Methods", "Failed to fetch payment methods.")
+        print_error("❌", "Failed to fetch payment methods.")
         print_panel("📑 Response", json.dumps(payment_res, indent=2))
         return None
 
-    print_success("✅ Payment Methods", "Payment methods fetched successfully")
+    print_success("✅", "Payment methods fetched successfully")
     return payment_res.get("data")
