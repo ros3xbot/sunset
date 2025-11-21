@@ -1,60 +1,49 @@
-from datetime import datetime, timezone, timedelta
 import json
 import uuid
 import base64
 import qrcode
-
 import time
 import requests
-from app.client.engsel import *
+from datetime import datetime, timezone
+
+from app.client.engsel import BASE_API_URL, UA, intercept_page, send_api_request
 from app.client.encrypt import API_KEY, decrypt_xdata, encryptsign_xdata, java_like_timestamp, get_x_signature_payment
 from app.type_dict import PaymentItem
+from app.menus.util import live_loading, print_error, print_success, print_warning, print_panel
+from app.config.theme_config import get_theme
 
-def settlement_qris(
-    api_key: str,
-    tokens: dict,
-    items: list[PaymentItem],
-    payment_for: str,
-    ask_overwrite: bool,
-    overwrite_amount: int = -1,
-    token_confirmation_idx: int = 0,
-    amount_idx: int = -1,
-    topup_number: str = "",
-    stage_token: str = "",
-):  
-    # Sanity check
+
+def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
+                    payment_for: str, ask_overwrite: bool,
+                    overwrite_amount: int = -1,
+                    token_confirmation_idx: int = 0,
+                    amount_idx: int = -1,
+                    topup_number: str = "",
+                    stage_token: str = "") -> str | None:
     if overwrite_amount == -1 and not ask_overwrite:
-        print("Either ask_overwrite must be True or overwrite_amount must be set.")
+        print_error("❌ Settlement", "Either ask_overwrite must be True or overwrite_amount must be set.")
         return None
 
     token_confirmation = items[token_confirmation_idx]["token_confirmation"]
-    payment_targets = ""
-    for item in items:
-        if payment_targets != "":
-            payment_targets += ";"
-        payment_targets += item["item_code"]
+    payment_targets = ";".join([item["item_code"] for item in items])
 
-    amount_int = 0
-    
-    # Determine amount to use
+    # Determine amount
     if overwrite_amount != -1:
         amount_int = overwrite_amount
     elif amount_idx == -1:
         amount_int = items[amount_idx]["item_price"]
 
-    # If Overwrite
     if ask_overwrite:
-        print(f"Total amount is {amount_int}.\nEnter new amount if you need to overwrite.")
+        print_panel("💰 Amount", f"Total amount is {amount_int}. Enter new amount if you need to overwrite.")
         amount_str = input("Press enter to ignore & use default amount: ")
-        if amount_str != "":
+        if amount_str:
             try:
                 amount_int = int(amount_str)
             except ValueError:
-                print("Invalid overwrite input, using original price.")
-                # return None
-    
+                print_warning("⚠️ Settlement", "Invalid overwrite input, using original price.")
+
     intercept_page(api_key, tokens, items[0]["item_code"], False)
-    
+
     # Get payment methods
     payment_path = "payments/api/v8/payment-methods-option"
     payment_payload = {
@@ -63,27 +52,24 @@ def settlement_qris(
         "payment_target": items[token_confirmation_idx]["item_code"],
         "lang": "en",
         "is_referral": False,
-        "token_confirmation": token_confirmation
+        "token_confirmation": token_confirmation,
     }
-    
-    print("Getting payment methods...")
-    payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
-    if payment_res["status"] != "SUCCESS":
-        print("Failed to fetch payment methods.")
-        print(f"Error: {payment_res}")
+
+    with live_loading("💳 Getting payment methods...", get_theme()):
+        payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
+
+    if payment_res.get("status") != "SUCCESS":
+        print_error("❌ Payment Methods", "Failed to fetch payment methods.")
+        print_panel("📑 Response", json.dumps(payment_res, indent=2))
         return None
-    
+
     token_payment = payment_res["data"]["token_payment"]
     ts_to_sign = payment_res["data"]["timestamp"]
-    
+
     # Settlement request
     path = "payments/api/v8/settlement-multipayment/qris"
     settlement_payload = {
-        "akrab": {
-            "akrab_members": [],
-            "akrab_parent_alias": "",
-            "members": []
-        },
+        "akrab": {"akrab_members": [], "akrab_parent_alias": "", "members": []},
         "can_trigger_rating": False,
         "total_discount": 0,
         "coupon": "",
@@ -94,11 +80,7 @@ def settlement_qris(
         "autobuy": {
             "is_using_autobuy": False,
             "activated_autobuy_code": "",
-            "autobuy_threshold_setting": {
-            "label": "",
-            "type": "",
-            "value": 0
-            }
+            "autobuy_threshold_setting": {"label": "", "type": "", "value": 0},
         },
         "access_token": tokens["access_token"],
         "is_myxl_wallet": False,
@@ -117,7 +99,7 @@ def settlement_qris(
             "is_switch_plan": False,
             "discount_recurring": 0,
             "has_bonus": False,
-            "discount_promo": 0
+            "discount_promo": 0,
         },
         "total_amount": amount_int,
         "total_fee": 0,
@@ -128,32 +110,17 @@ def settlement_qris(
         "payment_method": "QRIS",
         "timestamp": int(time.time()),
     }
-    
-    encrypted_payload = encryptsign_xdata(
-        api_key=api_key,
-        method="POST",
-        path=path,
-        id_token=tokens["id_token"],
-        payload=settlement_payload
-    )
-    
+
+    encrypted_payload = encryptsign_xdata(api_key, "POST", path, tokens["id_token"], settlement_payload)
     xtime = int(encrypted_payload["encrypted_body"]["xtime"])
-    sig_time_sec = (xtime // 1000)
+    sig_time_sec = xtime // 1000
     x_requested_at = datetime.fromtimestamp(sig_time_sec, tz=timezone.utc).astimezone()
     settlement_payload["timestamp"] = ts_to_sign
-    
+
     body = encrypted_payload["encrypted_body"]
-    x_sig = get_x_signature_payment(
-            api_key,
-            tokens["access_token"],
-            ts_to_sign,
-            payment_targets,
-            token_payment,
-            "QRIS",
-            payment_for,
-            path
-        )
-    
+    x_sig = get_x_signature_payment(api_key, tokens["access_token"], ts_to_sign,
+                                    payment_targets, token_payment, "QRIS", payment_for, path)
+
     headers = {
         "host": BASE_API_URL.replace("https://", ""),
         "content-type": "application/json; charset=utf-8",
@@ -167,95 +134,73 @@ def settlement_qris(
         "x-request-at": java_like_timestamp(x_requested_at),
         "x-version-app": "8.9.0",
     }
-    
+
     url = f"{BASE_API_URL}/{path}"
-    print("Sending settlement request...")
-    resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
-    
+    with live_loading("📤 Sending settlement request...", get_theme()):
+        resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
+
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        if decrypted_body["status"] != "SUCCESS":
-            print("Failed to initiate settlement.")
-            print(f"Error: {decrypted_body}")
+        if decrypted_body.get("status") != "SUCCESS":
+            print_error("❌ Settlement", "Failed to initiate settlement.")
+            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
-        
         transaction_id = decrypted_body["data"]["transaction_code"]
-        
+        print_success("✅ Settlement", "QRIS transaction created successfully")
         return transaction_id
     except Exception as e:
-        print("[decrypt err]", e)
-        return resp.text
-
-def get_qris_code(
-    api_key: str,
-    tokens: dict,
-    transaction_id: str
-):
-    path = "payments/api/v8/pending-detail"
-    payload = {
-        "transaction_id": transaction_id,
-        "is_enterprise": False,
-        "lang": "en",
-        "status": ""
-    }
-    
-    res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
-    if res["status"] != "SUCCESS":
-        print("Failed to fetch QRIS code.")
-        print(f"Error: {res}")
+        print_error("❌ Settlement", f"Decrypt error: {e}")
+        print_panel("📑 Raw Response", resp.text)
         return None
-    
+
+
+def get_qris_code(api_key: str, tokens: dict, transaction_id: str) -> str | None:
+    path = "payments/api/v8/pending-detail"
+    payload = {"transaction_id": transaction_id, "is_enterprise": False, "lang": "en", "status": ""}
+
+    with live_loading("🔍 Fetching QRIS code...", get_theme()):
+        res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
+
+    if res.get("status") != "SUCCESS":
+        print_error("❌ QRIS", "Failed to fetch QRIS code.")
+        print_panel("📑 Response", json.dumps(res, indent=2))
+        return None
+
+    print_success("✅ QRIS", "QRIS code fetched successfully")
     return res["data"]["qr_code"]
 
-def show_qris_payment(
-    api_key: str,
-    tokens: dict,
-    items: list[PaymentItem],
-    payment_for: str,
-    ask_overwrite: bool,
-    overwrite_amount: int = -1,
-    token_confirmation_idx: int = 0,
-    amount_idx: int = -1,
-    topup_number: str = "",
-    stage_token: str = "",
-):  
-    transaction_id = settlement_qris(
-        api_key,
-        tokens,
-        items,
-        payment_for,
-        ask_overwrite,
-        overwrite_amount,
-        token_confirmation_idx,
-        amount_idx,
-        topup_number,
-        stage_token
-    )
-    
+
+def show_qris_payment(api_key: str, tokens: dict, items: list[PaymentItem],
+                      payment_for: str, ask_overwrite: bool,
+                      overwrite_amount: int = -1,
+                      token_confirmation_idx: int = 0,
+                      amount_idx: int = -1,
+                      topup_number: str = "",
+                      stage_token: str = "") -> str | None:
+    transaction_id = settlement_qris(api_key, tokens, items, payment_for,
+                                     ask_overwrite, overwrite_amount,
+                                     token_confirmation_idx, amount_idx,
+                                     topup_number, stage_token)
+
     if not transaction_id:
-        print("Failed to create QRIS transaction.")
-        return
-    
-    print("Fetching QRIS code...")
+        print_error("❌ QRIS", "Failed to create QRIS transaction.")
+        return None
+
     qris_code = get_qris_code(api_key, tokens, transaction_id)
     if not qris_code:
-        print("Failed to get QRIS code.")
-        return
-    print(f"QRIS data:\n{qris_code}")
-    
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=1,
-        border=1,
-    )
+        print_error("❌ QRIS", "Failed to get QRIS code.")
+        return None
+
+    print_panel("📲 QRIS Data", qris_code)
+
+    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,
+                       box_size=1, border=1)
     qr.add_data(qris_code)
     qr.make(fit=True)
     qr.print_ascii(invert=True)
-    
+
     qris_b64 = base64.urlsafe_b64encode(qris_code.encode()).decode()
     qris_url = f"https://ki-ar-kod.netlify.app/?data={qris_b64}"
-    
-    print(f"Atau buka link berikut untuk melihat QRIS:\n{qris_url}")
-    
+
+    print_panel("🔗 QRIS Link", f"Atau buka link berikut untuk melihat QRIS:\n{qris_url}")
     return qris_b64
