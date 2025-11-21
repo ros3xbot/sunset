@@ -2,7 +2,6 @@ import os
 import json
 import uuid
 import requests
-
 from datetime import datetime, timezone
 
 from app.client.engsel import BASE_API_URL, UA
@@ -16,192 +15,98 @@ from app.client.encrypt import (
     get_x_signature_bounty,
     get_x_signature_bounty_allotment,
 )
+from app.menus.util import live_loading, print_error, print_success, print_panel
+from app.config.theme_config import get_theme
 
 BASE_API_URL = os.getenv("BASE_API_URL")
 AX_FP = os.getenv("AX_FP")
 UA = os.getenv("UA")
 
-def settlement_bounty(
-    api_key: str,
-    tokens: dict,
-    token_confirmation: str,
-    ts_to_sign: int,
-    payment_target: str,
-    price: int,
-    item_name: str = "",
-):
-    # Settlement request
+
+def settlement_bounty(api_key: str, tokens: dict,
+                      token_confirmation: str, ts_to_sign: int,
+                      payment_target: str, price: int,
+                      item_name: str = "") -> dict | None:
     path = "api/v8/personalization/bounties-exchange"
     settlement_payload = {
         "total_discount": 0,
         "is_enterprise": False,
-        "payment_token": "",
-        "token_payment": "",
-        "activated_autobuy_code": "",
-        "cc_payment_type": "",
-        "is_myxl_wallet": False,
-        "pin": "",
-        "ewallet_promo_id": "",
-        "members": [],
-        "total_fee": 0,
-        "fingerprint": "",
-        "autobuy_threshold_setting": {
-            "label": "",
-            "type": "",
-            "value": 0
-        },
-        "is_use_point": False,
-        "lang": "en",
         "payment_method": "BALANCE",
         "timestamp": ts_to_sign,
-        "points_gained": 0,
-        "can_trigger_rating": False,
-        "akrab_members": [],
-        "akrab_parent_alias": "",
-        "referral_unique_code": "",
-        "coupon": "",
         "payment_for": "REDEEM_VOUCHER",
-        "with_upsell": False,
-        "topup_number": "",
-        "stage_token": "",
-        "authentication_id": "",
-        "encrypted_payment_token": build_encrypted_field(urlsafe_b64=True),
-        "token": "",
         "token_confirmation": token_confirmation,
         "access_token": tokens["access_token"],
-        "wallet_number": "",
+        "encrypted_payment_token": build_encrypted_field(urlsafe_b64=True),
         "encrypted_authentication_id": build_encrypted_field(urlsafe_b64=True),
-        "additional_data": {
-            "original_price": 0,
-            "is_spend_limit_temporary": False,
-            "migration_type": "",
-            "akrab_m2m_group_id": "",
-            "spend_limit_amount": 0,
-            "is_spend_limit": False,
-            "mission_id": "",
-            "tax": 0,
-            "benefit_type": "",
-            "quota_bonus": 0,
-            "cashtag": "",
-            "is_family_plan": False,
-            "combo_details": [],
-            "is_switch_plan": False,
-            "discount_recurring": 0,
-            "is_akrab_m2m": False,
-            "balance_type": "",
-            "has_bonus": False,
-            "discount_promo": 0
-        },
-        "total_amount": 0,
-        "is_using_autobuy": False,
         "items": [{
             "item_code": payment_target,
-            "product_type": "",
             "item_price": price,
             "item_name": item_name,
             "tax": 0
         }]
     }
-        
-    encrypted_payload = encryptsign_xdata(
-        api_key=api_key,
-        method="POST",
-        path=path,
-        id_token=tokens["id_token"],
-        payload=settlement_payload
-    )
-    
+
+    encrypted_payload = encryptsign_xdata(api_key, "POST", path, tokens["id_token"], settlement_payload)
     xtime = int(encrypted_payload["encrypted_body"]["xtime"])
-    sig_time_sec = (xtime // 1000)
+    sig_time_sec = xtime // 1000
     x_requested_at = datetime.fromtimestamp(sig_time_sec, tz=timezone.utc).astimezone()
-    settlement_payload["timestamp"] = ts_to_sign
-    
     body = encrypted_payload["encrypted_body"]
-        
-    x_sig = get_x_signature_bounty(
-        api_key=api_key,
-        access_token=tokens["access_token"],
-        sig_time_sec=ts_to_sign,
-        package_code=payment_target,
-        token_payment=token_confirmation
-    )
-    
+
+    x_sig = get_x_signature_bounty(api_key, tokens["access_token"], ts_to_sign,
+                                   payment_target, token_confirmation)
+
     headers = {
         "host": BASE_API_URL.replace("https://", ""),
         "content-type": "application/json; charset=utf-8",
         "user-agent": UA,
         "x-api-key": API_KEY,
         "authorization": f"Bearer {tokens['id_token']}",
-        "x-hv": "v3",
         "x-signature-time": str(sig_time_sec),
         "x-signature": x_sig,
         "x-request-id": str(uuid.uuid4()),
         "x-request-at": java_like_timestamp(x_requested_at),
         "x-version-app": "8.9.0",
     }
-    
+
     url = f"{BASE_API_URL}/{path}"
-    print("Sending bounty request...")
-    resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
-    
+    with live_loading("🎯 Sending bounty request...", get_theme()):
+        resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
+
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        if decrypted_body["status"] != "SUCCESS":
-            print("Failed to claim bounty.")
-            print(f"Error: {decrypted_body}")
+        if decrypted_body.get("status") != "SUCCESS":
+            print_error("❌ Bounty", "Failed to claim bounty.")
+            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
-        
-        print(decrypted_body)
-        
+        print_success("✅ Bounty", "Bounty claimed successfully")
+        print_panel("🎁 Bounty Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
     except Exception as e:
-        print("[decrypt err]", e)
-        return resp.text
+        print_error("❌ Bounty", f"Decrypt error: {e}")
+        print_panel("📑 Raw Response", resp.text)
+        return None
 
-def settlement_loyalty(
-    api_key: str,
-    tokens: dict,
-    token_confirmation: str,
-    ts_to_sign: int,
-    payment_target: str,
-    price: int,
-):
-    # Settlement reuest
+
+def settlement_loyalty(api_key: str, tokens: dict,
+                       token_confirmation: str, ts_to_sign: int,
+                       payment_target: str, price: int) -> dict | None:
     path = "gamification/api/v8/loyalties/tiering/exchange"
     settlement_payload = {
         "item_code": payment_target,
-        "amount": 0,
-        "partner": "",
-        "is_enterprise": False,
-        "item_name": "",
-        "lang": "en",
         "points": price,
         "timestamp": ts_to_sign,
-        "token_confirmation": token_confirmation
+        "token_confirmation": token_confirmation,
+        "is_enterprise": False,
+        "lang": "en",
     }
 
-    encrypted_payload = encryptsign_xdata(
-        api_key=api_key,
-        method="POST",
-        path=path,
-        id_token=tokens["id_token"],
-        payload=settlement_payload
-    )
-    
+    encrypted_payload = encryptsign_xdata(api_key, "POST", path, tokens["id_token"], settlement_payload)
     xtime = int(encrypted_payload["encrypted_body"]["xtime"])
-    sig_time_sec = (xtime // 1000)
+    sig_time_sec = xtime // 1000
     x_requested_at = datetime.fromtimestamp(sig_time_sec, tz=timezone.utc).astimezone()
-    settlement_payload["timestamp"] = ts_to_sign
-    
     body = encrypted_payload["encrypted_body"]
 
-    x_sig = get_x_signature_loyalty(
-        api_key=api_key,
-        sig_time_sec=ts_to_sign,
-        package_code=payment_target,
-        token_confirmation=token_confirmation,
-        path=path
-    )
+    x_sig = get_x_signature_loyalty(api_key, ts_to_sign, payment_target, token_confirmation, path)
 
     headers = {
         "host": BASE_API_URL.replace("https://", ""),
@@ -209,7 +114,6 @@ def settlement_loyalty(
         "user-agent": UA,
         "x-api-key": API_KEY,
         "authorization": f"Bearer {tokens['id_token']}",
-        "x-hv": "v3",
         "x-signature-time": str(sig_time_sec),
         "x-signature": x_sig,
         "x-request-id": str(uuid.uuid4()),
@@ -218,96 +122,75 @@ def settlement_loyalty(
     }
 
     url = f"{BASE_API_URL}/{path}"
-    print("Sending loyalty request...")
-    resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
-    
+    with live_loading("🏅 Sending loyalty request...", get_theme()):
+        resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
+
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        if decrypted_body["status"] != "SUCCESS":
-            print("Failed purchase.")
-            print(f"Error: {decrypted_body}")
+        if decrypted_body.get("status") != "SUCCESS":
+            print_error("❌ Loyalty", "Failed purchase.")
+            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
-        
-        print(decrypted_body)
-        
+        print_success("✅ Loyalty", "Loyalty exchange successful")
+        print_panel("🏆 Loyalty Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
     except Exception as e:
-        print("[decrypt err]", e)
-        return resp.text
+        print_error("❌ Loyalty", f"Decrypt error: {e}")
+        print_panel("📑 Raw Response", resp.text)
+        return None
 
-def bounty_allotment(
-    api_key: str,
-    tokens: dict,
-    ts_to_sign: int,
-    destination_msisdn: str,
-    item_name: str,
-    item_code: str,
-    token_confirmation: str,
-):
+
+def bounty_allotment(api_key: str, tokens: dict,
+                     ts_to_sign: int, destination_msisdn: str,
+                     item_name: str, item_code: str,
+                     token_confirmation: str) -> dict | None:
     path = "gamification/api/v8/loyalties/tiering/bounties-allotment"
-    
     settlement_payload = {
         "destination_msisdn": destination_msisdn,
         "item_code": item_code,
-        "is_enterprise": False,
         "item_name": item_name,
-        "lang": "en",
         "timestamp": int(datetime.now().timestamp()),
         "token_confirmation": token_confirmation,
+        "is_enterprise": False,
+        "lang": "en",
     }
-    
-    encrypted_payload = encryptsign_xdata(
-        api_key=api_key,
-        method="POST",
-        path=path,
-        id_token=tokens["id_token"],
-        payload=settlement_payload
-    )
-    
+
+    encrypted_payload = encryptsign_xdata(api_key, "POST", path, tokens["id_token"], settlement_payload)
     xtime = int(encrypted_payload["encrypted_body"]["xtime"])
-    sig_time_sec = (xtime // 1000)
+    sig_time_sec = xtime // 1000
     x_requested_at = datetime.fromtimestamp(sig_time_sec, tz=timezone.utc).astimezone()
-    settlement_payload["timestamp"] = ts_to_sign
-    
     body = encrypted_payload["encrypted_body"]
-    
-    x_sig = get_x_signature_bounty_allotment(
-        api_key=api_key,
-        sig_time_sec=ts_to_sign,
-        package_code=item_code,
-        token_confirmation=token_confirmation,
-        destination_msisdn=destination_msisdn,
-        path=path
-    )
-    
+
+    x_sig = get_x_signature_bounty_allotment(api_key, ts_to_sign, item_code,
+                                             token_confirmation, destination_msisdn, path)
+
     headers = {
         "host": BASE_API_URL.replace("https://", ""),
         "content-type": "application/json; charset=utf-8",
         "user-agent": UA,
         "x-api-key": API_KEY,
         "authorization": f"Bearer {tokens['id_token']}",
-        "x-hv": "v3",
         "x-signature-time": str(sig_time_sec),
         "x-signature": x_sig,
         "x-request-id": str(uuid.uuid4()),
         "x-request-at": java_like_timestamp(x_requested_at),
         "x-version-app": "8.9.0",
     }
-    
+
     url = f"{BASE_API_URL}/{path}"
-    print("Sending bounty request...")
-    resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
-    
+    with live_loading("🎯 Sending bounty allotment request...", get_theme()):
+        resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
+
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        if decrypted_body["status"] != "SUCCESS":
-            print("Failed to claim bounty.")
-            print(f"Error: {decrypted_body}")
+        if decrypted_body.get("status") != "SUCCESS":
+            print_error("❌ Bounty Allotment", "Failed to claim bounty.")
+            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
-        
-        print(decrypted_body)
-        
+        print_success("✅ Bounty Allotment", "Bounty allotment successful")
+        print_panel("🎁 Bounty Allotment Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
     except Exception as e:
-        print("[decrypt err]", e)
-        return resp.text
+        print_error("❌ Bounty Allotment", f"Decrypt error: {e}")
+        print_panel("📑 Raw Response", resp.text)
+        return None
