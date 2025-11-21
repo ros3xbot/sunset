@@ -54,12 +54,12 @@ def clear_screen():
       |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
       |______  /(____  /__|  |___  /\___  >__/\_ \
              \/      \/          \/     \/      \/
-                 myXL CLI v8.9.1 sunset
+                myXL CLI v8.9.1 sunset
     """
 
     console.print(
         Panel(
-            ascii_art,
+            Align.center(ascii_art),
             border_style=get_theme_style("border_info"),
             style=get_theme_style("text_body"),
             expand=True,
@@ -77,12 +77,12 @@ def clear_sc():
       |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
       |______  /(____  /__|  |___  /\___  >__/\_ \
              \/      \/          \/     \/      \/
-                 myXL CLI v8.9.1 sunset
+                myXL CLI v8.9.1 sunset
     """
 
     console.print(
         Panel(
-            ascii_art,
+            Align.center(ascii_art),
             border_style=get_theme_style("border_info"),
             style=get_theme_style("text_body"),
             expand=True,
