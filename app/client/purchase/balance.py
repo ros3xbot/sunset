@@ -32,7 +32,7 @@ def settlement_balance(
 ):
     # Sanity check
     if overwrite_amount == -1 and not ask_overwrite:
-        print_error("❌ Settlement", "Either ask_overwrite must be True or overwrite_amount must be set.")
+        print_error("❌", "Either ask_overwrite must be True or overwrite_amount must be set.")
         return None
 
     token_confirmation = items[token_confirmation_idx]["token_confirmation"]
@@ -52,7 +52,7 @@ def settlement_balance(
             try:
                 amount_int = int(amount_str)
             except ValueError:
-                print_warning("⚠️ Settlement", "Invalid overwrite input, using original price.")
+                print_warning("⚠️", "Invalid overwrite input, using original price.")
 
     intercept_page(api_key, tokens, items[0]["item_code"], False)
 
@@ -71,7 +71,7 @@ def settlement_balance(
         payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
 
     if payment_res.get("status") != "SUCCESS":
-        print_error("❌ Payment Methods", "Failed to fetch payment methods.")
+        print_error("❌", "Failed to fetch payment methods.")
         print_panel("📑 Response", json.dumps(payment_res, indent=2))
         return payment_res
 
@@ -186,14 +186,14 @@ def settlement_balance(
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            print_error("❌ Settlement", "Failed to initiate settlement.")
+            print_error("❌", "Failed to initiate settlement.")
             print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return decrypted_body
 
-        print_success("✅ Settlement", "Purchase completed successfully")
+        print_success("✅", "Purchase completed successfully")
         print_panel("🧾 Purchase Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
     except Exception as e:
-        print_error("❌ Settlement", f"Decrypt error: {e}")
+        print_error("❌", f"Decrypt error: {e}")
         print_panel("📑 Raw Response", resp.text)
         return resp.text
