@@ -160,6 +160,7 @@ def show_main_menu(profile, display_quota, segments):
 # ============================
 def main():
     ensure_git()
+    theme = get_theme()
     while True:
         active_user = AuthInstance.get_active_user()
         if active_user is not None:
