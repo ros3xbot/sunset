@@ -1,6 +1,9 @@
 import os
 import json
 from typing import List, Dict
+from app.menus.util import print_error, print_success, print_warning, print_panel
+from app.config.theme_config import get_theme
+
 
 class Bookmark:
     _instance = None
@@ -32,14 +35,14 @@ class Bookmark:
         """Ensure all bookmarks have the latest schema fields."""
         updated = False
         for p in self.packages:
-            if "family_name" not in p:  # add missing field
+            if "family_name" not in p:
                 p["family_name"] = ""
                 updated = True
             if "order" not in p:
                 p["order"] = 0
                 updated = True
         if updated:
-            self.save_bookmark()  # persist schema upgrade
+            self.save_bookmark()
 
     def load_bookmark(self):
         """Load bookmarks from JSON file and ensure schema consistency."""
@@ -67,12 +70,12 @@ class Bookmark:
             (p["family_code"], p["variant_name"], p["order"]) == key
             for p in self.packages
         ):
-            print("Bookmark already exists.")
+            print_warning("⚠️ Bookmark", "Bookmark already exists.")
             return False
 
         self.packages.append(
             {
-                "family_name": family_name,  # required field
+                "family_name": family_name,
                 "family_code": family_code,
                 "is_enterprise": is_enterprise,
                 "variant_name": variant_name,
@@ -81,7 +84,7 @@ class Bookmark:
             }
         )
         self.save_bookmark()
-        print("Bookmark added.")
+        print_success("✅ Bookmark", f"Bookmark for {family_name} added.")
         return True
 
     def remove_bookmark(
@@ -101,13 +104,14 @@ class Bookmark:
             ):
                 del self.packages[i]
                 self.save_bookmark()
-                print("Bookmark removed.")
+                print_success("✅ Bookmark", f"Bookmark {family_code}-{variant_name} removed.")
                 return True
-        print("Bookmark not found.")
+        print_error("❌ Bookmark", "Bookmark not found.")
         return False
 
     def get_bookmarks(self) -> List[Dict]:
         """Return all bookmarks."""
         return self.packages.copy()
+
 
 BookmarkInstance = Bookmark()
