@@ -735,7 +735,7 @@ def fetch_my_packages():
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilihan:[/{theme['text_title']}] ").strip()
         if choice == "00":
             return "BACK"
 
