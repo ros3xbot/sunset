@@ -57,7 +57,6 @@ def clear_screen():
       |______  /(____  /__|  |___  /\___  >__/\_ \
              \/      \/          \/     \/      \/
                 myXL CLI v8.9.1 sunset
-    
     """
 
     print(ascii_art)
@@ -76,7 +75,6 @@ def clear_sc():
       |______  /(____  /__|  |___  /\___  >__/\_ \
              \/      \/          \/     \/      \/
                 myXL CLI v8.9.1 sunset
-    
     """
 
     print(ascii_art)
