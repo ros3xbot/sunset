@@ -59,7 +59,7 @@ def clear_screen():
         Panel(
             Align.center(ascii_art),
             border_style=get_theme_style("border_primary"),
-            style=get_theme_style("text_sub"),
+            style=get_theme_style("text_body"),
             expand=True,
         )
     )
@@ -80,7 +80,7 @@ def clear_sc():
         Panel(
             Align.center(ascii_art),
             border_style=get_theme_style("border_primary"),
-            style=get_theme_style("text_sub"),
+            style=get_theme_style("text_body"),
             expand=True,
         )
     )
