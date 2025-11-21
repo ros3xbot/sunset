@@ -13,6 +13,7 @@ from app.config.theme_config import get_theme
 
 console = Console()
 
+
 def show_bookmark_menu(return_package_detail: bool = False):
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
