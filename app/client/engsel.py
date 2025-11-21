@@ -2,9 +2,17 @@ import os
 import json
 import uuid
 import requests
-
 from datetime import datetime, timezone
-from app.menus.util import format_quota_byte, live_loading, print_error, print_success, print_warning, print_panel
+
+from app.menus.util import (
+    format_quota_byte,
+    live_loading,
+    print_error,
+    print_success,
+    print_warning,
+    print_panel,
+    pause,
+)
 from app.config.theme_config import get_theme
 from app.client.encrypt import (
     encryptsign_xdata,
@@ -18,29 +26,23 @@ if not BASE_API_URL:
     raise ValueError("BASE_API_URL environment variable not set")
 UA = os.getenv("UA")
 
-def send_api_request(
-    api_key: str,
-    path: str,
-    payload_dict: dict,
-    id_token: str,
-    method: str = "POST",
-):
+
+def send_api_request(api_key: str, path: str, payload_dict: dict, id_token: str, method: str = "POST"):
     encrypted_payload = encryptsign_xdata(
         api_key=api_key,
         method=method,
         path=path,
         id_token=id_token,
-        payload=payload_dict
+        payload=payload_dict,
     )
-    
+
     xtime = int(encrypted_payload["encrypted_body"]["xtime"])
-    
     now = datetime.now(timezone.utc).astimezone()
-    sig_time_sec = (xtime // 1000)
+    sig_time_sec = xtime // 1000
 
     body = encrypted_payload["encrypted_body"]
     x_sig = encrypted_payload["x_signature"]
-    
+
     headers = {
         "host": BASE_API_URL.replace("https://", ""),
         "content-type": "application/json; charset=utf-8",
@@ -57,82 +59,50 @@ def send_api_request(
 
     url = f"{BASE_API_URL}/{path}"
     resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
-    
-    # print(f"Headers: {json.dumps(headers, indent=2)}")
-    # print(f"Response body: {resp.text}")
 
     try:
-        decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        # print(f"Decrypted body: {json.dumps(decrypted_body, indent=2)}")
-        return decrypted_body
+        return decrypt_xdata(api_key, json.loads(resp.text))
     except Exception as e:
-        print("[decrypt err]", e)
-        return resp.text
+        print_error("❌ Decrypt", f"Gagal decrypt response: {e}")
+        return {"error": str(e), "raw": resp.text}
+
 
 def get_profile(api_key: str, access_token: str, id_token: str) -> dict:
     path = "api/v8/profile"
-
     raw_payload = {
         "access_token": access_token,
         "app_version": "8.9.0",
         "is_enterprise": False,
-        "lang": "en"
+        "lang": "en",
     }
-
     with live_loading("📡 Fetching profile...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, id_token, "POST")
-
     return res.get("data")
+
 
 def get_balance(api_key: str, id_token: str) -> dict:
     path = "api/v8/packages/balance-and-credit"
-    
-    raw_payload = {
-        "is_enterprise": False,
-        "lang": "en"
-    }
-    
+    raw_payload = {"is_enterprise": False, "lang": "en"}
     with live_loading("💰 Fetching balance...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, id_token, "POST")
-    
     if "data" in res and "balance" in res["data"]:
         return res["data"]["balance"]
-    else:
-        print_error("❌ Balance", f"Error getting balance: {res.get('error', 'Unknown error')}")
-        return None
+    print_error("❌ Balance", f"Error getting balance: {res.get('error', 'Unknown error')}")
+    return None
 
-def get_family(
-    api_key: str,
-    tokens: dict,
-    family_code: str,
-    is_enterprise: bool | None = None,
-    migration_type: str | None = None
-) -> dict:
+
+def get_family(api_key: str, tokens: dict, family_code: str,
+               is_enterprise: bool | None = None,
+               migration_type: str | None = None) -> dict:
     theme = get_theme()
-
-    is_enterprise_list = [False, True]
-    migration_type_list = ["NONE", "PRE_TO_PRIOH", "PRIOH_TO_PRIO", "PRIO_TO_PRIOH"]
-
-    if is_enterprise is not None:
-        is_enterprise_list = [is_enterprise]
-
-    if migration_type is not None:
-        migration_type_list = [migration_type]
-
+    is_enterprise_list = [False, True] if is_enterprise is None else [is_enterprise]
+    migration_type_list = ["NONE", "PRE_TO_PRIOH", "PRIOH_TO_PRIO", "PRIO_TO_PRIOH"] if migration_type is None else [migration_type]
     path = "api/v8/xl-stores/options/list"
     id_token = tokens.get("id_token")
-
     family_data = None
-
     with live_loading(f"📦 Fetching package family {family_code}...", theme):
         for mt in migration_type_list:
-            if family_data is not None:
-                break
-
             for ie in is_enterprise_list:
-                if family_data is not None:
-                    break
-
                 payload_dict = {
                     "is_show_tagging_tab": True,
                     "is_dedicated_event": True,
@@ -144,24 +114,22 @@ def get_family(
                     "is_pdlp": True,
                     "referral_code": "",
                     "is_migration": False,
-                    "lang": "en"
+                    "lang": "en",
                 }
-
                 res = send_api_request(api_key, path, payload_dict, id_token, "POST")
-
-                if res.get("status") != "SUCCESS":
-                    continue
-
-                family_name = res["data"]["package_family"].get("name", "")
-                if family_name:
-                    family_data = res["data"]
-                    print_success("✅ Family", f"Success with is_enterprise={ie}, migration_type={mt}. Family name: {family_name}")
-
-    if family_data is None:
+                if res.get("status") == "SUCCESS":
+                    family_name = res["data"]["package_family"].get("name", "")
+                    if family_name:
+                        family_data = res["data"]
+                        print_success("✅ Family", f"Success with is_enterprise={ie}, migration_type={mt}. Family name: {family_name}")
+                        break
+            if family_data:
+                break
+    if not family_data:
         print_error("❌ Family", f"Failed to get valid family data for {family_code}")
         return None
-
     return family_data
+
 
 def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict:
     path = "api/v8/xl-stores/families"
@@ -172,29 +140,23 @@ def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict
         "package_category_code": package_category_code,
         "with_icon_url": True,
         "is_migration": False,
-        "lang": "en"
+        "lang": "en",
     }
-
     with live_loading(f"📂 Fetching families for category {package_category_code}...", get_theme()):
         res = send_api_request(api_key, path, payload_dict, tokens["id_token"], "POST")
-
     if res.get("status") != "SUCCESS":
         print_error("❌ Families", f"Gagal mengambil families untuk kategori {package_category_code}")
         print_panel("📑 Response", json.dumps(res, indent=2))
         pause()
         return None
-
     return res["data"]
 
-def get_package(
-    api_key: str,
-    tokens: dict,
-    package_option_code: str,
-    package_family_code: str = "",
-    package_variant_code: str = ""
-) -> dict:
+
+def get_package(api_key: str, tokens: dict,
+                package_option_code: str,
+                package_family_code: str = "",
+                package_variant_code: str = "") -> dict:
     path = "api/v8/xl-stores/options/detail"
-    
     raw_payload = {
         "is_transaction_routine": False,
         "migration_type": "NONE",
@@ -207,235 +169,150 @@ def get_package(
         "lang": "en",
         "package_option_code": package_option_code,
         "is_upsell_pdp": False,
-        "package_variant_code": package_variant_code
+        "package_variant_code": package_variant_code,
     }
-
     with live_loading(f"📦 Fetching package {package_option_code}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
     if "data" not in res:
         print_error("❌ Package", f"Gagal mengambil package {package_option_code}")
         print_panel("📑 Response", json.dumps(res, indent=2))
         return None
-        
     return res["data"]
+
 
 def get_addons(api_key: str, tokens: dict, package_option_code: str) -> dict:
     path = "api/v8/xl-stores/options/addons-pinky-box"
-    
-    raw_payload = {
-        "is_enterprise": False,
-        "lang": "en",
-        "package_option_code": package_option_code
-    }
-
+    raw_payload = {"is_enterprise": False, "lang": "en", "package_option_code": package_option_code}
     with live_loading(f"🧩 Fetching addons for {package_option_code}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
     if "data" not in res:
         print_error("❌ Addons", f"Gagal mengambil addons untuk {package_option_code}")
         print_panel("📑 Response", json.dumps(res, indent=2))
         return None
-        
     return res["data"]
 
-def intercept_page(
-    api_key: str,
-    tokens: dict,
-    option_code: str,
-    is_enterprise: bool = False
-):
+
+def intercept_page(api_key: str, tokens: dict, option_code: str, is_enterprise: bool = False):
     path = "misc/api/v8/utility/intercept-page"
-    
-    raw_payload = {
-        "is_enterprise": is_enterprise,
-        "lang": "en",
-        "package_option_code": option_code
-    }
-    
+    raw_payload = {"is_enterprise": is_enterprise, "lang": "en", "package_option_code": option_code}
     with live_loading(f"🛡️ Fetching intercept page for {option_code}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
     if "status" in res:
         print_panel("🛡️ Intercept", f"Status: {res['status']}")
     else:
         print_error("❌ Intercept", "Intercept error")
 
-def login_info(
-    api_key: str,
-    tokens: dict,
-    is_enterprise: bool = False
-):
+def login_info(api_key: str, tokens: dict, is_enterprise: bool = False):
     path = "api/v8/auth/login"
-    
     raw_payload = {
         "access_token": tokens["access_token"],
         "is_enterprise": is_enterprise,
-        "lang": "en"
+        "lang": "en",
     }
-
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
+    with live_loading("🔑 Fetching login info...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if "data" not in res:
-        print(json.dumps(res, indent=2))
-        print("Error getting package:", res.get("error", "Unknown error"))
+        print_error("❌ Login", f"Error getting login info: {res.get('error', 'Unknown error')}")
+        print_panel("📑 Response", json.dumps(res, indent=2))
         return None
-        
     return res["data"]
 
-def get_package_details(
-    api_key: str,
-    tokens: dict,
-    family_code: str,
-    variant_code: str,
-    option_order: int,
-    is_enterprise: bool | None = None,
-    migration_type: str | None = None
-) -> dict | None:
+
+def get_package_details(api_key: str, tokens: dict,
+                        family_code: str, variant_code: str, option_order: int,
+                        is_enterprise: bool | None = None,
+                        migration_type: str | None = None) -> dict | None:
     family_data = get_family(api_key, tokens, family_code, is_enterprise, migration_type)
     if not family_data:
-        print(f"Gagal mengambil data family untuk {family_code}.")
+        print_error("❌ Family", f"Gagal mengambil data family untuk {family_code}")
         return None
-    
-    package_options = []
-    
-    package_variants = family_data["package_variants"]
     option_code = None
-    for variant in package_variants:
+    for variant in family_data.get("package_variants", []):
         if variant["package_variant_code"] == variant_code:
-            selected_variant = variant
-            package_options = selected_variant["package_options"]
-            for option in package_options:
+            for option in variant.get("package_options", []):
                 if option["order"] == option_order:
-                    selected_option = option
-                    option_code = selected_option["package_option_code"]
+                    option_code = option["package_option_code"]
                     break
-
-    if option_code is None:
-        print("Gagal menemukan opsi paket yang sesuai.")
+    if not option_code:
+        print_error("❌ Package", "Gagal menemukan opsi paket yang sesuai.")
         return None
-        
     package_details_data = get_package(api_key, tokens, option_code)
     if not package_details_data:
-        print("Gagal mengambil detail paket.")
+        print_error("❌ Package", "Gagal mengambil detail paket.")
         return None
-    
     return package_details_data
 
-def get_notifications(
-    api_key: str,
-    tokens: dict,
-):
+
+def get_notifications(api_key: str, tokens: dict):
     path = "api/v8/notification-non-grouping"
-    
-    raw_payload = {
-        "is_enterprise": False,
-        "lang": "en"
-    }
-    
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
+    raw_payload = {"is_enterprise": False, "lang": "en"}
+    with live_loading("🔔 Fetching notifications...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if isinstance(res, dict) and res.get("status") != "SUCCESS":
-        print("Error getting notifications:", res.get("error", "Unknown error"))
+        print_error("❌ Notifications", f"Error getting notifications: {res.get('error', 'Unknown error')}")
         return None
-        
     return res
 
-def get_notification_detail(
-    api_key: str,
-    tokens: dict,
-    notification_id: str
-):
+
+def get_notification_detail(api_key: str, tokens: dict, notification_id: str):
     path = "api/v8/notification/detail"
-    
-    raw_payload = {
-        "is_enterprise": False,
-        "lang": "en",
-        "notification_id": notification_id
-    }
-    
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
+    raw_payload = {"is_enterprise": False, "lang": "en", "notification_id": notification_id}
+    with live_loading(f"🔔 Fetching notification {notification_id}...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if isinstance(res, dict) and res.get("status") != "SUCCESS":
-        print("Error getting notification detail:", res.get("error", "Unknown error"))
+        print_error("❌ Notification", f"Error getting notification detail: {res.get('error', 'Unknown error')}")
         return None
-
     return res
+
 
 def get_pending_transaction(api_key: str, tokens: dict) -> dict:
     path = "api/v8/profile"
-
-    raw_payload = {
-        "is_enterprise": False,
-        "lang": "en"
-    }
-
+    raw_payload = {"is_enterprise": False, "lang": "en"}
     with live_loading("⏳ Fetching pending transactions...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-
     if res.get("status") != "SUCCESS":
         print_error("❌ Pending Transaction", "Gagal mengambil pending transactions.")
         print_panel("📑 Response", json.dumps(res, indent=2))
         return None
-
     data = res.get("data", {})
     if not data or "pending_payment" not in data:
         print_error("⚠️ Pending Transaction", "Tidak ada transaksi pending ditemukan.")
         return None
-
     return data
+
 
 def get_transaction_history(api_key: str, tokens: dict) -> dict:
     path = "payments/api/v8/transaction-history"
-
-    raw_payload = {
-        "is_enterprise": False,
-        "lang": "en"
-    }
-
+    raw_payload = {"is_enterprise": False, "lang": "en"}
     with live_loading("📜 Fetching transaction history...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-
     if res.get("status") != "SUCCESS":
         print_error("❌ Transaction History", "Gagal mengambil riwayat transaksi.")
         print_panel("📑 Response", json.dumps(res, indent=2))
         return None
-
     data = res.get("data", {})
     if not data or "list" not in data:
         print_error("⚠️ Transaction History", "Tidak ada riwayat transaksi ditemukan.")
         return None
-
     return data
+
 
 def get_tiering_info(api_key: str, tokens: dict) -> dict:
     path = "gamification/api/v8/loyalties/tiering/info"
-
-    raw_payload = {
-        "is_enterprise": False,
-        "lang": "en"
-    }
-
+    raw_payload = {"is_enterprise": False, "lang": "en"}
     with live_loading("🏆 Fetching tiering info...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    
     if not res or res.get("status") != "SUCCESS":
         print_error("❌ Tiering", "Gagal mengambil tiering info.")
         if res:
             print_panel("📑 Response", json.dumps(res, indent=2))
         return {}
-
     return res.get("data", {})
 
-def unsubscribe(
-    api_key: str,
-    tokens: dict,
-    quota_code: str,
-    product_domain: str,
-    product_subscription_type: str,
-) -> bool:
-    path = "api/v8/packages/unsubscribe"
 
+def unsubscribe(api_key: str, tokens: dict,
+                quota_code: str, product_domain: str, product_subscription_type: str) -> bool:
+    path = "api/v8/packages/unsubscribe"
     raw_payload = {
         "product_subscription_type": product_subscription_type,
         "quota_code": quota_code,
@@ -443,21 +320,21 @@ def unsubscribe(
         "is_enterprise": False,
         "unsubscribe_reason_code": "",
         "lang": "en",
-        "family_member_id": ""
+        "family_member_id": "",
     }
-    
-    # print(f"Payload: {json.dumps(raw_payload, indent=4)}")
-
-    try:
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-        print(json.dumps(res, indent=4))
-
-        if res and res.get("code") == "000":
-            return True
-        else:
+    with live_loading(f"🚫 Unsubscribing quota {quota_code}...", get_theme()):
+        try:
+            res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+            if res and res.get("code") == "000":
+                print_success("✅ Unsubscribe", f"Berhasil unsubscribe quota {quota_code}")
+                return True
+            print_error("❌ Unsubscribe", f"Gagal unsubscribe quota {quota_code}")
+            print_panel("📑 Response", json.dumps(res, indent=2))
             return False
-    except Exception as e:
-        return False
+        except Exception as e:
+            print_error("❌ Unsubscribe", f"Exception: {e}")
+            return False
+
 
 def dashboard_segments(api_key: str, id_token: str, access_token: str, balance: int = 0) -> dict | None:
     path = "dashboard/api/v8/segments"
@@ -469,7 +346,7 @@ def dashboard_segments(api_key: str, id_token: str, access_token: str, balance: 
         "is_enterprise": False,
         "lang": "id",
         "manufacturer_name": "samsung",
-        "model_name": "SM-N935F"
+        "model_name": "SM-N935F",
     }
 
     theme = get_theme()
@@ -491,7 +368,7 @@ def dashboard_segments(api_key: str, id_token: str, access_token: str, balance: 
     loyalty_data = data.get("loyalty", {}).get("data", {})
     loyalty_info = {
         "current_point": loyalty_data.get("current_point", 0),
-        "tier_name": loyalty_data.get("detail_tier", {}).get("name", "")
+        "tier_name": loyalty_data.get("detail_tier", {}).get("name", ""),
     }
 
     # Notifications
@@ -524,7 +401,7 @@ def dashboard_segments(api_key: str, id_token: str, access_token: str, balance: 
                 "original_price": original_price,
                 "diskon_price": discounted_price,
                 "diskon_percent": diskon_percent,
-                "kuota_gb": kuota_gb
+                "kuota_gb": kuota_gb,
             }
             special_packages.append(formatted_pkg)
         except Exception as e:
@@ -534,29 +411,26 @@ def dashboard_segments(api_key: str, id_token: str, access_token: str, balance: 
     return {
         "loyalty": loyalty_info,
         "notification": notifications,
-        "special_packages": special_packages
+        "special_packages": special_packages,
     }
+
 
 def get_quota(api_key: str, id_token: str) -> dict | None:
     path = "api/v8/packages/quota-summary"
-
-    payload = {
-        "is_enterprise": False,
-        "lang": "en"
-    }
-
-    try:
-        res = send_api_request(api_key, path, payload, id_token, "POST")
-    except Exception:
-        return None
-
+    payload = {"is_enterprise": False, "lang": "en"}
+    with live_loading("📶 Fetching quota summary...", get_theme()):
+        try:
+            res = send_api_request(api_key, path, payload, id_token, "POST")
+        except Exception as e:
+            print_error("❌ Quota", f"Gagal request quota: {e}")
+            return None
     if isinstance(res, dict):
         quota = res.get("data", {}).get("quota", {}).get("data")
         if quota:
             return {
                 "remaining": quota.get("remaining", 0),
                 "total": quota.get("total", 0),
-                "has_unlimited": quota.get("has_unlimited", False)
+                "has_unlimited": quota.get("has_unlimited", False),
             }
-
+    print_error("⚠️ Quota", "Tidak ada data quota ditemukan.")
     return None
