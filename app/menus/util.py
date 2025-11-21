@@ -81,7 +81,7 @@ def clear_sc():
         Panel(
             Align.center(ascii_art),
             border_style=get_theme_style("border_primary"),
-            style=get_theme_style("text_body"),
+            style=get_theme_style("text_title"),
             expand=True,
             box=box.DOUBLE,
         )
