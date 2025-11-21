@@ -301,11 +301,11 @@ def main():
 
 if __name__ == "__main__":
     try:
-        #with live_loading("🔄 Checking for updates...", get_theme()):
-        #    need_update = check_for_updates()
-        #if need_update:
-        #    print_warning("⬆️ Update", "Versi baru tersedia, silakan update sebelum melanjutkan.")
-        #    pause()
+        with live_loading("🔄 Checking for updates...", get_theme()):
+            need_update = check_for_updates()
+        if need_update:
+            print_warning("⬆️ Update", "Versi baru tersedia, silakan update sebelum melanjutkan.")
+            pause()
         main()
     except KeyboardInterrupt:
         print_error("⛔ Exit", "Aplikasi dihentikan oleh pengguna.")
