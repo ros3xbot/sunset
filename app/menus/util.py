@@ -188,15 +188,15 @@ def print_panel(title, content, border_style=None):
 
 
 def print_success(title, content):
-    console.print(Panel(f"✅ {content}", title=title, title_align="left", border_style=get_theme_style("border_success")))
+    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_success")))
 
 
 def print_error(title, content):
-    console.print(Panel(f"❌ {content}", title=title, title_align="left", border_style=get_theme_style("border_error")))
+    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_error")))
 
 
 def print_warning(title, content):
-    console.print(Panel(f"⚠️ {content}", title=title, title_align="left", border_style=get_theme_style("border_warning")))
+    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_warning")))
 
 
 def print_title(text):
