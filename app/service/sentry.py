@@ -16,7 +16,7 @@ def enter_sentry_mode():
     api_key = AuthInstance.api_key
     active_user = AuthInstance.get_active_user()
     if active_user is None:
-        print_error("❌ Sentry", "No active user. Please login first.")
+        print_error("❌", "No active user. Please login first.")
         pause()
         return
 
@@ -59,11 +59,11 @@ def enter_sentry_mode():
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
                 try:
-                    print_panel("⏳ Fetching", f"Fetching data at {timestamp}...", style="info")
+                    print_panel("⏳ Fetching", f"Fetching data...", style="info")
 
                     res = send_api_request(api_key, path, payload, id_token, "POST")
                     if res.get("status") != "SUCCESS":
-                        print_error("❌ Sentry", "Failed to fetch packages")
+                        print_error("❌", "Failed to fetch packages")
                         print_panel("📑 Response", json.dumps(res, indent=2))
                         pause()
                         return None
@@ -73,14 +73,14 @@ def enter_sentry_mode():
 
                     f.write(json.dumps(data_point) + "\n")
                     f.flush()
-                    print_success("✅ Sentry", f"Data point logged at {timestamp}")
+                    print_success("✅", f"Data point logged at {timestamp}")
 
                 except Exception as e:
-                    print_error("❌ Sentry", f"Error during fetch at {timestamp}: {e}")
+                    print_error("❌", f"Error during fetch at {timestamp}: {e}")
                     continue
 
     except KeyboardInterrupt:
-        print_warning("⚠️ Sentry", "Keyboard interrupt received. Exiting Sentry Mode...")
+        print_warning("⚠️", "Keyboard interrupt received. Exiting Sentry Mode...")
     finally:
-        print_success("✅ Sentry", f"Sentry Mode exited. Data saved to {file_name}")
+        print_success("✅", f"Sentry Mode exited. Data saved to {file_name}")
         pause()
