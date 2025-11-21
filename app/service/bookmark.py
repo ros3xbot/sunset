@@ -70,7 +70,7 @@ class Bookmark:
             (p["family_code"], p["variant_name"], p["order"]) == key
             for p in self.packages
         ):
-            print_warning("⚠️ Bookmark", "Bookmark already exists.")
+            print_warning("⚠️", "Bookmark already exists.")
             return False
 
         self.packages.append(
@@ -84,7 +84,7 @@ class Bookmark:
             }
         )
         self.save_bookmark()
-        print_success("✅ Bookmark", f"Bookmark for {family_name} added.")
+        print_success("✅", f"Bookmark for {family_name} added.")
         return True
 
     def remove_bookmark(
@@ -104,9 +104,9 @@ class Bookmark:
             ):
                 del self.packages[i]
                 self.save_bookmark()
-                print_success("✅ Bookmark", f"Bookmark {family_code}-{variant_name} removed.")
+                print_success("✅", f"Bookmark {family_code}-{variant_name} removed.")
                 return True
-        print_error("❌ Bookmark", "Bookmark not found.")
+        print_error("❌", "Bookmark not found.")
         return False
 
     def get_bookmarks(self) -> List[Dict]:
