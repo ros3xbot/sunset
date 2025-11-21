@@ -97,15 +97,17 @@ def clear_sc():
 
 
 def pause():
-    input("\nPress enter to continue...")
+    console.print(Panel("⏸️ Press Enter to continue...", border_style=get_theme_style("border_info")))
+    input()
 
 
 class HTMLToText(HTMLParser):
-    def __init__(self, width=80):
+    def __init__(self, width=80, bullet="•"):
         super().__init__()
         self.width = width
         self.result = []
         self.in_li = False
+        self.bullet = bullet
 
     def handle_starttag(self, tag, attrs):
         if tag == "li":
@@ -122,7 +124,7 @@ class HTMLToText(HTMLParser):
         text = data.strip()
         if text:
             if self.in_li:
-                self.result.append(f"- {text}")
+                self.result.append(f"{self.bullet} {text}")
             else:
                 self.result.append(text)
 
@@ -139,18 +141,16 @@ def display_html(html_text, width=80):
 
 
 def format_quota_byte(quota_byte: int) -> str:
-    GB = 1024 ** 3 
-    MB = 1024 ** 2
+    GB = 1024**3
+    MB = 1024**2
     KB = 1024
-
     if quota_byte >= GB:
         return f"{quota_byte / GB:.2f} GB"
     elif quota_byte >= MB:
         return f"{quota_byte / MB:.2f} MB"
     elif quota_byte >= KB:
         return f"{quota_byte / KB:.2f} KB"
-    else:
-        return f"{quota_byte} B"
+    return f"{quota_byte} B"
 
 
 def get_rupiah(value) -> str:
@@ -159,15 +159,12 @@ def get_rupiah(value) -> str:
     match = re.match(r"([\d,]+)(.*)", value_str)
     if not match:
         return value_str
-
     raw_number = match.group(1).replace(",", "")
     suffix = match.group(2).strip()
-
     try:
         number = int(raw_number)
     except ValueError:
         return value_str
-
     formatted_number = f"{number:,}".replace(",", ".")
     formatted = f"{formatted_number},-"
     return f"{formatted} {suffix}" if suffix else formatted
@@ -191,34 +188,44 @@ def print_panel(title, content, border_style=None):
 
 
 def print_success(title, content):
-    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_success")))
+    console.print(Panel(f"✅ {content}", title=title, title_align="left", border_style=get_theme_style("border_success")))
 
 
 def print_error(title, content):
-    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_error")))
+    console.print(Panel(f"❌ {content}", title=title, title_align="left", border_style=get_theme_style("border_error")))
 
 
 def print_warning(title, content):
-    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_warning")))
+    console.print(Panel(f"⚠️ {content}", title=title, title_align="left", border_style=get_theme_style("border_warning")))
 
 
 def print_title(text):
-    console.print(Panel(
-        Align.center(f"[bold {get_theme_style('text_title')}]{text}[/{get_theme_style('text_title')}]"),
-        border_style=get_theme_style("border_primary"),
-        padding=(0, 1),
-        expand=True
-    ))
+    console.print(
+        Panel(
+            Align.center(f"[bold {get_theme_style('text_title')}]{text}[/{get_theme_style('text_title')}]"),
+            border_style=get_theme_style("border_primary"),
+            padding=(0, 1),
+            expand=True,
+        )
+    )
 
 
 def print_key_value(label, value):
-    console.print(f"[{get_theme_style('text_key')}]{label}:[/] [{get_theme_style('text_value')}]{value}[/{get_theme_style('text_value')}]")
+    console.print(f"[{get_theme_style('text_key')}]{label}:[/] [{get_theme_style('text_value')}]{value}[/{get_theme_style('text_value')}] ✅")
+
 
 def print_info(label, value):
     console.print(f"[{get_theme_style('text_sub')}]{label}:[/{get_theme_style('text_sub')}] [{get_theme_style('text_body')}]{value}[/{get_theme_style('text_body')}]")
 
-def print_menu(title, options):
+
+def print_menu(title, options, highlight=None):
     table = Table(title=title, box=box.SIMPLE, show_header=False)
     for key, label in options.items():
-        table.add_row(f"[{get_theme_style('text_key')}]{key}[/{get_theme_style('text_key')}]", f"[{get_theme_style('text_value')}]{label}[/{get_theme_style('text_value')}]")
+        style = get_theme_style("text_value")
+        if highlight and key == highlight:
+            style = get_theme_style("text_title")
+        table.add_row(
+            f"[{get_theme_style('text_key')}]{key}[/{get_theme_style('text_key')}]",
+            f"[{style}]{label}[/{style}]",
+        )
     console.print(table)
