@@ -115,7 +115,6 @@ class Auth:
         self.write_tokens_to_file()
         self.last_refresh_time = int(time.time())
         self.write_active_number()
-        print_success("✅", f"Active user set to {number}")
         return True
 
     def renew_active_user_token(self):
