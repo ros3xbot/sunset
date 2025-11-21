@@ -55,8 +55,10 @@ def clear_screen():
       |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
       |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
       |______  /(____  /__|  |___  /\___  >__/\_ \
-             \/      \/          \/     \/      \/    
-                myXL CLI v8.9.1 sunset """
+             \/      \/          \/     \/      \/
+                myXL CLI v8.9.1 sunset
+    
+    """
 
     print(ascii_art)
     #print_banner()
@@ -72,8 +74,10 @@ def clear_sc():
       |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
       |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
       |______  /(____  /__|  |___  /\___  >__/\_ \
-             \/      \/          \/     \/      \/    
-                myXL CLI v8.9.1 sunset """
+             \/      \/          \/     \/      \/
+                myXL CLI v8.9.1 sunset
+    
+    """
 
     print(ascii_art)
     #print_banner()
