@@ -158,7 +158,8 @@ def show_account_menu():
         console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
         console.print(f"Masukkan nomor akun (1 - {len(users)}) untuk berganti.")
         
-        input_str = console.input("Pilihan: ").strip()
+        #input_str = console.input("Pilihan: ").strip()
+        input_str = choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         
         if input_str == "00":
             return active_user["number"] if active_user else None
