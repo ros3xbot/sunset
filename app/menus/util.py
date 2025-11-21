@@ -77,7 +77,7 @@ def clear_sc():
 |______  /(____  /__|  |___  /\___  >__/\_ \
        \/      \/          \/     \/      \/"""
 
-    version_text = f"[{get_theme_style('text_sub')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_sub')}]"
+    version_text = f"[{get_theme_style('text_body')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_body')}]"
     
     content = f"{ascii_art}\n           {version_text}"
     console.print(
