@@ -52,19 +52,21 @@ def clear_screen():
 |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
 |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
 |______  /(____  /__|  |___  /\___  >__/\_ \
-       \/      \/          \/     \/      \/
-           myXL CLI v8.9.1 sunset """
+       \/      \/          \/     \/      \/"""
+
+    version_text = f"[{get_theme_style('text_title')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_title')}]"
+    
+    content = f"{ascii_art}\n           {version_text}"
 
     console.print(
         Panel(
-            Align.center(ascii_art),
+            Align.center(content),
             border_style=get_theme_style("border_primary"),
             style=get_theme_style("text_warn"),
             expand=True,
             box=box.DOUBLE,
         )
     )
-    #print_banner()
     simple_number()
 
 def clear_sc():
@@ -86,7 +88,6 @@ def clear_sc():
             box=box.DOUBLE,
         )
     )
-    #print_banner()
 
 def pause():
     input("\nPress enter to continue...")
