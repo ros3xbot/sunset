@@ -12,9 +12,9 @@ def get_segments(api_key: str, tokens: dict, is_enterprise: bool = False) -> dic
         res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
 
     if not res or res.get("status") != "SUCCESS":
-        print_error("❌ Segments", "Failed to fetch segments.")
+        print_error("❌", "Failed to fetch segments.")
         print_panel("📑 Response", json.dumps(res, indent=2))
         return None
 
-    print_success("✅ Segments", "Store segments fetched successfully")
+    print_success("✅", "Store segments fetched successfully")
     return res
