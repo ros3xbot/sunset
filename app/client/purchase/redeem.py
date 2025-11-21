@@ -75,14 +75,14 @@ def settlement_bounty(api_key: str, tokens: dict,
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            print_error("❌ Bounty", "Failed to claim bounty.")
+            print_error("❌", "Failed to claim bounty.")
             print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
-        print_success("✅ Bounty", "Bounty claimed successfully")
+        print_success("✅", "Bounty claimed successfully")
         print_panel("🎁 Bounty Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
     except Exception as e:
-        print_error("❌ Bounty", f"Decrypt error: {e}")
+        print_error("❌", f"Decrypt error: {e}")
         print_panel("📑 Raw Response", resp.text)
         return None
 
@@ -128,14 +128,14 @@ def settlement_loyalty(api_key: str, tokens: dict,
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            print_error("❌ Loyalty", "Failed purchase.")
+            print_error("❌", "Failed purchase.")
             print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
-        print_success("✅ Loyalty", "Loyalty exchange successful")
+        print_success("✅", "Loyalty exchange successful")
         print_panel("🏆 Loyalty Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
     except Exception as e:
-        print_error("❌ Loyalty", f"Decrypt error: {e}")
+        print_error("❌", f"Decrypt error: {e}")
         print_panel("📑 Raw Response", resp.text)
         return None
 
@@ -184,13 +184,13 @@ def bounty_allotment(api_key: str, tokens: dict,
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            print_error("❌ Bounty Allotment", "Failed to claim bounty.")
+            print_error("❌", "Failed to claim bounty.")
             print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
-        print_success("✅ Bounty Allotment", "Bounty allotment successful")
+        print_success("✅", "Bounty allotment successful")
         print_panel("🎁 Bounty Allotment Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
     except Exception as e:
-        print_error("❌ Bounty Allotment", f"Decrypt error: {e}")
+        print_error("❌", f"Decrypt error: {e}")
         print_panel("📑 Raw Response", resp.text)
         return None
