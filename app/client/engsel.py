@@ -4,7 +4,7 @@ import uuid
 import requests
 
 from datetime import datetime, timezone
-from app.menus.util import format_quota_byte, live_loading
+from app.menus.util import format_quota_byte, live_loading, print_error, print_success, print_warning, print_panel
 from app.config.theme_config import get_theme
 from app.client.encrypt import (
     encryptsign_xdata,
@@ -79,8 +79,8 @@ def get_profile(api_key: str, access_token: str, id_token: str) -> dict:
         "lang": "en"
     }
 
-    print("Fetching profile...")
-    res = send_api_request(api_key, path, raw_payload, id_token, "POST")
+    with live_loading("📡 Fetching profile...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, id_token, "POST")
 
     return res.get("data")
 
@@ -92,14 +92,13 @@ def get_balance(api_key: str, id_token: str) -> dict:
         "lang": "en"
     }
     
-    print("Fetching balance...")
-    res = send_api_request(api_key, path, raw_payload, id_token, "POST")
+    with live_loading("💰 Fetching balance...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, id_token, "POST")
     
-    if "data" in res:
-        if "balance" in res["data"]:
-            return res["data"]["balance"]
+    if "data" in res and "balance" in res["data"]:
+        return res["data"]["balance"]
     else:
-        print("Error getting balance:", res.get("error", "Unknown error"))
+        print_error("❌ Balance", f"Error getting balance: {res.get('error', 'Unknown error')}")
         return None
 
 def get_family(
@@ -109,19 +108,10 @@ def get_family(
     is_enterprise: bool | None = None,
     migration_type: str | None = None
 ) -> dict:
-    print("Fetching package family...")
-    
-    is_enterprise_list = [
-        False,
-        True
-    ]
+    theme = get_theme()
 
-    migration_type_list = [
-        "NONE",
-        "PRE_TO_PRIOH",
-        "PRIOH_TO_PRIO",
-        "PRIO_TO_PRIOH"
-    ]
+    is_enterprise_list = [False, True]
+    migration_type_list = ["NONE", "PRE_TO_PRIOH", "PRIOH_TO_PRIO", "PRIO_TO_PRIOH"]
 
     if is_enterprise is not None:
         is_enterprise_list = [is_enterprise]
@@ -134,49 +124,46 @@ def get_family(
 
     family_data = None
 
-    for mt in migration_type_list:
-        if family_data is not None:
-            break
-
-        for ie in is_enterprise_list:
+    with live_loading(f"📦 Fetching package family {family_code}...", theme):
+        for mt in migration_type_list:
             if family_data is not None:
                 break
-        
-            print(f"Trying is_enterprise={ie}, migration_type={mt}.")
 
-            payload_dict = {
-                "is_show_tagging_tab": True,
-                "is_dedicated_event": True,
-                "is_transaction_routine": False,
-                "migration_type": mt,
-                "package_family_code": family_code,
-                "is_autobuy": False,
-                "is_enterprise": ie,
-                "is_pdlp": True,
-                "referral_code": "",
-                "is_migration": False,
-                "lang": "en"
-            }
-        
-            res = send_api_request(api_key, path, payload_dict, id_token, "POST")
+            for ie in is_enterprise_list:
+                if family_data is not None:
+                    break
 
-            if res.get("status") != "SUCCESS":
-                continue
-            
-            family_name = res["data"]["package_family"].get("name", "")
-            if family_name != "":
-                family_data = res["data"]
-                print(f"Success with is_enterprise={ie}, migration_type={mt}. Family name: {family_name}")
+                payload_dict = {
+                    "is_show_tagging_tab": True,
+                    "is_dedicated_event": True,
+                    "is_transaction_routine": False,
+                    "migration_type": mt,
+                    "package_family_code": family_code,
+                    "is_autobuy": False,
+                    "is_enterprise": ie,
+                    "is_pdlp": True,
+                    "referral_code": "",
+                    "is_migration": False,
+                    "lang": "en"
+                }
 
+                res = send_api_request(api_key, path, payload_dict, id_token, "POST")
+
+                if res.get("status") != "SUCCESS":
+                    continue
+
+                family_name = res["data"]["package_family"].get("name", "")
+                if family_name:
+                    family_data = res["data"]
+                    print_success("✅ Family", f"Success with is_enterprise={ie}, migration_type={mt}. Family name: {family_name}")
 
     if family_data is None:
-        print(f"Failed to get valid family data for {family_code}")
+        print_error("❌ Family", f"Failed to get valid family data for {family_code}")
         return None
 
     return family_data
 
 def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict:
-    print("Fetching families...")
     path = "api/v8/xl-stores/families"
     payload_dict = {
         "migration_type": "",
@@ -187,13 +174,16 @@ def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict
         "is_migration": False,
         "lang": "en"
     }
-    
-    res = send_api_request(api_key, path, payload_dict, tokens["id_token"], "POST")
+
+    with live_loading(f"📂 Fetching families for category {package_category_code}...", get_theme()):
+        res = send_api_request(api_key, path, payload_dict, tokens["id_token"], "POST")
+
     if res.get("status") != "SUCCESS":
-        print(f"Failed to get families for category {package_category_code}")
-        print(f"Res:{json.dumps(res, indent=2)}")
-        input("Press Enter to continue...")
+        print_error("❌ Families", f"Gagal mengambil families untuk kategori {package_category_code}")
+        print_panel("📑 Response", json.dumps(res, indent=2))
+        pause()
         return None
+
     return res["data"]
 
 def get_package(
@@ -202,7 +192,7 @@ def get_package(
     package_option_code: str,
     package_family_code: str = "",
     package_variant_code: str = ""
-    ) -> dict:
+) -> dict:
     path = "api/v8/xl-stores/options/detail"
     
     raw_payload = {
@@ -219,13 +209,13 @@ def get_package(
         "is_upsell_pdp": False,
         "package_variant_code": package_variant_code
     }
-    
-    print("Fetching package...")
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+
+    with live_loading(f"📦 Fetching package {package_option_code}...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     
     if "data" not in res:
-        print(json.dumps(res, indent=2))
-        print("Error getting package:", res.get("error", "Unknown error"))
+        print_error("❌ Package", f"Gagal mengambil package {package_option_code}")
+        print_panel("📑 Response", json.dumps(res, indent=2))
         return None
         
     return res["data"]
@@ -238,12 +228,13 @@ def get_addons(api_key: str, tokens: dict, package_option_code: str) -> dict:
         "lang": "en",
         "package_option_code": package_option_code
     }
-    
-    print("Fetching addons...")
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+
+    with live_loading(f"🧩 Fetching addons for {package_option_code}...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     
     if "data" not in res:
-        print("Error getting addons:", res.get("error", "Unknown error"))
+        print_error("❌ Addons", f"Gagal mengambil addons untuk {package_option_code}")
+        print_panel("📑 Response", json.dumps(res, indent=2))
         return None
         
     return res["data"]
@@ -262,13 +253,13 @@ def intercept_page(
         "package_option_code": option_code
     }
     
-    print("Fetching intercept page...")
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+    with live_loading(f"🛡️ Fetching intercept page for {option_code}...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     
     if "status" in res:
-        print(f"Intercept status: {res['status']}")
+        print_panel("🛡️ Intercept", f"Status: {res['status']}")
     else:
-        print("Intercept error")
+        print_error("❌ Intercept", "Intercept error")
 
 def login_info(
     api_key: str,
@@ -372,7 +363,6 @@ def get_notification_detail(
     return res
 
 def get_pending_transaction(api_key: str, tokens: dict) -> dict:
-    # @TODO: implement this function properly
     path = "api/v8/profile"
 
     raw_payload = {
@@ -380,34 +370,20 @@ def get_pending_transaction(api_key: str, tokens: dict) -> dict:
         "lang": "en"
     }
 
-    print("Fetching pending transactions...")
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+    with live_loading("⏳ Fetching pending transactions...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
 
-    # {
-    #     "code": "000",
-    #     "data": {
-    #         "pending_payment": [
-    #             {
-    #                 "payment_for": "BUY_PACKAGE",
-    #                 "reference_id": "xxx-xxx",
-    #                 "formated_date": "05 October 2025 | 11:10 WIB",
-    #                 "title": "Package Purchase",
-    #                 "payment_with_label": "QRIS",
-    #                 "payment_id": "1234567890",
-    #                 "price": "IDRxx.xxx",
-    #                 "package_name": "Package Purchase",
-    #                 "payment_with": "QRIS",
-    #                 "payment_with_icon": "",
-    #                 "raw_price": xxxxx,
-    #                 "status": "FINISHED",
-    #                 "timestamp": xxxxxxxxxxx,
-    #             }
-    #         ]
-    #     },
-    #     "status": "SUCCESS"
-    # }
+    if res.get("status") != "SUCCESS":
+        print_error("❌ Pending Transaction", "Gagal mengambil pending transactions.")
+        print_panel("📑 Response", json.dumps(res, indent=2))
+        return None
 
-    return res.get("data")
+    data = res.get("data", {})
+    if not data or "pending_payment" not in data:
+        print_error("⚠️ Pending Transaction", "Tidak ada transaksi pending ditemukan.")
+        return None
+
+    return data
 
 def get_transaction_history(api_key: str, tokens: dict) -> dict:
     path = "payments/api/v8/transaction-history"
@@ -417,37 +393,20 @@ def get_transaction_history(api_key: str, tokens: dict) -> dict:
         "lang": "en"
     }
 
-    print("Fetching transaction history...")
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    # print(json.dumps(res, indent=4))
+    with live_loading("📜 Fetching transaction history...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
 
-# {
-#   "code": "000",
-#   "data": {"list": [
-#     {
-#       "show_time": false,
-#       "code": "to get detail",
-#       "payment_method_icon": "",
-#       "formated_date": "",
-#       "payment_status": "REFUND-SUCCESS",
-#       "icon": "",
-#       "title": "Xtra Edukasi 2GB, 1hr",
-#       "trx_code": "",
-#       "price": "IDR 2000",
-#       "target_msisdn": "",
-#       "payment_method_label": "XQRIS",
-#       "validity": "1 Day",
-#       "category": "",
-#       "payment_method": "XQRIS",
-#       "raw_price": 2000,
-#       "timestamp": 1759523623,
-#       "status": "FAILED"
-#     }
-#   ]},
-#   "status": "SUCCESS"
-# }
+    if res.get("status") != "SUCCESS":
+        print_error("❌ Transaction History", "Gagal mengambil riwayat transaksi.")
+        print_panel("📑 Response", json.dumps(res, indent=2))
+        return None
 
-    return res.get("data")
+    data = res.get("data", {})
+    if not data or "list" not in data:
+        print_error("⚠️ Transaction History", "Tidak ada riwayat transaksi ditemukan.")
+        return None
+
+    return data
 
 def get_tiering_info(api_key: str, tokens: dict) -> dict:
     path = "gamification/api/v8/loyalties/tiering/info"
@@ -457,12 +416,16 @@ def get_tiering_info(api_key: str, tokens: dict) -> dict:
         "lang": "en"
     }
 
-    print("Fetching tiering info...")
-    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+    with live_loading("🏆 Fetching tiering info...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     
-    if res:
-        return res.get("data", {})
-    return {}
+    if not res or res.get("status") != "SUCCESS":
+        print_error("❌ Tiering", "Gagal mengambil tiering info.")
+        if res:
+            print_panel("📑 Response", json.dumps(res, indent=2))
+        return {}
+
+    return res.get("data", {})
 
 def unsubscribe(
     api_key: str,
@@ -510,28 +473,31 @@ def dashboard_segments(api_key: str, id_token: str, access_token: str, balance: 
     }
 
     theme = get_theme()
-    with live_loading("Mengambil data segmen pengguna...", theme):
+    with live_loading("📊 Mengambil data segmen pengguna...", theme):
         try:
             res = send_api_request(api_key, path, payload, id_token, "POST")
         except Exception as e:
-            print(f"❌ Gagal kirim request segments: {e}")
+            print_error("❌ Segments", f"Gagal kirim request segments: {e}")
             return None
 
     if not (isinstance(res, dict) and "data" in res):
         err = res.get("error", "Unknown error") if isinstance(res, dict) else res
-        print(f"❌ Error respons segments: {err}")
+        print_error("❌ Segments", f"Error respons segments: {err}")
         return None
 
     data = res["data"]
 
+    # Loyalty info
     loyalty_data = data.get("loyalty", {}).get("data", {})
     loyalty_info = {
         "current_point": loyalty_data.get("current_point", 0),
         "tier_name": loyalty_data.get("detail_tier", {}).get("name", "")
     }
 
+    # Notifications
     notifications = data.get("notification", {}).get("data", [])
 
+    # Special For You packages
     sfy_data = data.get("special_for_you", {}).get("data", {})
     sfy_banners = sfy_data.get("banners", [])
     special_packages = []
@@ -562,7 +528,7 @@ def dashboard_segments(api_key: str, id_token: str, access_token: str, balance: 
             }
             special_packages.append(formatted_pkg)
         except Exception as e:
-            print(f"⚠️ Gagal parse paket SFY: {e}")
+            print_warning("⚠️ SFY", f"Gagal parse paket SFY: {e}")
             continue
 
     return {
