@@ -12,6 +12,7 @@ from app.service.service import load_status, save_status
 
 console = Console()
 
+
 def normalize_number(raw_input: str) -> str:
     raw_input = raw_input.strip()
     if raw_input.startswith("08"):
@@ -21,6 +22,7 @@ def normalize_number(raw_input: str) -> str:
     elif raw_input.startswith("628"):
         return raw_input
     return raw_input
+
 
 def login_prompt(api_key: str):
     clear_sc()
@@ -70,6 +72,7 @@ def login_prompt(api_key: str):
     except Exception as e:
         print_panel("⚠️ Error", f"Terjadi kesalahan: {e}")
         return None, None
+
 
 def show_account_menu():
     clear_sc()
