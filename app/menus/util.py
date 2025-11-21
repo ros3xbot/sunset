@@ -60,8 +60,8 @@ __________             ___.
     console.print(
         Panel(
             Align.center(ascii_art),
-            border_style=get_theme_style("border_info"),
-            style=get_theme_style("text_body"),
+            border_style=get_theme_style("border_primary"),
+            style=get_theme_style("text_sub"),
             expand=True,
         )
     )
