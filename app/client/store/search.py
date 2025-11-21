@@ -14,11 +14,11 @@ def get_family_list(api_key: str, tokens: dict,
         res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
 
     if not res or res.get("status") != "SUCCESS":
-        print_error("❌ Family List", "Failed to fetch family list.")
+        print_error("❌", "Failed to fetch family list.")
         print_panel("📑 Response", json.dumps(res, indent=2))
         return None
 
-    print_success("✅ Family List", "Family list fetched successfully")
+    print_success("✅", "Family list fetched successfully")
     return res
 
 
@@ -44,9 +44,9 @@ def get_store_packages(api_key: str, tokens: dict,
         res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
 
     if not res or res.get("status") != "SUCCESS":
-        print_error("❌ Store Packages", "Failed to fetch store packages.")
+        print_error("❌", "Failed to fetch store packages.")
         print_panel("📑 Response", json.dumps(res, indent=2))
         return None
 
-    print_success("✅ Store Packages", "Store packages fetched successfully")
+    print_success("✅", "Store packages fetched successfully")
     return res
