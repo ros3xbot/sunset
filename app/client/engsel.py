@@ -146,7 +146,7 @@ def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict
         res = send_api_request(api_key, path, payload_dict, tokens["id_token"], "POST")
     if res.get("status") != "SUCCESS":
         print_error("❌", f"Gagal mengambil families untuk kategori {package_category_code}")
-        print_panel("📑", json.dumps(res, indent=2))
+        print_panel("📑 Response", json.dumps(res, indent=2))
         pause()
         return None
     return res["data"]
@@ -175,7 +175,7 @@ def get_package(api_key: str, tokens: dict,
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if "data" not in res:
         print_error("❌", f"Gagal mengambil package: {package_variant_code}")
-        print_panel("📑", json.dumps(res, indent=2))
+        print_panel("📑 Response", json.dumps(res, indent=2))
         return None
     return res["data"]
 
@@ -187,7 +187,7 @@ def get_addons(api_key: str, tokens: dict, package_option_code: str) -> dict:
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if "data" not in res:
         print_error("❌", f"Gagal mengambil addons untuk {package_option_code}")
-        print_panel("📑", json.dumps(res, indent=2))
+        print_panel("📑 Response", json.dumps(res, indent=2))
         return None
     return res["data"]
 
@@ -198,7 +198,7 @@ def intercept_page(api_key: str, tokens: dict, option_code: str, is_enterprise: 
     with live_loading(f"🛡️ Fetching intercept page...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if "status" in res:
-        print_panel("🛡️", f"Status: {res['status']}")
+        print_panel("🛡️️ Intercept", f"Status: {res['status']}")
     else:
         print_error("❌", "Intercept error")
 
@@ -213,7 +213,7 @@ def login_info(api_key: str, tokens: dict, is_enterprise: bool = False):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if "data" not in res:
         print_error("❌", f"Error getting login info: {res.get('error', 'Unknown error')}")
-        print_panel("📑", json.dumps(res, indent=2))
+        print_panel("📑 Response", json.dumps(res, indent=2))
         return None
     return res["data"]
 
@@ -329,7 +329,7 @@ def unsubscribe(api_key: str, tokens: dict,
                 print_success("✅", f"Berhasil unsubscribe quota {quota_code}")
                 return True
             print_error("❌", f"Gagal unsubscribe quota {quota_code}")
-            print_panel("📑", json.dumps(res, indent=2))
+            print_panel("📑 Response", json.dumps(res, indent=2))
             return False
         except Exception as e:
             print_error("❌", f"Exception: {e}")
