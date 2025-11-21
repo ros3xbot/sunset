@@ -40,7 +40,7 @@ def simple_number():
 
     console.print(Panel(
         Align.center(text),
-        border_style=get_theme_style("border_warn"),
+        border_style=get_theme_style("border_warning"),
         padding=(0, 0),
         expand=True
     ))
@@ -59,7 +59,7 @@ def clear_screen():
         Panel(
             Align.center(ascii_art),
             border_style=get_theme_style("border_primary"),
-            style=get_theme_style("text_warning"),
+            style=get_theme_style("text_warn"),
             expand=True,
             box=box.DOUBLE,
         )
