@@ -1,12 +1,22 @@
-from datetime import timezone, datetime
 import json
 import time
 import uuid
-
 import requests
-from app.client.encrypt import API_KEY, build_encrypted_field, decrypt_xdata, encryptsign_xdata, get_x_signature_payment, java_like_timestamp
+from datetime import timezone, datetime
+
+from app.client.encrypt import (
+    API_KEY,
+    build_encrypted_field,
+    decrypt_xdata,
+    encryptsign_xdata,
+    get_x_signature_payment,
+    java_like_timestamp,
+)
 from app.client.engsel import BASE_API_URL, UA, intercept_page, send_api_request
 from app.type_dict import PaymentItem
+from app.menus.util import live_loading, print_error, print_success, print_panel
+from app.config.theme_config import get_theme
+
 
 def settlement_balance(
     api_key: str,
@@ -22,18 +32,12 @@ def settlement_balance(
 ):
     # Sanity check
     if overwrite_amount == -1 and not ask_overwrite:
-        print("Either ask_overwrite must be True or overwrite_amount must be set.")
+        print_error("❌ Settlement", "Either ask_overwrite must be True or overwrite_amount must be set.")
         return None
 
     token_confirmation = items[token_confirmation_idx]["token_confirmation"]
-    payment_targets = ""
-    for item in items:
-        if payment_targets != "":
-            payment_targets += ";"
-        payment_targets += item["item_code"]
+    payment_targets = ";".join([item["item_code"] for item in items])
 
-    amount_int = 0
-    
     # Determine amount to use
     if overwrite_amount != -1:
         amount_int = overwrite_amount
@@ -42,16 +46,16 @@ def settlement_balance(
 
     # If Overwrite
     if ask_overwrite:
-        print(f"Total amount is {amount_int}.\nEnter new amount if you need to overwrite.")
+        print_panel("💰 Amount", f"Total amount is {amount_int}. Enter new amount if you need to overwrite.")
         amount_str = input("Press enter to ignore & use default amount: ")
         if amount_str != "":
             try:
                 amount_int = int(amount_str)
             except ValueError:
-                print("Invalid overwrite input, using original price.")
-                # return None
+                print_warning("⚠️ Settlement", "Invalid overwrite input, using original price.")
+
     intercept_page(api_key, tokens, items[0]["item_code"], False)
-    
+
     # Get payment methods
     payment_path = "payments/api/v8/payment-methods-option"
     payment_payload = {
@@ -60,19 +64,20 @@ def settlement_balance(
         "payment_target": items[token_confirmation_idx]["item_code"],
         "lang": "en",
         "is_referral": False,
-        "token_confirmation": token_confirmation
+        "token_confirmation": token_confirmation,
     }
-    
-    print("Getting payment methods...")
-    payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
-    if payment_res["status"] != "SUCCESS":
-        print("Failed to fetch payment methods.")
-        print(f"Error: {payment_res}")
+
+    with live_loading("💳 Getting payment methods...", get_theme()):
+        payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
+
+    if payment_res.get("status") != "SUCCESS":
+        print_error("❌ Payment Methods", "Failed to fetch payment methods.")
+        print_panel("📑 Response", json.dumps(payment_res, indent=2))
         return payment_res
-    
+
     token_payment = payment_res["data"]["token_payment"]
     ts_to_sign = payment_res["data"]["timestamp"]
-    
+
     # Settlement request
     path = "payments/api/v8/settlement-multipayment"
     settlement_payload = {
@@ -88,11 +93,7 @@ def settlement_balance(
         "members": [],
         "total_fee": 0,
         "fingerprint": "",
-        "autobuy_threshold_setting": {
-            "label": "",
-            "type": "",
-            "value": 0
-        },
+        "autobuy_threshold_setting": {"label": "", "type": "", "value": 0},
         "is_use_point": False,
         "lang": "en",
         "payment_method": "BALANCE",
@@ -132,40 +133,38 @@ def settlement_balance(
             "is_akrab_m2m": False,
             "balance_type": "PREPAID_BALANCE",
             "has_bonus": False,
-            "discount_promo": 0
+            "discount_promo": 0,
         },
         "total_amount": amount_int,
         "is_using_autobuy": False,
         "items": items,
     }
-    
-    # print(f"[SB] payload: {json.dumps(settlement_payload, indent=1)}")
-    
+
     encrypted_payload = encryptsign_xdata(
         api_key=api_key,
         method="POST",
         path=path,
         id_token=tokens["id_token"],
-        payload=settlement_payload
+        payload=settlement_payload,
     )
-    
+
     xtime = int(encrypted_payload["encrypted_body"]["xtime"])
-    sig_time_sec = (xtime // 1000)
+    sig_time_sec = xtime // 1000
     x_requested_at = datetime.fromtimestamp(sig_time_sec, tz=timezone.utc).astimezone()
     settlement_payload["timestamp"] = ts_to_sign
-    
+
     body = encrypted_payload["encrypted_body"]
     x_sig = get_x_signature_payment(
-                api_key,
-                tokens["access_token"],
-                ts_to_sign,
-                payment_targets,
-                token_payment,
-                "BALANCE",
-                payment_for,
-                path
-            )
-    
+        api_key,
+        tokens["access_token"],
+        ts_to_sign,
+        payment_targets,
+        token_payment,
+        "BALANCE",
+        payment_for,
+        path,
+    )
+
     headers = {
         "host": BASE_API_URL.replace("https://", ""),
         "content-type": "application/json; charset=utf-8",
@@ -179,21 +178,22 @@ def settlement_balance(
         "x-request-at": java_like_timestamp(x_requested_at),
         "x-version-app": "8.9.0",
     }
-    
+
     url = f"{BASE_API_URL}/{path}"
-    print("Sending settlement request...")
-    resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
-    
+    with live_loading("📤 Sending settlement request...", get_theme()):
+        resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
+
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        if decrypted_body["status"] != "SUCCESS":
-            print("Failed to initiate settlement.")
-            print(f"Error: {decrypted_body}")
+        if decrypted_body.get("status") != "SUCCESS":
+            print_error("❌ Settlement", "Failed to initiate settlement.")
+            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return decrypted_body
-        
-        print(f"Purchase result:\n{json.dumps(decrypted_body, indent=2)}")
-        
+
+        print_success("✅ Settlement", "Purchase completed successfully")
+        print_panel("🧾 Purchase Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
     except Exception as e:
-        print("[decrypt err]", e)
+        print_error("❌ Settlement", f"Decrypt error: {e}")
+        print_panel("📑 Raw Response", resp.text)
         return resp.text
