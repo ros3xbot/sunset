@@ -8,7 +8,6 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from app.config.theme_config import get_theme_style
-from app.menus.util import print_error, print_success, print_warning, print_panel
 
 console = Console()
 
@@ -17,23 +16,23 @@ REPO = "sunset"
 BRANCH = "main"
 EXPECTED_URL = f"https://github.com/{OWNER}/{REPO}"
 
-
 def get_repo_root():
     try:
         return subprocess.check_output(["git", "rev-parse", "--show-toplevel"]).decode().strip()
     except Exception:
         return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-
 def ensure_git(strict=True):
     root_path = get_repo_root()
     git_config = os.path.join(root_path, ".git", "config")
 
     if not os.path.exists(git_config):
-        print_error("❌ Git", "Script ini hanya bisa dijalankan dari hasil git clone.")
-        print_panel("📑 Info", f"Pastikan Anda meng-clone dari repository resmi:\n  git clone {EXPECTED_URL}")
-        if strict:
-            sys.exit(1)
+        show_panel(
+            "❌ Script ini hanya bisa dijalankan dari hasil git clone.",
+            f"Pastikan Anda meng-clone dari repository resmi:\n  git clone {EXPECTED_URL}",
+            style="info"
+        )
+        if strict: sys.exit(1)
         return False
 
     config = configparser.RawConfigParser(strict=False)
@@ -41,22 +40,21 @@ def ensure_git(strict=True):
 
     origin_url = config.get('remote "origin"', 'url', fallback="").strip()
     if origin_url != EXPECTED_URL:
-        print_warning("⚠️ Git", "Repo ini tidak berasal dari sumber resmi.")
-        print_panel("📑 Info", f"URL saat ini: {origin_url}\nSilakan clone ulang dari:\n  git clone {EXPECTED_URL}")
-        if strict:
-            sys.exit(1)
+        show_panel(
+            "⚠️ Repo ini tidak berasal dari sumber resmi.",
+            f"URL saat ini: {origin_url}\nSilakan clone ulang dari:\n  git clone {EXPECTED_URL}",
+            style="info"
+        )
+        if strict: sys.exit(1)
         return False
 
-    print_success("✅ Git", "Repository valid dan berasal dari sumber resmi.")
     return True
-
 
 def get_local_commit():
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL).decode().strip()
     except Exception:
         return None
-
 
 def get_latest_commit_atom():
     url = f"https://github.com/{OWNER}/{REPO}/commits/{BRANCH}.atom"
@@ -68,7 +66,6 @@ def get_latest_commit_atom():
     entry_id = entry.find("a:id", ns) if entry is not None else None
     return entry_id.text.rsplit("/", 1)[-1] if entry_id is not None else None
 
-
 def check_for_updates():
     local = get_local_commit()
     try:
@@ -77,17 +74,14 @@ def check_for_updates():
         remote = None
 
     if not remote or not local:
-        print_warning("⚠️ Update", "Tidak dapat memeriksa versi terbaru.")
         return False
 
     if local != remote:
-        print_warning("⚠️ Update", f"Versi terbaru tersedia (local {local[:7]} vs remote {remote[:7]})")
-        print_panel("📑 Info", "Jalankan:\n[bold]git pull --rebase[/] untuk update.")
+        console.print(f"[bold yellow]⚠️ Versi terbaru tersedia[/] [dim](local {local[:7]} vs remote {remote[:7]})[/]")
+        console.print("[green]Jalankan:[/] [bold]git pull --rebase[/] untuk update.")
         return True
 
-    print_success("✅ Update", "Repository sudah dalam versi terbaru.")
     return False
-
 
 def show_panel(title, body, style="info"):
     border = get_theme_style(f"border_{style}")
@@ -96,3 +90,4 @@ def show_panel(title, body, style="info"):
         line_style = get_theme_style("text_date") if "http" in line else get_theme_style("text_body")
         text.append(line + "\n", style=line_style)
     console.print(Panel(text, title=title, border_style=border, expand=True))
+
