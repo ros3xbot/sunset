@@ -1,7 +1,7 @@
-from html.parser import HTMLParser
 import os
 import re
 import textwrap
+from html.parser import HTMLParser
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -27,6 +27,7 @@ def print_banner():
         box=box.DOUBLE
     ))
 
+
 def simple_number():
     from app.service.auth import AuthInstance
     theme = get_theme()
@@ -44,6 +45,7 @@ def simple_number():
         padding=(0, 0),
         expand=True
     ))
+
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -69,6 +71,7 @@ def clear_screen():
     )
     simple_number()
 
+
 def clear_sc():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""__________             ___.                  
@@ -92,8 +95,10 @@ def clear_sc():
         )
     )
 
+
 def pause():
     input("\nPress enter to continue...")
+
 
 class HTMLToText(HTMLParser):
     def __init__(self, width=80):
@@ -122,16 +127,16 @@ class HTMLToText(HTMLParser):
                 self.result.append(text)
 
     def get_text(self):
-        # Join and clean multiple newlines
         text = "".join(self.result)
         text = re.sub(r"\n\s*\n\s*\n+", "\n\n", text)
-        # Wrap lines nicely
         return "\n".join(textwrap.wrap(text, width=self.width, replace_whitespace=False))
+
 
 def display_html(html_text, width=80):
     parser = HTMLToText(width=width)
     parser.feed(html_text)
     return parser.get_text()
+
 
 def format_quota_byte(quota_byte: int) -> str:
     GB = 1024 ** 3 
@@ -146,6 +151,7 @@ def format_quota_byte(quota_byte: int) -> str:
         return f"{quota_byte / KB:.2f} KB"
     else:
         return f"{quota_byte} B"
+
 
 def get_rupiah(value) -> str:
     value_str = str(value).strip()
@@ -166,6 +172,7 @@ def get_rupiah(value) -> str:
     formatted = f"{formatted_number},-"
     return f"{formatted} {suffix}" if suffix else formatted
 
+
 def nav_range(label: str, count: int) -> str:
     if count <= 0:
         return f"{label} (tidak tersedia)"
@@ -173,21 +180,27 @@ def nav_range(label: str, count: int) -> str:
         return f"{label} (1)"
     return f"{label} (1–{count})"
 
+
 def live_loading(text: str, theme: dict):
     return console.status(f"[{theme['text_body']}]{text}[/{theme['text_body']}]", spinner="dots")
+
 
 def print_panel(title, content, border_style=None):
     style = border_style or get_theme_style("border_info")
     console.print(Panel(content, title=title, title_align="left", border_style=style))
 
+
 def print_success(title, content):
     console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_success")))
+
 
 def print_error(title, content):
     console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_error")))
 
+
 def print_warning(title, content):
     console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_warning")))
+
 
 def print_title(text):
     console.print(Panel(
@@ -196,6 +209,7 @@ def print_title(text):
         padding=(0, 1),
         expand=True
     ))
+
 
 def print_key_value(label, value):
     console.print(f"[{get_theme_style('text_key')}]{label}:[/] [{get_theme_style('text_value')}]{value}[/{get_theme_style('text_value')}]")
