@@ -52,9 +52,7 @@ def clear_screen():
 |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
 |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
 |______  /(____  /__|  |___  /\___  >__/\_ \
-       \/      \/          \/     \/      \/
-       
-       """
+       \/      \/          \/     \/      \/"""
 
     version_text = f"[{get_theme_style('text_title')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_title')}]"
     
@@ -66,6 +64,7 @@ def clear_screen():
             style=get_theme_style("text_warn"),
             expand=True,
             box=box.DOUBLE,
+            padding=(1, 2),
         )
     )
     simple_number()
@@ -77,9 +76,7 @@ def clear_sc():
 |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
 |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
 |______  /(____  /__|  |___  /\___  >__/\_ \
-       \/      \/          \/     \/      \/
-       
-       """
+       \/      \/          \/     \/      \/"""
 
     version_text = f"[{get_theme_style('text_body')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_body')}]"
     
@@ -91,6 +88,7 @@ def clear_sc():
             style=get_theme_style("text_title"),
             expand=True,
             box=box.DOUBLE,
+            padding=(1, 2),
         )
     )
 
