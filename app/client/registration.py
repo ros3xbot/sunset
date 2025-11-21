@@ -18,10 +18,10 @@ def validate_puk(api_key: str, msisdn: str, puk: str) -> dict:
         res = send_api_request(api_key, path, raw_payload, "", "POST")
 
     if not res or res.get("status") != "SUCCESS":
-        print_error("❌ PUK", f"Failed to validate PUK for {msisdn}")
+        print_error("❌", f"Failed to validate PUK for {msisdn}")
         print_panel("📑 Response", json.dumps(res, indent=2))
     else:
-        print_success("✅ PUK", f"PUK validated successfully for {msisdn}")
+        print_success("✅", f"PUK validated successfully for {msisdn}")
     return res
 
 
@@ -38,8 +38,8 @@ def dukcapil(api_key: str, msisdn: str, kk: str, nik: str) -> dict:
         res = send_api_request(api_key, path, raw_payload, "", "POST")
 
     if not res or res.get("status") != "SUCCESS":
-        print_error("❌ Dukcapil", f"Failed to validate Dukcapil for {msisdn}")
+        print_error("❌", f"Failed to validate Dukcapil for {msisdn}")
         print_panel("📑 Response", json.dumps(res, indent=2))
     else:
-        print_success("✅ Dukcapil", f"Dukcapil validated successfully for {msisdn}")
+        print_success("✅", f"Dukcapil validated successfully for {msisdn}")
     return res
