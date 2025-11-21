@@ -53,6 +53,7 @@ def clear_screen():
 |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
 |______  /(____  /__|  |___  /\___  >__/\_ \
        \/      \/          \/     \/      \/
+       
        """
 
     version_text = f"[{get_theme_style('text_title')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_title')}]"
@@ -77,6 +78,7 @@ def clear_sc():
 |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
 |______  /(____  /__|  |___  /\___  >__/\_ \
        \/      \/          \/     \/      \/
+       
        """
 
     version_text = f"[{get_theme_style('text_body')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_body')}]"
