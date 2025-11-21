@@ -168,7 +168,7 @@ def nav_range(label: str, count: int) -> str:
     return f"{label} (1–{count})"
 
 def live_loading(text: str, theme: dict):
-    return console.status(f"[{theme['text_sub']}]{text}[/{theme['text_sub']}]", spinner="dots")
+    return console.status(f"[{theme['text_body']}]{text}[/{theme['text_body']}]", spinner="dots")
 
 def print_panel(title, content, border_style=None):
     style = border_style or get_theme_style("border_info")
