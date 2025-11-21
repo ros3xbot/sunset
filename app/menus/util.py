@@ -59,7 +59,7 @@ def clear_screen():
                 myXL CLI v8.9.1 sunset """
 
     print(ascii_art)
-    print_banner()
+    #print_banner()
     simple_number()
 
 def clear_sc():
@@ -73,10 +73,10 @@ def clear_sc():
       |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
       |______  /(____  /__|  |___  /\___  >__/\_ \
              \/      \/          \/     \/      \/    
-    """
+                myXL CLI v8.9.1 sunset """
 
     print(ascii_art)
-    print_banner()
+    #print_banner()
 
 def pause():
     input("\nPress enter to continue...")
