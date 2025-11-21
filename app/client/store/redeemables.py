@@ -12,9 +12,9 @@ def get_redeemables(api_key: str, tokens: dict, is_enterprise: bool = False) -> 
         res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
 
     if not res or res.get("status") != "SUCCESS":
-        print_error("❌ Redeemables", "Failed to fetch redeemables.")
+        print_error("❌", "Failed to fetch redeemables.")
         print_panel("📑 Response", json.dumps(res, indent=2))
         return None
 
-    print_success("✅ Redeemables", "Redeemables fetched successfully")
+    print_success("✅", "Redeemables fetched successfully")
     return res
