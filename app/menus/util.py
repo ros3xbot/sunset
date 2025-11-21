@@ -83,6 +83,7 @@ def clear_sc():
             border_style=get_theme_style("border_primary"),
             style=get_theme_style("text_body"),
             expand=True,
+            box=box.DOUBLE,
         )
     )
     #print_banner()
