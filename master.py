@@ -196,7 +196,6 @@ def main():
             # tampilkan menu utama
             show_main_menu(profile, display_quota, segments)
 
-            #choice = input("👉 Pilih menu: ")
             choice = console.input(f"[{theme['text_sub']}]👉 Pilih menu:[/{theme['text_sub']}] ").strip()
 
             # Shortcuts & navigasi
