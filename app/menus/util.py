@@ -90,7 +90,7 @@ def clear_sc():
             border_style=get_theme_style("border_primary"),
             style=get_theme_style("text_title"),
             expand=True,
-            box=box.DOUBLE,
+            #box=box.DOUBLE,
             padding=(1, 2),
         )
     )
