@@ -11,7 +11,7 @@ def get_group_data(api_key: str, tokens: dict) -> dict:
     with live_loading("👥 Fetching group detail...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if not res or res.get("status") != "SUCCESS":
-        print_error("❌ Group", f"Failed to fetch group detail: {res.get('error', 'Unknown error')}")
+        print_error("❌", f"Failed to fetch group detail: {res.get('error', 'Unknown error')}")
         print_panel("📑 Response", json.dumps(res, indent=2))
     return res
 
