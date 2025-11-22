@@ -82,7 +82,7 @@ def check_for_updates():
 
     if local != remote:
         print_warning("⚠️", f"Versi terbaru tersedia (local {local[:7]} vs remote {remote[:7]})")
-        print_panel("📑 Info", "Jalankan:\n[bold]git pull --rebase[/] untuk update.")
+        #print_panel("📑 Info", "Jalankan:\n[bold]git pull --rebase[/] untuk update.")
         return True
 
     #print_success("✅", "Repository sudah dalam versi terbaru.")
