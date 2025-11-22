@@ -54,6 +54,7 @@ from app.menus.sfy import show_special_for_you_menu
 from app.menus.bundle import show_bundle_menu
 from app.menus.theme import show_theme_menu
 from app.config.theme_config import get_theme, get_theme_style
+from app.config.cache import get_cache, set_cache
 
 console = Console()
 
@@ -232,7 +233,6 @@ def show_main_menu2(active_user: dict, profile: dict):
             print_warning("⚠️", "Pilihan tidak valid. Silakan coba lagi.")
             pause()
 
-
 def main():
     ensure_git()
     theme = get_theme()
@@ -240,13 +240,27 @@ def main():
         active_user = AuthInstance.get_active_user()
         if active_user is not None:
             with live_loading("🔄 Memuat data akun...", get_theme()):
-                balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
-                quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
-                segments = dash_segments(
-                    AuthInstance.api_key,
-                    active_user["tokens"]["id_token"],
-                    active_user["tokens"]["access_token"]
-                ) or {}
+                # Balance cache (TTL 30 detik)
+                balance = get_cache("balance", ttl=30)
+                if not balance:
+                    balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
+                    set_cache("balance", balance)
+
+                # Quota cache (TTL 30 detik)
+                quota = get_cache("quota", ttl=30)
+                if not quota:
+                    quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
+                    set_cache("quota", quota)
+
+                # Segments cache (TTL 300 detik, file-based)
+                segments = get_cache("segments", ttl=300, use_file=True)
+                if not segments:
+                    segments = dash_segments(
+                        AuthInstance.api_key,
+                        active_user["tokens"]["id_token"],
+                        active_user["tokens"]["access_token"]
+                    ) or {}
+                    set_cache("segments", segments, use_file=True)
 
             remaining = quota.get("remaining", 0)
             total = quota.get("total", 0)
@@ -297,12 +311,12 @@ def main():
                     continue
                 show_package_details(AuthInstance.api_key, active_user["tokens"], option_code, False)
             elif choice == "6":
-                family_code = input("🧩 Masukkan family code: ")
+                family_code = input("💵 Masukkan family code: ")
                 if family_code == "99":
                     continue
                 get_packages_by_family(family_code)
             elif choice == "7":
-                family_code = input("🛒 Masukkan family code: ")
+                family_code = input("🔁 Masukkan family code: ")
                 if family_code == "99":
                     continue
                 start_from_option = input("Mulai dari option number (default 1): ")
@@ -322,7 +336,6 @@ def main():
                 show_transaction_history(AuthInstance.api_key, active_user["tokens"])
             elif choice == "00":
                 show_bookmark_menu()
-
             elif choice == "44":
                 show_bundle_menu()
             elif choice == "55":
@@ -336,7 +349,6 @@ def main():
             elif choice == "99":
                 print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
                 sys.exit(0)
-
             elif choice.lower() == "y":
                 show_special_for_you_menu(active_user["tokens"])
             elif choice.lower() == "s":
@@ -357,10 +369,11 @@ if __name__ == "__main__":
     try:
         with live_loading("🔄 Checking for updates...", get_theme()):
             need_update = check_for_updates()
-        #if need_update:
-            #print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
-            #pause()
-            #sys.exit(0)
+        # Jika ingin paksa update, aktifkan blok ini:
+        # if need_update:
+        #     print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
+        #     pause()
+        #     sys.exit(0)
         main()
     except KeyboardInterrupt:
         print_error("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
