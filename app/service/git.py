@@ -12,7 +12,7 @@ from app.menus.util import print_error, print_success, print_warning, print_pane
 
 console = Console()
 
-OWNER = "ros3xbotx"
+OWNER = "ros3xbot"
 REPO = "sunset"
 BRANCH = "main"
 EXPECTED_URL = f"https://github.com/{OWNER}/{REPO}"
