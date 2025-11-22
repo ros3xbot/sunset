@@ -156,7 +156,9 @@ if __name__ == "__main__":
     try:
         with live_loading("🔄 Checking for updates...", get_theme()):
             need_update = check_for_updates()
-        ensure_git()
-        git_pull_rebase()
-        run_main()
+    except Exception as e:
+        print_warning("⚠️", f"Gagal cek update: {e}")
 
+    ensure_git()
+    git_pull_rebase()
+    run_main()
