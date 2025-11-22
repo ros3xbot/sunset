@@ -357,10 +357,32 @@ def get_quota(api_key: str, id_token: str) -> dict | None:
     return None
 
 
-def dashboard_segments(api_key: str, tokens: dict, balance: int = 0) -> dict | None:
+def dashboard_segments(
+    api_key: str,
+    tokens: dict,
+) -> dict:
+    path = "dashboard/api/v8/segments"
+
+    raw_payload = {
+        "access_token": tokens["access_token"],
+        # "app_version": "",
+        # "model_name": "",
+        # "is_enterprise": False,
+        # "current_balance": 0,
+        # "family_plan_role": "",
+        # "manufacturer_name": "",
+        # "lang": "en"
+    }
+
+    res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+
+    return res
+
+
+def segments(api_key: str, id_token: str, access_token: str, balance: int = 0) -> dict | None:
     path = "dashboard/api/v8/segments"
     payload = {
-        "access_token": tokens.get("access_token", ""),
+        "access_token": access_token,
         "app_version": "8.9.0",
         "current_balance": balance,
         "family_plan_role": "NO_ROLE",
@@ -373,7 +395,7 @@ def dashboard_segments(api_key: str, tokens: dict, balance: int = 0) -> dict | N
     theme = get_theme()
     with live_loading("📊 Mengambil data segmen pengguna...", theme):
         try:
-            res = send_api_request(api_key, path, payload, tokens.get("id_token", ""), "POST")
+            res = send_api_request(api_key, path, payload, id_token, "POST")
         except Exception as e:
             print_error("❌", f"Gagal kirim request segments: {e}")
             return None
