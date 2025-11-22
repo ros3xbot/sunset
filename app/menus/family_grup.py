@@ -34,8 +34,10 @@ def ensure_family_file():
             json.dump(default_data, f, indent=2)
         return default_data
 
+
 def list_family_codes():
     return ensure_family_file()["codes"]
+
 
 def add_family_code(code, name):
     if not code.strip() or not name.strip():
@@ -48,6 +50,7 @@ def add_family_code(code, name):
         json.dump(data, f, indent=2)
     return True
 
+
 def remove_family_code(index):
     data = ensure_family_file()
     if 0 <= index < len(data["codes"]):
@@ -56,6 +59,7 @@ def remove_family_code(index):
             json.dump(data, f, indent=2)
         return removed["code"]
     return None
+
 
 def edit_family_name(index, new_name):
     if not new_name.strip():
@@ -67,6 +71,7 @@ def edit_family_name(index, new_name):
             json.dump(data, f, indent=2)
         return True
     return False
+
 
 def show_family_grup_menu(return_package_detail: bool = False):
     while True:
@@ -115,7 +120,7 @@ def show_family_grup_menu(return_package_detail: bool = False):
 
         console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
-        aksi = console.input(f"[{theme['text_sub']}]Pilih aksi atau nomor kode:[/{theme['text_sub']}] ").strip().lower()
+        aksi = console.input(f"[{theme['text_title']}]Pilih aksi atau nomor kode:[/{theme['text_title']}] ").strip().lower()
 
         if aksi == "t":
             code = console.input("Masukkan family code: ").strip()
