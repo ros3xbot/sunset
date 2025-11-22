@@ -14,6 +14,7 @@ from app.menus.util import get_rupiah
 
 console = Console()
 
+
 def fetch_special_for_you(api_key: str, id_token: str, access_token: str, balance: int = 0) -> list:
     try:
         seg_data = dash_segments(api_key, id_token, access_token, balance)
@@ -76,7 +77,6 @@ def show_special_for_you_menu(tokens: dict):
             pause()
             return
 
-        # Panel informasi di atas tabel
         info_text = Align.center(
             f"[{theme['text_body']}]🔥 Daftar Paket Special For You 🔥[/{theme['text_body']}]"
         )
@@ -87,7 +87,6 @@ def show_special_for_you_menu(tokens: dict):
             expand=True
         ))
 
-        # Tabel daftar paket
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_key"], width=4)
         table.add_column("Nama Paket", style=theme["text_body"])
@@ -112,7 +111,6 @@ def show_special_for_you_menu(tokens: dict):
 
         console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
 
-        # Panel navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
@@ -125,8 +123,7 @@ def show_special_for_you_menu(tokens: dict):
             expand=True
         ))
 
-        # Input pilihan
-        choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilih paket (nomor):[/{theme['text_title']}] ").strip()
 
         if choice == "00":
             return "BACK"
