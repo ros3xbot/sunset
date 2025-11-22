@@ -66,7 +66,7 @@ __________             ___.
     console.print(
         Padding(
             Align.center(content),
-            (1, 2)
+            (1, 0)
         ),
         style=get_theme_style("text_title")
     )
