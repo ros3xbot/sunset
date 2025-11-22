@@ -157,61 +157,77 @@ def show_main_menu(profile, display_quota, segments):
     )
 
 
-def show_main_menu2(profile, display_quota, segments):
-    clear_sc()
+def show_main_menu2():
     theme = get_theme()
+    while True:
+        clear_screen()
 
-    expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
-    pulsa_str = get_rupiah(profile["balance"])
-
-    info_table = Table.grid(padding=(0, 1))
-    info_table.add_column(justify="left", style=get_theme_style("text_body"))
-    info_table.add_column(justify="left", style=get_theme_style("text_body"))
-
-    info_table.add_row(" Nomor", f": 📞 [bold {theme['text_body']}]{profile['number']}[/]")
-    info_table.add_row(" Type", f": 🧾 [{theme['text_body']}]{profile['subscription_type']} ({profile['subscriber_id']})[/]")
-    info_table.add_row(" Pulsa", f": 💰 Rp [{theme['text_money']}]{pulsa_str}[/]")
-    info_table.add_row(" Kuota", f": 📊 [{theme['text_date']}]{display_quota}[/]")
-    info_table.add_row(" Tiering", f": 🏅 [{theme['text_date']}]{profile['point_info']}[/]")
-    info_table.add_row(" Masa Aktif", f": ⏳ [{theme['text_date']}]{expired_at_dt}[/]")
-
-    console.print(
-        Panel(
-            info_table,
-            title=f"[{get_theme_style('text_title')}]✨ Informasi Akun ✨[/]",
-            title_align="center",
-            border_style=get_theme_style("border_info"),
+        console.print(Panel(
+            Align.center("✨ Paket Promo ✨", vertical="middle"),
+            border_style=theme["border_info"],
             padding=(1, 2),
-            expand=True,
-        )
-    )
+            expand=True
+        ))
 
-    menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-    menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
-    menu_table.add_column("Aksi", style=get_theme_style("text_body"))
+        menu_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
+        menu_table.add_row("Kode", justify="right", style=theme["text_key"], width=6)
+        menu_table.add_row("Menu Paket", style=theme["text_body"])
+        menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
+        menu_table.add_row("10", "👥 Circle")
+        menu_table.add_row("11", "🏬 Store Segments")
+        menu_table.add_row("12", "📂 Store Family List")
+        menu_table.add_row("13", "📦 Store Packages")
+        menu_table.add_row("14", "🎁 Redeemables")
+        menu_table.add_row("R", "📝 Register")
+        menu_table.add_row("N", "🔔 Notifikasi")
+        menu_table.add_row("V", "✅ Validate MSISDN")
+        menu_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama[/]")
 
-    menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
-    menu_table.add_row("10", "👥 Circle")
-    menu_table.add_row("11", "🏬 Store Segments")
-    menu_table.add_row("12", "📂 Store Family List")
-    menu_table.add_row("13", "📦 Store Packages")
-    menu_table.add_row("14", "🎁 Redeemables")
-    menu_table.add_row("R", "📝 Register")
-    menu_table.add_row("N", "🔔 Notifikasi")
-    menu_table.add_row("V", "✅ Validate MSISDN")
-
-    console.print(
-        Panel(
+        console.print(Panel(
             menu_table,
-            title=f"[{get_theme_style('text_title')}]✨ Menu Utama ✨[/]",
-            title_align="center",
-            border_style=get_theme_style("border_primary"),
+            border_style=theme["border_primary"],
             padding=(0, 1),
-            expand=True,
-        )
-    )
+            expand=True
+        ))
+
+        choice = console.input(f"[{theme['text_sub']}]Pilih menu:[/{theme['text_sub']}] ").strip()
+        if choice == "9":
+            show_family_info(AuthInstance.api_key, active_user["tokens"])
+        elif choice == "10":
+            show_circle_info(AuthInstance.api_key, active_user["tokens"])
+        elif choice == "11":
+            is_enterprise = input("🏬 Enterprise store? (y/n): ").lower() == "y"
+            show_store_segments_menu(is_enterprise)
+        elif choice == "12":
+            is_enterprise = input("📂 Enterprise? (y/n): ").lower() == "y"
+            show_family_list_menu(profile["subscription_type"], is_enterprise)
+        elif choice == "13":
+            is_enterprise = input("📦 Enterprise? (y/n): ").lower() == "y"
+            show_store_packages_menu(profile["subscription_type"], is_enterprise)
+        elif choice == "14":
+            is_enterprise = input("🎁 Enterprise? (y/n): ").lower() == "y"
+            show_redeemables_menu(is_enterprise)
+
+        elif choice.lower() == "r":
+            msisdn = input("📝 Masukkan msisdn (628xxxx): ")
+            nik = input("Masukkan NIK: ")
+            kk = input("Masukkan KK: ")
+            res = dukcapil(AuthInstance.api_key, msisdn, kk, nik)
+            print_panel("📑 Hasil Registrasi", json.dumps(res, indent=2))
+            pause()
+        elif choice.lower() == "v":
+            msisdn = input("✅ Masukkan msisdn untuk validasi (628xxxx): ")
+            res = validate_msisdn(AuthInstance.api_key, active_user["tokens"], msisdn)
+            print_panel("📑 Hasil Validasi", json.dumps(res, indent=2))
+            pause()
+        elif choice.lower() == "n":
+            show_notification_menu()
+        elif choice == "00":
+            live_loading(text="Kembali ke menu utama...", theme=theme)
+            return
+        else:
+            print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
+            pause()
 
 
 # ============================
