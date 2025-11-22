@@ -65,7 +65,6 @@ def show_main_menu(profile, display_quota, segments):
     )
     pulsa_str = get_rupiah(profile["balance"])
 
-    # Panel informasi akun ✨
     info_table = Table.grid(padding=(0, 1))
     info_table.add_column(justify="left", style=get_theme_style("text_body"))
     info_table.add_column(justify="left", style=get_theme_style("text_body"))
@@ -88,7 +87,6 @@ def show_main_menu(profile, display_quota, segments):
         )
     )
 
-    # Paket spesial preview 🔥
     special_packages = segments.get("special_packages", [])
     if special_packages:
         best = random.choice(special_packages)
@@ -117,7 +115,6 @@ def show_main_menu(profile, display_quota, segments):
         )
         console.print(Align.center(f"[{theme['text_sub']}]Pilih [Y] untuk lihat semua paket spesial[/{theme['text_sub']}]"))
 
-    # Menu utama ⭐
     menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
     menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
     menu_table.add_column("Aksi", style=get_theme_style("text_body"))
@@ -131,7 +128,8 @@ def show_main_menu(profile, display_quota, segments):
     menu_table.add_row("7", "🛒 Beli Semua Paket di Family Code")
     menu_table.add_row("8", "📜 Riwayat Transaksi")
     menu_table.add_row("00", "⭐ Bookmark Paket")
-    menu_table.add_row("55", "👉 Menu berikutnya..")
+    menu_table.add_row("", "")
+    menu_table.add_row("55", "👉 Halaman Menu Lainnya..")
     menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("77", "📢 Info Unlock Code")
     menu_table.add_row("88", "🎨 Ganti Tema CLI")
@@ -164,6 +162,7 @@ def show_main_menu2():
         menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
         menu_table.add_column("Aksi", style=get_theme_style("text_body"))
+
         menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
         menu_table.add_row("10", "👥 Circle")
         menu_table.add_row("11", "🏬 Store Segments")
@@ -173,6 +172,7 @@ def show_main_menu2():
         menu_table.add_row("R", "📝 Register")
         menu_table.add_row("N", "🔔 Notifikasi")
         menu_table.add_row("V", "✅ Validate MSISDN")
+        menu_table.add_row("", "")
         menu_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
@@ -223,9 +223,6 @@ def show_main_menu2():
             pause()
 
 
-# ============================
-# Main loop
-# ============================
 def main():
     ensure_git()
     theme = get_theme()
@@ -237,7 +234,6 @@ def main():
                 quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
                 segments = dash_segments(AuthInstance.api_key, active_user["tokens"]["id_token"], active_user["tokens"]["access_token"]) or {}
 
-            # Format quota
             remaining = quota.get("remaining", 0)
             total = quota.get("total", 0)
             has_unlimited = quota.get("has_unlimited", False)
@@ -246,7 +242,6 @@ def main():
             else:
                 display_quota = "-"
 
-            # Tiering
             point_info = "Points: N/A | Tier: N/A"
             if active_user["subscription_type"] == "PREPAID":
                 tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
@@ -261,12 +256,10 @@ def main():
                 "point_info": point_info,
             }
 
-            # tampilkan menu utama
             show_main_menu(profile, display_quota, segments)
 
             choice = console.input(f"[{theme['text_title']}]👉 Pilih menu:[/{theme['text_title']}] ").strip()
 
-            # Shortcuts & navigasi
             if choice.lower() == "t":
                 pause()
             elif choice == "1":
