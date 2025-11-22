@@ -51,7 +51,7 @@ def show_family_list_menu(
             print(f"Fetching packages for family: {family_name}...")
             get_packages_by_family(family_code)
     
-    pause()
+    #pause()
 
 def show_store_packages_menu(
     subs_type: str = "PREPAID",
