@@ -379,7 +379,7 @@ def dashboard_segments(
     return res
 
 
-def segments(api_key: str, id_token: str, access_token: str, balance: int = 0) -> dict | None:
+def dash_segments(api_key: str, id_token: str, access_token: str, balance: int = 0) -> dict | None:
     path = "dashboard/api/v8/segments"
     payload = {
         "access_token": access_token,
