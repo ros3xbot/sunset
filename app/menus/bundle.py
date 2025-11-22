@@ -30,7 +30,7 @@ def show_bundle_menu():
     while True:
         clear_screen()
         console.print(Panel(
-            Align.center("🛒 Keranjang Paket Bundle", vertical="middle"),
+            Align.center("🛒 Keranjang Paket", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
