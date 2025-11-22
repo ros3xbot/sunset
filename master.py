@@ -289,11 +289,7 @@ def main():
             elif choice.lower() == "n":
                 show_notification_menu()
             elif choice.lower() == "y":
-                special_packages = user_context.get("segments", {}).get("special_packages", [])
-                if special_packages:
-                    result = show_special_for_you_menu(user_context["tokens"], special_packages)
-                    if result in ("MAIN", "BACK"):
-                        continue
+                show_special_for_you_menu()
                 else:
                     print_panel("ℹ️ Info", "Tidak ada paket Special For You yang tersedia saat ini.")
                     pause()
