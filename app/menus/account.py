@@ -34,7 +34,6 @@ def login_prompt(api_key: str):
         expand=True
     ))
     console.print(f" Masukkan nomor XL, Supported (08xx / 628xx / +628xx) ")
-    #raw_input = console.input(" Nomor: ").strip()
     raw_input = console.input(f"[{theme['text_title']}] Nomor: [/{theme['text_title']}] ").strip()
     phone_number = normalize_number(raw_input)
 
