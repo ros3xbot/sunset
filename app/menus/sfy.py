@@ -1,19 +1,22 @@
-from app.client.engsel import dash_segments
-from app.menus.util import clear_screen, pause, print_panel, get_rupiah
-from app.config.theme_config import get_theme
-from app.service.auth import AuthInstance
-from app.menus.package import show_package_details
+import os
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 from rich.box import MINIMAL_DOUBLE_HEAD
 from rich.align import Align
 
+from app.client.engsel import dash_segments
+from app.menus.util import clear_screen, pause, print_panel, print_error
+from app.config.theme_config import get_theme
+from app.service.auth import AuthInstance
+from app.menus.package import show_package_details
+from app.menus.util import get_rupiah
+
 console = Console()
 
 def fetch_special_for_you(api_key: str, id_token: str, access_token: str, balance: int = 0) -> list:
     try:
-        seg_data = segments(api_key, id_token, access_token, balance)
+        seg_data = dash_segments(api_key, id_token, access_token, balance)
         if not seg_data:
             return []
 
@@ -26,7 +29,7 @@ def fetch_special_for_you(api_key: str, id_token: str, access_token: str, balanc
                 kode_paket = pkg.get("kode_paket", "-")
 
                 if not kode_paket or kode_paket == "-":
-                    continue  # skip jika tidak ada kode paket
+                    continue
 
                 original_price = int(pkg.get("original_price", 0))
                 diskon_price = int(pkg.get("diskon_price", original_price))
@@ -38,9 +41,10 @@ def fetch_special_for_you(api_key: str, id_token: str, access_token: str, balanc
                 special_packages.append({
                     "name": name,
                     "kode_paket": kode_paket,
-                    "original_price": f"Rp {original_price:,}".replace(",", "."),
-                    "diskon_price": f"Rp {diskon_price:,}".replace(",", "."),
+                    "original_price": original_price,
+                    "diskon_price": diskon_price,
                     "diskon_percent": diskon_percent,
+                    "kuota_gb": pkg.get("kuota_gb", 0),
                 })
             except Exception as e:
                 print_panel("⚠️ Error", f"Gagal parse paket: {e}")
@@ -54,8 +58,15 @@ def fetch_special_for_you(api_key: str, id_token: str, access_token: str, balanc
         return []
 
 
-def show_special_for_you_menu(tokens: dict, special_packages: list):
+def show_special_for_you_menu(tokens: dict):
     theme = get_theme()
+
+    api_key = AuthInstance.api_key
+    id_token = tokens.get("id_token", "")
+    access_token = tokens.get("access_token", "")
+    balance = 0
+
+    special_packages = fetch_special_for_you(api_key, id_token, access_token, balance)
 
     while True:
         clear_screen()
@@ -71,7 +82,6 @@ def show_special_for_you_menu(tokens: dict, special_packages: list):
         )
         console.print(Panel(
             info_text,
-            #title=f"[{theme['text_title']}]🔥 Daftar Paket Special For You 🔥[/]",
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -89,16 +99,8 @@ def show_special_for_you_menu(tokens: dict, special_packages: list):
             emoji_diskon = "💸" if pkg.get("diskon_percent", 0) >= 50 else ""
             emoji_kuota = "🔥" if pkg.get("kuota_gb", 0) >= 100 else ""
 
-            # Konversi harga ke format rupiah
-            try:
-                original_int = int(str(pkg.get("original_price", "0")).replace("Rp", "").replace(".", "").replace(",", "").strip())
-                diskon_int = int(str(pkg.get("diskon_price", "0")).replace("Rp", "").replace(".", "").replace(",", "").strip())
-            except:
-                original_int = 0
-                diskon_int = 0
-
-            original_price = get_rupiah(original_int)
-            diskon_price = get_rupiah(diskon_int)
+            original_price = get_rupiah(pkg.get("original_price", 0))
+            diskon_price = get_rupiah(pkg.get("diskon_price", 0))
 
             table.add_row(
                 str(idx),
@@ -115,7 +117,6 @@ def show_special_for_you_menu(tokens: dict, special_packages: list):
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
-        #nav_table.add_row("99", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             nav_table,
@@ -127,8 +128,6 @@ def show_special_for_you_menu(tokens: dict, special_packages: list):
         # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
 
-        if choice == "99":
-            return "MAIN"
         if choice == "00":
             return "BACK"
 
@@ -140,8 +139,6 @@ def show_special_for_you_menu(tokens: dict, special_packages: list):
         choice_idx = int(choice) - 1
         if 0 <= choice_idx < len(special_packages):
             selected_pkg = special_packages[choice_idx]
-            #print_panel("📦 Paket Dipilih", selected_pkg["name"])
-            #pause()
             api_key = AuthInstance.api_key
             result = show_package_details(api_key, tokens, selected_pkg["kode_paket"], is_enterprise=False)
 
