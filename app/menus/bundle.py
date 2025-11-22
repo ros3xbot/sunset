@@ -56,8 +56,8 @@ def show_bundle_menu():
         nav.add_row("1", "Tambah dari Bookmark")
         nav.add_row("2", "Tambah dari Family Code Tersimpan")
         nav.add_row("3", "Tambah dari Family Code Manual")
-        nav.add_row("4", f"[{theme['text_err']}]Hapus Item dari Keranjang[/]")
         if cart_items:
+            nav.add_row("4", f"[{theme['text_err']}]Hapus Item dari Keranjang[/]")
             nav.add_row("5", f"[{theme['text_warn']}]💳 Lanjutkan ke Pembayaran[/]")
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
