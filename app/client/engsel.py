@@ -393,14 +393,14 @@ def parse_package(pkg: dict) -> dict | None:
         print_warning("⚠️", f"Gagal parse paket SFY: {e}")
         return None
 
-def dashboard_segments(api_key: str, tokens: dict) -> dict | None:
+def dashboard_segments(api_key: str, tokens: dict, balance: int = 0) -> dict | None:
     path = "dashboard/api/v8/segments"
     payload = {
         "access_token": tokens.get("access_token", ""),
         "app_version": "8.9.0",
         "model_name": "SM-N935F",
         "is_enterprise": False,
-        "current_balance": 0,
+        "current_balance": balance,
         "family_plan_role": "NO_ROLE",
         "manufacturer_name": "samsung",
         "lang": "id",
