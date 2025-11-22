@@ -167,7 +167,7 @@ def main():
             with live_loading("🔄 Memuat data akun...", get_theme()):
                 balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
                 quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
-                segments = dashboard_segments(AuthInstance.api_key, active_user["tokens"]["id_token"], active_user["tokens"]["access_token"]) or {}
+                segments = dash_segments(AuthInstance.api_key, active_user["tokens"]["id_token"], active_user["tokens"]["access_token"]) or {}
 
             # Format quota
             remaining = quota.get("remaining", 0)
