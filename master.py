@@ -290,7 +290,7 @@ def main():
                 show_notification_menu()
 
             elif choice.lower() == "y":
-                show_special_for_you_menu(tokens)
+                show_special_for_you_menu(active_user["tokens"])
 
             elif choice.lower() == "s":
                 enter_sentry_mode()
