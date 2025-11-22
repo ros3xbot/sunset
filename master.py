@@ -155,7 +155,7 @@ def show_main_menu2():
         clear_screen()
 
         console.print(Panel(
-            Align.center("✨ Paket Promo ✨", vertical="middle"),
+            Align.center("✨ Halaman Menu-2 ✨", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -177,12 +177,13 @@ def show_main_menu2():
 
         console.print(Panel(
             menu_table,
+            title=f"[{get_theme_style('text_title')}]✨ Menu ✨[/]",
             border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_sub']}]Pilih menu:[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilih menu:[/{theme['text_title']}] ").strip()
         if choice == "9":
             show_family_info(AuthInstance.api_key, active_user["tokens"])
         elif choice == "10":
