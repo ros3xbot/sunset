@@ -47,6 +47,9 @@ def simple_number():
     ))
 
 
+from rich.align import Align
+from rich.padding import Padding
+
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""__________             ___.                  
@@ -60,7 +63,10 @@ def clear_screen():
     
     content = f"{ascii_art}\n           {version_text}"
     console.print(
-        Align.center(content),
+        Padding(
+            Align.center(content),
+            (1, 2)
+        ),
         style=get_theme_style("text_warn")
     )
     #console.print(
@@ -89,15 +95,22 @@ def clear_sc():
     
     content = f"{ascii_art}\n           {version_text}"
     console.print(
-        Panel(
+        Padding(
             Align.center(content),
-            border_style=get_theme_style("border_primary"),
-            style=get_theme_style("text_title"),
-            expand=True,
-            #box=box.DOUBLE,
-            padding=(1, 2),
-        )
+            (1, 2)
+        ),
+        style=get_theme_style("text_title")
     )
+    #console.print(
+    #    Panel(
+    #        Align.center(content),
+    #        border_style=get_theme_style("border_primary"),
+    #        style=get_theme_style("text_title"),
+    #        expand=True,
+    #        #box=box.DOUBLE,
+    #        padding=(1, 2),
+    #    )
+    #)
 
 
 def pause():
