@@ -13,6 +13,7 @@ from app.service.git import check_for_updates, ensure_git
 from app.menus.util import (
     clear_screen,
     clear_sc,
+    simple_number,
     pause,
     print_panel,
     print_error,
@@ -155,7 +156,7 @@ def show_main_menu2(active_user: dict, profile: dict):
         return
 
     while True:
-        clear_screen()
+        clear_sc()
 
         console.print(Panel(
             Align.center("✨ Halaman Menu-2 ✨", vertical="middle"),
@@ -163,6 +164,7 @@ def show_main_menu2(active_user: dict, profile: dict):
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
