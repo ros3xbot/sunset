@@ -135,7 +135,7 @@ def show_main_menu(profile, display_quota, segments):
     menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("77", "📢 Info Unlock Code")
     menu_table.add_row("88", "🎨 Ganti Tema CLI")
-    menu_table.add_row("99", "⛔ f"[{theme['text_err']}]Tutup Aplikasi[/]")
+    menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
     console.print(
         Panel(
