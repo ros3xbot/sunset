@@ -54,7 +54,7 @@ from app.menus.sfy import show_special_for_you_menu
 from app.menus.bundle import show_bundle_menu
 from app.menus.theme import show_theme_menu
 from app.config.theme_config import get_theme, get_theme_style
-from app.config.cache import get_cache, set_cache
+from app.config.cache import get_cache, set_cache, clear_cache
 
 console = Console()
 
@@ -136,6 +136,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("66", "📢 Info Unlock Code")
     menu_table.add_row("77", f"[{theme['border_warning']}]🎨 Ganti Tema CLI[/]")
     menu_table.add_row("88", f"[{theme['text_sub']}]☕ Menu Berikutnya[/]")
+    menu_table.add_row("CC", f"[{theme['text_sub']}]🧹 Clear Cache[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
     console.print(
@@ -346,6 +347,12 @@ def main():
                 show_theme_menu()
             elif choice == "88":
                 show_main_menu2(active_user, profile)
+
+            elif choice.lower() == "cc":
+                clear_cache()
+                print_success("🧹", "Cache berhasil dibersihkan.")
+                pause()
+
             elif choice == "99":
                 print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
                 sys.exit(0)
