@@ -357,60 +357,26 @@ def get_quota(api_key: str, id_token: str) -> dict | None:
     return None
 
 
-def safe_int(val, default=0):
-    try:
-        return int(val)
-    except (TypeError, ValueError):
-        return default
-
-def parse_package(pkg: dict) -> dict | None:
-    if not pkg.get("action_param"):
-        return None
-    try:
-        kuota_total = sum(
-            safe_int(b.get("total"))
-            for b in pkg.get("benefits", [])
-            if b.get("data_type") == "DATA"
-        )
-        kuota_gb = kuota_total / (1024 ** 3)
-
-        original_price = safe_int(pkg.get("original_price"))
-        discounted_price = safe_int(pkg.get("discounted_price", original_price))
-        diskon_percent = (
-            int(round((original_price - discounted_price) / original_price * 100))
-            if original_price else 0
-        )
-
-        return {
-            "name": f"{pkg.get('family_name', '')} ({pkg.get('title', '')}) {pkg.get('validity', '')}",
-            "kode_paket": pkg.get("action_param", ""),
-            "original_price": original_price,
-            "diskon_price": discounted_price,
-            "diskon_percent": diskon_percent,
-            "kuota_gb": kuota_gb,
-        }
-    except Exception as e:
-        print_warning("⚠️", f"Gagal parse paket SFY: {e}")
-        return None
-
-def dashboard_segments(api_key: str, tokens: dict, balance: int = 0) -> dict | None:
+def dashboard_segments(api_key: str, id_token: str, access_token: str, balance: int = 0) -> dict | None:
     path = "dashboard/api/v8/segments"
     payload = {
-        "access_token": tokens.get("access_token", ""),
+        "access_token": access_token,
         "app_version": "8.9.0",
-        "model_name": "SM-N935F",
-        "is_enterprise": False,
         "current_balance": balance,
         "family_plan_role": "NO_ROLE",
-        "manufacturer_name": "samsung",
+        "is_enterprise": False,
         "lang": "id",
+        "manufacturer_name": "samsung",
+        "model_name": "SM-N935F",
     }
 
-    try:
-        res = send_api_request(api_key, path, payload, tokens.get("id_token", ""), "POST")
-    except Exception as e:
-        print_error("❌", f"Gagal kirim request segments: {e}")
-        return None
+    theme = get_theme()
+    with live_loading("📊 Mengambil data segmen pengguna...", theme):
+        try:
+            res = send_api_request(api_key, path, payload, id_token, "POST")
+        except Exception as e:
+            print_error("❌", f"Gagal kirim request segments: {e}")
+            return None
 
     if not (isinstance(res, dict) and "data" in res):
         err = res.get("error", "Unknown error") if isinstance(res, dict) else res
@@ -422,7 +388,7 @@ def dashboard_segments(api_key: str, tokens: dict, balance: int = 0) -> dict | N
     # Loyalty info
     loyalty_data = data.get("loyalty", {}).get("data", {})
     loyalty_info = {
-        "current_point": safe_int(loyalty_data.get("current_point")),
+        "current_point": loyalty_data.get("current_point", 0),
         "tier_name": loyalty_data.get("detail_tier", {}).get("name", ""),
     }
 
@@ -432,7 +398,36 @@ def dashboard_segments(api_key: str, tokens: dict, balance: int = 0) -> dict | N
     # Special For You packages
     sfy_data = data.get("special_for_you", {}).get("data", {})
     sfy_banners = sfy_data.get("banners", [])
-    special_packages = [p for pkg in sfy_banners if (p := parse_package(pkg))]
+    special_packages = []
+
+    for pkg in sfy_banners:
+        try:
+            if not pkg.get("action_param"):
+                continue
+
+            kuota_total = sum(
+                int(benefit.get("total", 0))
+                for benefit in pkg.get("benefits", [])
+                if benefit.get("data_type") == "DATA"
+            )
+            kuota_gb = kuota_total / (1024 ** 3)
+
+            original_price = int(pkg.get("original_price", 0))
+            discounted_price = int(pkg.get("discounted_price", original_price))
+            diskon_percent = int(round((original_price - discounted_price) / original_price * 100)) if original_price else 0
+
+            formatted_pkg = {
+                "name": f"{pkg.get('family_name', '')} ({pkg.get('title', '')}) {pkg.get('validity', '')}",
+                "kode_paket": pkg.get("action_param", ""),
+                "original_price": original_price,
+                "diskon_price": discounted_price,
+                "diskon_percent": diskon_percent,
+                "kuota_gb": kuota_gb,
+            }
+            special_packages.append(formatted_pkg)
+        except Exception as e:
+            print_warning("⚠️", f"Gagal parse paket SFY: {e}")
+            continue
 
     return {
         "loyalty": loyalty_info,
