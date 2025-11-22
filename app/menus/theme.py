@@ -9,6 +9,7 @@ from app.menus.util import clear_screen, pause, print_panel
 
 console = Console()
 
+
 def show_theme_menu():
     while True:
         clear_screen()
@@ -53,7 +54,7 @@ def show_theme_menu():
         console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
         # Input pilihan
-        choice = console.input(f"[{theme['text_sub']}]Pilih nomor tema:[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilih nomor tema:[/{theme['text_title']}] ").strip()
 
         if choice == "00":
             return
@@ -85,6 +86,7 @@ def show_theme_menu():
         else:
             print_panel("⚠️ Error", "Pilihan tidak valid.")
             pause()
+
 
 def print_theme_changed(theme_name):
     theme = get_theme()
