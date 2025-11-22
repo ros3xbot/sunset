@@ -158,7 +158,23 @@ if __name__ == "__main__":
             need_update = check_for_updates()
     except Exception as e:
         print_warning("⚠️", f"Gagal cek update: {e}")
+        need_update = False  # fallback supaya tidak crash
 
     ensure_git()
-    git_pull_rebase()
+
+    # hanya jalankan git_pull_rebase kalau memang ada update
+    if need_update:
+        git_pull_rebase()
+    else:
+        console.print(Panel(
+            Text.from_markup(
+                f"[bold {get_theme_style('text_success')}]✅ Sudah versi terbaru[/]\n\n"
+                f"[{get_theme_style('text_body')}]Tidak perlu menarik update dari repository[/]"
+            ),
+            title=f"[{get_theme_style('text_title')}]📥 Update CLI[/]",
+            border_style=get_theme_style("border_success"),
+            padding=(1, 2),
+            expand=True
+        ))
+
     run_main()
