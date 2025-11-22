@@ -60,15 +60,19 @@ def clear_screen():
     
     content = f"{ascii_art}\n           {version_text}"
     console.print(
-        Panel(
-            Align.center(content),
-            border_style=get_theme_style("border_primary"),
-            style=get_theme_style("text_warn"),
-            expand=True,
-            #box=box.DOUBLE,
-            padding=(1, 2),
-        )
+        Align.center(content),
+        style=get_theme_style("text_warn")
     )
+    #console.print(
+    #    Panel(
+    #        Align.center(content),
+    #        border_style=get_theme_style("border_primary"),
+    #        style=get_theme_style("text_warn"),
+    #        expand=True,
+    #        #box=box.DOUBLE,
+    #        padding=(1, 2),
+    #    )
+    #)
     simple_number()
 
 
