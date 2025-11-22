@@ -53,7 +53,6 @@ from rich.padding import Padding
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
-
 __________             ___.                  
 \______   \_____ ______\_ |__   ____ ___  ___
 |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
@@ -77,7 +76,7 @@ __________             ___.
     #        border_style=get_theme_style("border_primary"),
     #        style=get_theme_style("text_warn"),
     #        expand=True,
-    #        #box=box.DOUBLE,
+    #        box=box.DOUBLE,
     #        padding=(1, 2),
     #    )
     #)
@@ -87,15 +86,15 @@ __________             ___.
 def clear_sc():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
+__________             ___.                     .___________   
+\______   \_____ ______\_ |__   ____ ___  ___   |   \______ \  
+ |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /   |   ||    |  \ 
+ |    |   \ / __ \|  | \/ \_\ \  ___/ >    <    |   ||    `   \
+ |______  /(____  /__|  |___  /\___  >__/\_ \   |___/_______  /
+        \/      \/          \/     \/      \/               \/ 
+"""
 
-__________             ___.                  
-\______   \_____ ______\_ |__   ____ ___  ___
-|    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
-|    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
-|______  /(____  /__|  |___  /\___  >__/\_ \
-       \/      \/          \/     \/      \/"""
-
-    version_text = f"[{get_theme_style('text_title')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_title')}]"
+    version_text = f"[{get_theme_style('text_body')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_body')}]"
     
     content = f"{ascii_art}\n           {version_text}"
     console.print(
@@ -111,7 +110,7 @@ __________             ___.
     #        border_style=get_theme_style("border_primary"),
     #        style=get_theme_style("text_title"),
     #        expand=True,
-    #        #box=box.DOUBLE,
+    #        box=box.DOUBLE,
     #        padding=(1, 2),
     #    )
     #)
