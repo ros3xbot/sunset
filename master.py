@@ -157,6 +157,63 @@ def show_main_menu(profile, display_quota, segments):
     )
 
 
+def show_main_menu2(profile, display_quota, segments):
+    clear_sc()
+    theme = get_theme()
+
+    expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+    pulsa_str = get_rupiah(profile["balance"])
+
+    info_table = Table.grid(padding=(0, 1))
+    info_table.add_column(justify="left", style=get_theme_style("text_body"))
+    info_table.add_column(justify="left", style=get_theme_style("text_body"))
+
+    info_table.add_row(" Nomor", f": 📞 [bold {theme['text_body']}]{profile['number']}[/]")
+    info_table.add_row(" Type", f": 🧾 [{theme['text_body']}]{profile['subscription_type']} ({profile['subscriber_id']})[/]")
+    info_table.add_row(" Pulsa", f": 💰 Rp [{theme['text_money']}]{pulsa_str}[/]")
+    info_table.add_row(" Kuota", f": 📊 [{theme['text_date']}]{display_quota}[/]")
+    info_table.add_row(" Tiering", f": 🏅 [{theme['text_date']}]{profile['point_info']}[/]")
+    info_table.add_row(" Masa Aktif", f": ⏳ [{theme['text_date']}]{expired_at_dt}[/]")
+
+    console.print(
+        Panel(
+            info_table,
+            title=f"[{get_theme_style('text_title')}]✨ Informasi Akun ✨[/]",
+            title_align="center",
+            border_style=get_theme_style("border_info"),
+            padding=(1, 2),
+            expand=True,
+        )
+    )
+
+    menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+    menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
+    menu_table.add_column("Aksi", style=get_theme_style("text_body"))
+
+    menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
+    menu_table.add_row("10", "👥 Circle")
+    menu_table.add_row("11", "🏬 Store Segments")
+    menu_table.add_row("12", "📂 Store Family List")
+    menu_table.add_row("13", "📦 Store Packages")
+    menu_table.add_row("14", "🎁 Redeemables")
+    menu_table.add_row("R", "📝 Register")
+    menu_table.add_row("N", "🔔 Notifikasi")
+    menu_table.add_row("V", "✅ Validate MSISDN")
+
+    console.print(
+        Panel(
+            menu_table,
+            title=f"[{get_theme_style('text_title')}]✨ Menu Utama ✨[/]",
+            title_align="center",
+            border_style=get_theme_style("border_primary"),
+            padding=(0, 1),
+            expand=True,
+        )
+    )
+
+
 # ============================
 # Main loop
 # ============================
@@ -265,6 +322,8 @@ def main():
                 show_redeemables_menu(is_enterprise)
             elif choice == "00":
                 show_bookmark_menu()
+            elif choice == "55":
+                show_main_menu2()
             elif choice == "66":
                 show_family_grup_menu()
             elif choice == "77":
