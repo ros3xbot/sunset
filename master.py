@@ -129,7 +129,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("8", "📜 Riwayat Transaksi")
     menu_table.add_row("00", "📌 Bookmark Paket")
     menu_table.add_row("", "")
-    menu_table.add_row("55", "☕ Halaman Menu Berikutnya ..")
+    menu_table.add_row("55", f"[{theme['text_sub']}]☕ Halaman Menu Berikutnya[/]")
     menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("77", "📢 Info Unlock Code")
     menu_table.add_row("88", "🎨 Ganti Tema CLI")
