@@ -312,13 +312,13 @@ def main():
                 print_error("❌", "Tidak ada user terpilih atau gagal memuat user.")
 
 
-#if __name__ == "__main__":
-#    try:
-#        with live_loading("🔄 Checking for updates...", get_theme()):
-#            need_update = check_for_updates()
-#        if need_update:
-#            print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
-#            pause()
-#        main()
-#    except KeyboardInterrupt:
-#        print_error("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
+if __name__ == "__main__":
+    try:
+        with live_loading("🔄 Checking for updates...", get_theme()):
+            need_update = check_for_updates()
+        if need_update:
+            print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
+            pause()
+        main()
+    except KeyboardInterrupt:
+        print_error("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
