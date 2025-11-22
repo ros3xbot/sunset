@@ -56,14 +56,14 @@ from app.config.theme_config import get_theme, get_theme_style
 console = Console()
 
 
-def show_main_menu(profile, display_quota, segments):
+def show_main_menu(profile: dict, display_quota: str, segments: dict):
     clear_sc()
     theme = get_theme()
 
-    expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
-    pulsa_str = get_rupiah(profile["balance"])
+    # Info akun
+    expired_at_ts = profile.get("balance_expired_at")
+    expired_at_dt = datetime.fromtimestamp(expired_at_ts).strftime("%Y-%m-%d %H:%M:%S") if expired_at_ts else "-"
+    pulsa_str = get_rupiah(profile.get("balance", 0))
 
     info_table = Table.grid(padding=(0, 1))
     info_table.add_column(justify="left", style=get_theme_style("text_body"))
@@ -87,6 +87,7 @@ def show_main_menu(profile, display_quota, segments):
         )
     )
 
+    # Highlight satu paket SFY (opsional)
     special_packages = segments.get("special_packages", [])
     if special_packages:
         best = random.choice(special_packages)
@@ -115,6 +116,7 @@ def show_main_menu(profile, display_quota, segments):
         )
         console.print(Align.center(f"[{theme['text_sub']}]Pilih [Y] untuk lihat semua paket spesial[/{theme['text_sub']}]"))
 
+    # Menu utama
     menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
     menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
     menu_table.add_column("Aksi", style=get_theme_style("text_body"))
@@ -149,6 +151,13 @@ def show_main_menu(profile, display_quota, segments):
 
 def show_main_menu2(active_user: dict, profile: dict):
     theme = get_theme()
+
+    # Validasi awal untuk mencegah error jika belum login
+    if not active_user or "tokens" not in active_user:
+        print_error("❌", "User belum aktif, silakan login dulu.")
+        pause()
+        return
+
     while True:
         clear_screen()
 
@@ -183,7 +192,6 @@ def show_main_menu2(active_user: dict, profile: dict):
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_title']}]Pilih menu:[/{theme['text_title']}] ").strip()
         choice = console.input(f"[{theme['text_title']}]Pilih menu:[/{theme['text_title']}] ").strip()
         if choice == "9":
             show_family_info(AuthInstance.api_key, active_user["tokens"])
@@ -233,7 +241,11 @@ def main():
             with live_loading("🔄 Memuat data akun...", get_theme()):
                 balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
                 quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
-                segments = dash_segments(AuthInstance.api_key, active_user["tokens"]["id_token"], active_user["tokens"]["access_token"]) or {}
+                segments = dash_segments(
+                    AuthInstance.api_key,
+                    active_user["tokens"]["id_token"],
+                    active_user["tokens"]["access_token"]
+                ) or {}
 
             remaining = quota.get("remaining", 0)
             total = quota.get("total", 0)
@@ -311,7 +323,7 @@ def main():
             elif choice == "00":
                 show_bookmark_menu()
             elif choice == "55":
-                show_main_menu2(active_user, profile)   # ✅ perbaikan
+                show_main_menu2(active_user, profile)   # penting: kirim active_user & profile
             elif choice == "66":
                 show_family_grup_menu()
             elif choice == "77":
@@ -346,7 +358,7 @@ if __name__ == "__main__":
         if need_update:
             print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
             pause()
-            sys.exit(0)  # keluar agar tidak lanjut ke main()
+            sys.exit(0)  # hentikan agar update dilakukan dulu
         main()
     except KeyboardInterrupt:
         print_error("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
