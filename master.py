@@ -25,7 +25,7 @@ from app.client.engsel import (
     get_balance,
     get_tiering_info,
     get_quota,
-    dashboard_segments,
+    segments,
 )
 from app.client.famplan import validate_msisdn
 from app.client.registration import dukcapil
@@ -167,7 +167,7 @@ def main():
             with live_loading("🔄 Memuat data akun...", get_theme()):
                 balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
                 quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
-                segments = dashboard_segments(AuthInstance.api_key, active_user["tokens"]["id_token"], active_user["tokens"]["access_token"]) or {}
+                segments = segments(AuthInstance.api_key, active_user["tokens"]["id_token"], active_user["tokens"]["access_token"]) or {}
 
             # Format quota
             remaining = quota.get("remaining", 0)
