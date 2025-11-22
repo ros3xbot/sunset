@@ -48,7 +48,7 @@ def show_bundle_menu():
             console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
             console.print(f"[{theme['text_body']}]Total Harga: Rp {get_rupiah(total_price)}[/]")
         else:
-            print_panel("ℹ️ Info", "Keranjang masih kosong.")
+            print_panel("ℹ️", "Keranjang masih kosong.")
 
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
@@ -87,7 +87,7 @@ def show_bundle_menu():
                     add_to_cart(detail, name)
 
         elif choice == "2":
-            result = show_family_menu(return_package_detail=True)
+            result = show_family_grup_menu(return_package_detail=True)
             if result == "MAIN":
                 break
             elif isinstance(result, tuple):
@@ -158,7 +158,7 @@ def show_bundle_menu():
 
                 confirm = console.input(f"[{theme['text_sub']}]Lanjutkan pembelian dengan metode ini? (y/n):[/{theme['text_sub']}] ").strip().lower()
                 if confirm != "y":
-                    print_panel("ℹ️ Info", "Pembayaran dibatalkan.")
+                    print_panel("ℹ️", "Pembayaran dibatalkan.")
                     pause()
                     continue
 
