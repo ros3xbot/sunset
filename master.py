@@ -130,15 +130,6 @@ def show_main_menu(profile, display_quota, segments):
     menu_table.add_row("6", "🧩 Beli Paket Berdasarkan Family Code")
     menu_table.add_row("7", "🛒 Beli Semua Paket di Family Code")
     menu_table.add_row("8", "📜 Riwayat Transaksi")
-    menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
-    menu_table.add_row("10", "👥 Circle")
-    menu_table.add_row("11", "🏬 Store Segments")
-    menu_table.add_row("12", "📂 Store Family List")
-    menu_table.add_row("13", "📦 Store Packages")
-    menu_table.add_row("14", "🎁 Redeemables")
-    menu_table.add_row("R", "📝 Register")
-    menu_table.add_row("N", "🔔 Notifikasi")
-    menu_table.add_row("V", "✅ Validate MSISDN")
     menu_table.add_row("00", "⭐ Bookmark Paket")
     menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("77", "📢 Info Unlock Code")
@@ -320,22 +311,7 @@ def main():
                 purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
             elif choice == "8":
                 show_transaction_history(AuthInstance.api_key, active_user["tokens"])
-            elif choice == "9":
-                show_family_info(AuthInstance.api_key, active_user["tokens"])
-            elif choice == "10":
-                show_circle_info(AuthInstance.api_key, active_user["tokens"])
-            elif choice == "11":
-                is_enterprise = input("🏬 Enterprise store? (y/n): ").lower() == "y"
-                show_store_segments_menu(is_enterprise)
-            elif choice == "12":
-                is_enterprise = input("📂 Enterprise? (y/n): ").lower() == "y"
-                show_family_list_menu(profile["subscription_type"], is_enterprise)
-            elif choice == "13":
-                is_enterprise = input("📦 Enterprise? (y/n): ").lower() == "y"
-                show_store_packages_menu(profile["subscription_type"], is_enterprise)
-            elif choice == "14":
-                is_enterprise = input("🎁 Enterprise? (y/n): ").lower() == "y"
-                show_redeemables_menu(is_enterprise)
+
             elif choice == "00":
                 show_bookmark_menu()
             elif choice == "55":
@@ -349,20 +325,6 @@ def main():
             elif choice == "99":
                 print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
                 sys.exit(0)
-            elif choice.lower() == "r":
-                msisdn = input("📝 Masukkan msisdn (628xxxx): ")
-                nik = input("Masukkan NIK: ")
-                kk = input("Masukkan KK: ")
-                res = dukcapil(AuthInstance.api_key, msisdn, kk, nik)
-                print_panel("📑 Hasil Registrasi", json.dumps(res, indent=2))
-                pause()
-            elif choice.lower() == "v":
-                msisdn = input("✅ Masukkan msisdn untuk validasi (628xxxx): ")
-                res = validate_msisdn(AuthInstance.api_key, active_user["tokens"], msisdn)
-                print_panel("📑 Hasil Validasi", json.dumps(res, indent=2))
-                pause()
-            elif choice.lower() == "n":
-                show_notification_menu()
 
             elif choice.lower() == "y":
                 show_special_for_you_menu(active_user["tokens"])
