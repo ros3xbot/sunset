@@ -133,7 +133,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("44", "🎭 Ciptakan Paket Decoy (multi)")
     menu_table.add_row("55", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("66", "📢 Info Unlock Code")
-    menu_table.add_row("77", "🎨 Ganti Tema CLI")
+    menu_table.add_row("77", f"[{theme['border_warning']}]🎨 Ganti Tema CLI[/]")
     menu_table.add_row("88", f"[{theme['text_sub']}]☕ Menu Berikutnya[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
