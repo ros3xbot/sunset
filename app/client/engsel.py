@@ -54,7 +54,7 @@ def send_api_request(api_key: str, path: str, payload_dict: dict, id_token: str,
         "x-signature": x_sig,
         "x-request-id": str(uuid.uuid4()),
         "x-request-at": java_like_timestamp(now),
-        "x-version-app": "8.9.0",
+        "x-version-app": "8.9.1",
     }
 
     url = f"{BASE_API_URL}/{path}"
@@ -71,7 +71,7 @@ def get_profile(api_key: str, access_token: str, id_token: str) -> dict:
     path = "api/v8/profile"
     raw_payload = {
         "access_token": access_token,
-        "app_version": "8.9.0",
+        "app_version": "8.9.1",
         "is_enterprise": False,
         "lang": "en",
     }
@@ -362,7 +362,7 @@ def dash_segments(api_key: str, id_token: str, access_token: str, balance: int =
     path = "dashboard/api/v8/segments"
     payload = {
         "access_token": access_token,
-        "app_version": "8.9.0",
+        "app_version": "8.9.1",
         "current_balance": balance,
         "family_plan_role": "NO_ROLE",
         "is_enterprise": False,
