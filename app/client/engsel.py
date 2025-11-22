@@ -100,7 +100,7 @@ def get_family(api_key: str, tokens: dict, family_code: str,
     path = "api/v8/xl-stores/options/list"
     id_token = tokens.get("id_token")
     family_data = None
-    with live_loading(f"📦 Fetching package family...", theme):
+    with live_loading(f"📦 Fetching package family {family_code}...", theme):
         for mt in migration_type_list:
             for ie in is_enterprise_list:
                 payload_dict = {
@@ -142,7 +142,7 @@ def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict
         "is_migration": False,
         "lang": "en",
     }
-    with live_loading(f"📂 Fetching families...", get_theme()):
+    with live_loading(f"📂 Fetching families for category {package_category_code}...", get_theme()):
         res = send_api_request(api_key, path, payload_dict, tokens["id_token"], "POST")
     if res.get("status") != "SUCCESS":
         print_error("❌", f"Gagal mengambil families untuk kategori {package_category_code}")
@@ -174,7 +174,7 @@ def get_package(api_key: str, tokens: dict,
     with live_loading(f"📦 Fetching package...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if "data" not in res:
-        print_error("❌", f"Gagal mengambil package: {package_option_code}")
+        print_error("❌", f"Gagal mengambil package {package_option_code}")
         print_panel("📑 Response", json.dumps(res, indent=2))
         return None
     return res["data"]
@@ -183,7 +183,7 @@ def get_package(api_key: str, tokens: dict,
 def get_addons(api_key: str, tokens: dict, package_option_code: str) -> dict:
     path = "api/v8/xl-stores/options/addons-pinky-box"
     raw_payload = {"is_enterprise": False, "lang": "en", "package_option_code": package_option_code}
-    with live_loading(f"🧩 Fetching addons...", get_theme()):
+    with live_loading(f"🧩 Fetching addons for {package_option_code}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if "data" not in res:
         print_error("❌", f"Gagal mengambil addons untuk {package_option_code}")
@@ -195,10 +195,10 @@ def get_addons(api_key: str, tokens: dict, package_option_code: str) -> dict:
 def intercept_page(api_key: str, tokens: dict, option_code: str, is_enterprise: bool = False):
     path = "misc/api/v8/utility/intercept-page"
     raw_payload = {"is_enterprise": is_enterprise, "lang": "en", "package_option_code": option_code}
-    with live_loading(f"🛡️ Fetching intercept page...", get_theme()):
+    with live_loading(f"🛡️ Fetching intercept page for {option_code}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if "status" in res:
-        print_panel("🛡️️ Intercept", f"Status: {res['status']}")
+        print_panel("🛡️ Intercept", f"Status: {res['status']}")
     else:
         print_error("❌", "Intercept error")
 
@@ -257,7 +257,7 @@ def get_notifications(api_key: str, tokens: dict):
 def get_notification_detail(api_key: str, tokens: dict, notification_id: str):
     path = "api/v8/notification/detail"
     raw_payload = {"is_enterprise": False, "lang": "en", "notification_id": notification_id}
-    with live_loading(f"🔔 Fetching notification...", get_theme()):
+    with live_loading(f"🔔 Fetching notification {notification_id}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if isinstance(res, dict) and res.get("status") != "SUCCESS":
         print_error("❌", f"Error getting notification detail: {res.get('error', 'Unknown error')}")
@@ -322,7 +322,7 @@ def unsubscribe(api_key: str, tokens: dict,
         "lang": "en",
         "family_member_id": "",
     }
-    with live_loading(f"🚫 Unsubscribing quota...", get_theme()):
+    with live_loading(f"🚫 Unsubscribing quota {quota_code}...", get_theme()):
         try:
             res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
             if res and res.get("code") == "000":
@@ -334,27 +334,6 @@ def unsubscribe(api_key: str, tokens: dict,
         except Exception as e:
             print_error("❌", f"Exception: {e}")
             return False
-
-
-def get_quota(api_key: str, id_token: str) -> dict | None:
-    path = "api/v8/packages/quota-summary"
-    payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("📶 Fetching quota summary...", get_theme()):
-        try:
-            res = send_api_request(api_key, path, payload, id_token, "POST")
-        except Exception as e:
-            print_error("❌", f"Gagal request quota: {e}")
-            return None
-    if isinstance(res, dict):
-        quota = res.get("data", {}).get("quota", {}).get("data")
-        if quota:
-            return {
-                "remaining": quota.get("remaining", 0),
-                "total": quota.get("total", 0),
-                "has_unlimited": quota.get("has_unlimited", False),
-            }
-    print_error("⚠️", "Tidak ada data quota ditemukan.")
-    return None
 
 
 def dashboard_segments(
@@ -456,3 +435,24 @@ def dash_segments(api_key: str, id_token: str, access_token: str, balance: int =
         "notification": notifications,
         "special_packages": special_packages,
     }
+
+
+def get_quota(api_key: str, id_token: str) -> dict | None:
+    path = "api/v8/packages/quota-summary"
+    payload = {"is_enterprise": False, "lang": "en"}
+    with live_loading("📶 Fetching quota summary...", get_theme()):
+        try:
+            res = send_api_request(api_key, path, payload, id_token, "POST")
+        except Exception as e:
+            print_error("❌", f"Gagal request quota: {e}")
+            return None
+    if isinstance(res, dict):
+        quota = res.get("data", {}).get("quota", {}).get("data")
+        if quota:
+            return {
+                "remaining": quota.get("remaining", 0),
+                "total": quota.get("total", 0),
+                "has_unlimited": quota.get("has_unlimited", False),
+            }
+    print_error("⚠️", "Tidak ada data quota ditemukan.")
+    return None
