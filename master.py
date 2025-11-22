@@ -27,6 +27,7 @@ from app.client.engsel import (
     get_quota,
     dash_segments,
 )
+from app.menus.sfy import show_special_for_you_menu
 from app.client.famplan import validate_msisdn
 from app.client.registration import dukcapil
 from app.service.auth import AuthInstance
@@ -114,7 +115,7 @@ def show_main_menu(profile, display_quota, segments):
                 width=console.size.width,
             )
         )
-        console.print(Align.center(f"[{theme['text_sub']}]Pilih [11] untuk lihat semua paket spesial[/{theme['text_sub']}]"))
+        console.print(Align.center(f"[{theme['text_sub']}]Pilih [Y] untuk lihat semua paket spesial[/{theme['text_sub']}]"))
 
     # Menu utama ⭐
     menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -131,6 +132,7 @@ def show_main_menu(profile, display_quota, segments):
     menu_table.add_row("8", "📜 Riwayat Transaksi")
     menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
     menu_table.add_row("10", "👥 Circle")
+    menu_table.add_row("11", "🏬 Store Segments")
     menu_table.add_row("12", "📂 Store Family List")
     menu_table.add_row("13", "📦 Store Packages")
     menu_table.add_row("14", "🎁 Redeemables")
@@ -286,6 +288,16 @@ def main():
                 pause()
             elif choice.lower() == "n":
                 show_notification_menu()
+            elif choice.lower() == "y":
+                special_packages = user_context.get("segments", {}).get("special_packages", [])
+                if special_packages:
+                    result = show_special_for_you_menu(user_context["tokens"], special_packages)
+                    if result in ("MAIN", "BACK"):
+                        continue
+                else:
+                    print_panel("ℹ️ Info", "Tidak ada paket Special For You yang tersedia saat ini.")
+                    pause()
+
             elif choice.lower() == "s":
                 enter_sentry_mode()
             else:
