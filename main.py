@@ -153,6 +153,6 @@ def run_main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    #ensure_git()
+    ensure_git()
     git_pull_rebase()
     run_main()
