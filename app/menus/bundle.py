@@ -1,5 +1,5 @@
 from app.service.auth import AuthInstance
-from app.client.balance import settlement_balance
+from app.client.purchase.balance import settlement_balance
 from app.client.qris import show_qris_payment
 from app.client.ewallet import show_multipayment
 from app.menus.util import clear_screen, pause, print_panel, get_rupiah
