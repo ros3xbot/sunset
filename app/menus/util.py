@@ -52,7 +52,9 @@ from rich.padding import Padding
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
-    ascii_art = r"""__________             ___.                  
+    ascii_art = r"""
+
+__________             ___.                  
 \______   \_____ ______\_ |__   ____ ___  ___
 |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
 |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
@@ -84,7 +86,9 @@ def clear_screen():
 
 def clear_sc():
     os.system('cls' if os.name == 'nt' else 'clear')
-    ascii_art = r"""__________             ___.                  
+    ascii_art = r"""
+
+__________             ___.                  
 \______   \_____ ______\_ |__   ____ ___  ___
 |    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
 |    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
