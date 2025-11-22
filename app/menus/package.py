@@ -686,7 +686,8 @@ def fetch_my_packages():
 
                     benefit_table.add_row(name, dt, f"{r_str} / {t_str}")
 
-            with console.status(f"🔍 Memuat detail paket #{num}..."):
+            #with console.status(f"🔍 Memuat detail paket #{num}..."):
+            with console.status(f"{num}"):
                 package_details = get_package(api_key, tokens, quota_code)
             if package_details:
                 family_code = package_details["package_family"]["package_family_code"]
