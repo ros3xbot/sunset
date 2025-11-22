@@ -62,7 +62,7 @@ __________             ___.
 
     version_text = f"[{get_theme_style('text_body')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_body')}]"
     
-    content = f"{ascii_art}\n                   {version_text}"
+    content = f"{ascii_art}\n                  {version_text}"
     console.print(
         Padding(
             Align.center(content),
@@ -95,11 +95,11 @@ __________             ___.
 
     version_text = f"[{get_theme_style('text_body')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_body')}]"
     
-    content = f"{ascii_art}\n                   {version_text}"
+    content = f"{ascii_art}\n                  {version_text}"
     console.print(
         Padding(
             Align.center(content),
-            (1, 2)
+            (1, 0)
         ),
         style=get_theme_style("text_warn")
     )
