@@ -560,7 +560,7 @@ def get_packages_by_family(
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilih paket (nomor):[/{theme['text_title']}] ").strip()
         if choice == "00":
             return "BACK"
         if not choice.isdigit():
