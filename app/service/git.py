@@ -47,7 +47,7 @@ def ensure_git(strict=True):
             sys.exit(1)
         return False
 
-    print_success("✅", "Repository valid dan berasal dari sumber resmi.")
+    #print_success("✅", "Repository valid dan berasal dari sumber resmi.")
     return True
 
 
