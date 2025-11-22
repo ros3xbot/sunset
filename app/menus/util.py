@@ -62,7 +62,7 @@ __________             ___.
 
     version_text = f"[{get_theme_style('text_body')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_body')}]"
     
-    content = f"{ascii_art}\n                 {version_text}"
+    content = f"{ascii_art}\n                   {version_text}"
     console.print(
         Padding(
             Align.center(content),
@@ -87,15 +87,15 @@ def clear_sc():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
 __________             ___.                  
-\______   \_____ ______\_ |__   ____ ___  ___
-|    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  /
-|    |   \ / __ \|  | \/ \_\ \  ___/ >    < 
-|______  /(____  /__|  |___  /\___  >__/\_ \
+\______   \_____ ______\_ |__   ____ ___  ___    ▄   ▄
+|    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  / ▄█▄ █▀█▀█ ▄█▄
+|    |   \ / __ \|  | \/ \_\ \  ___/ >    < ▀▀████▄█▄████▀▀
+|______  /(____  /__|  |___  /\___  >__/\_ \     ▀█▀█▀
        \/      \/          \/     \/      \/"""
 
     version_text = f"[{get_theme_style('text_body')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_body')}]"
     
-    content = f"{ascii_art}\n           {version_text}"
+    content = f"{ascii_art}\n                   {version_text}"
     console.print(
         Padding(
             Align.center(content),
