@@ -209,7 +209,6 @@ def show_main_menu2(active_user: dict, profile: dict):
             is_enterprise = input("🎁 Enterprise? (y/n): ").lower() == "y"
             show_redeemables_menu(is_enterprise)
 
-        
         elif choice.lower() == "n":
             show_notification_menu()
         elif choice.lower() == "r":
@@ -228,7 +227,7 @@ def show_main_menu2(active_user: dict, profile: dict):
             live_loading(text="Kembali ke menu utama...", theme=theme)
             return
         else:
-            print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
+            print_warning("⚠️", "Pilihan tidak valid. Silakan coba lagi.")
             pause()
 
 
@@ -339,7 +338,7 @@ def main():
             elif choice.lower() == "s":
                 enter_sentry_mode()
             else:
-                print_warning("⚠️ Menu", "Pilihan tidak valid. Silakan coba lagi.")
+                print_warning("⚠️", "Pilihan tidak valid. Silakan coba lagi.")
                 pause()
         else:
             selected_user_number = show_account_menu()
