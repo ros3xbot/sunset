@@ -159,7 +159,7 @@ def show_main_menu2(active_user: dict, profile: dict):
         clear_sc()
 
         console.print(Panel(
-            Align.center("🗒️ Halaman Menu-2", vertical="middle"),
+            Align.center("☕ Halaman Menu-2", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
