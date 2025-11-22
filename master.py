@@ -136,7 +136,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("66", "📢 Info Unlock Code")
     menu_table.add_row("77", f"[{theme['border_warning']}]🎨 Ganti Tema CLI[/]")
     menu_table.add_row("88", f"[{theme['text_sub']}]☕ Menu Berikutnya[/]")
-    menu_table.add_row("CC", f"[{theme['text_sub']}]🧹 Clear Cache[/]")
+  #  menu_table.add_row("CC", f"[{theme['text_sub']}]🧹 Clear Cache[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
     console.print(
@@ -242,13 +242,13 @@ def main():
         if active_user is not None:
             with live_loading("🔄 Memuat data akun...", get_theme()):
                 # Balance cache (TTL 30 detik)
-                balance = get_cache("balance", ttl=30)
+                balance = get_cache("balance", ttl=60)
                 if not balance:
                     balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
                     set_cache("balance", balance)
 
                 # Quota cache (TTL 30 detik)
-                quota = get_cache("quota", ttl=30)
+                quota = get_cache("quota", ttl=60)
                 if not quota:
                     quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
                     set_cache("quota", quota)
