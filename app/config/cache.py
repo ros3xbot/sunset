@@ -2,14 +2,11 @@ import os
 import json
 import time
 
-# File cache lokal (hidden file)
-CACHE_FILE = ".cli_cache.json"
+CACHE_FILE = ".cache.json"
 
-# Cache in-memory
 _memory_cache = {}
 
-# Limit jumlah key di file cache
-MAX_KEYS = 20
+MAX_KEYS = 50
 
 def _load_file_cache():
     if os.path.exists(CACHE_FILE):
@@ -22,7 +19,6 @@ def _load_file_cache():
 
 def _save_file_cache(cache: dict):
     try:
-        # Batasi jumlah key agar file tidak membesar
         if len(cache) > MAX_KEYS:
             oldest = min(cache.items(), key=lambda x: x[1]["time"])[0]
             del cache[oldest]
@@ -32,12 +28,6 @@ def _save_file_cache(cache: dict):
         pass
 
 def get_cache(key: str, ttl: int = 60, use_file: bool = False, default=None):
-    """
-    Ambil data dari cache.
-    - ttl: waktu hidup cache (detik)
-    - use_file: True untuk cache file, False untuk cache memory
-    - default: nilai default jika cache kosong/kadaluarsa
-    """
     now = time.monotonic()
     if use_file:
         cache = _load_file_cache()
@@ -51,10 +41,6 @@ def get_cache(key: str, ttl: int = 60, use_file: bool = False, default=None):
     return default
 
 def set_cache(key: str, value, use_file: bool = False):
-    """
-    Simpan data ke cache.
-    - use_file: True untuk cache file, False untuk cache memory
-    """
     now = time.monotonic()
     if use_file:
         cache = _load_file_cache()
@@ -64,9 +50,6 @@ def set_cache(key: str, value, use_file: bool = False):
         _memory_cache[key] = {"value": value, "time": now}
 
 def clear_cache():
-    """
-    Bersihkan semua cache (memory + file).
-    """
     global _memory_cache
     _memory_cache = {}
     if os.path.exists(CACHE_FILE):
