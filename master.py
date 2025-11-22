@@ -147,7 +147,7 @@ def show_main_menu(profile, display_quota, segments):
     )
 
 
-def show_main_menu2():
+def show_main_menu2(active_user: dict, profile: dict):
     theme = get_theme()
     while True:
         clear_screen()
@@ -183,6 +183,7 @@ def show_main_menu2():
             expand=True
         ))
 
+        choice = console.input(f"[{theme['text_title']}]Pilih menu:[/{theme['text_title']}] ").strip()
         choice = console.input(f"[{theme['text_title']}]Pilih menu:[/{theme['text_title']}] ").strip()
         if choice == "9":
             show_family_info(AuthInstance.api_key, active_user["tokens"])
@@ -310,7 +311,7 @@ def main():
             elif choice == "00":
                 show_bookmark_menu()
             elif choice == "55":
-                show_main_menu2()
+                show_main_menu2(active_user, profile)   # ✅ perbaikan
             elif choice == "66":
                 show_family_grup_menu()
             elif choice == "77":
@@ -345,6 +346,7 @@ if __name__ == "__main__":
         if need_update:
             print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
             pause()
+            sys.exit(0)  # keluar agar tidak lanjut ke main()
         main()
     except KeyboardInterrupt:
         print_error("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
