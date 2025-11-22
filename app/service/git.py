@@ -85,7 +85,7 @@ def check_for_updates():
         print_panel("📑 Info", "Jalankan:\n[bold]git pull --rebase[/] untuk update.")
         return True
 
-    print_success("✅", "Repository sudah dalam versi terbaru.")
+    #print_success("✅", "Repository sudah dalam versi terbaru.")
     return False
 
 
