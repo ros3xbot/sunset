@@ -288,11 +288,9 @@ def main():
                 pause()
             elif choice.lower() == "n":
                 show_notification_menu()
+
             elif choice.lower() == "y":
                 show_special_for_you_menu()
-                else:
-                    print_panel("ℹ️ Info", "Tidak ada paket Special For You yang tersedia saat ini.")
-                    pause()
 
             elif choice.lower() == "s":
                 enter_sentry_mode()
