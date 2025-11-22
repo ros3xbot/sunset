@@ -129,10 +129,10 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("8", "📜 Riwayat Transaksi")
     menu_table.add_row("00", "📌 Bookmark Paket")
     menu_table.add_row("", "")
-    menu_table.add_row("55", f"[{theme['text_sub']}]☕ Halaman Menu Berikutnya[/]")
-    menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
-    menu_table.add_row("77", "📢 Info Unlock Code")
-    menu_table.add_row("88", "🎨 Ganti Tema CLI")
+    menu_table.add_row("55", "💾 Simpan/Kelola Family Code")
+    menu_table.add_row("66", "📢 Info Unlock Code")
+    menu_table.add_row("77", "🎨 Ganti Tema CLI")
+    menu_table.add_row("88", f"[{theme['text_sub']}]☕ Menu Berikutnya[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
     console.print(
@@ -176,8 +176,9 @@ def show_main_menu2(active_user: dict, profile: dict):
         menu_table.add_row("12", "📂 Store Family List")
         menu_table.add_row("13", "📦 Store Packages")
         menu_table.add_row("14", "🎁 Redeemables")
-        menu_table.add_row("R", "📝 Register")
+        menu_table.add_row("", "")
         menu_table.add_row("N", "🔔 Notifikasi")
+        menu_table.add_row("R", "📝 Register")
         menu_table.add_row("V", "✅ Validate MSISDN")
         menu_table.add_row("", "")
         menu_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
@@ -208,6 +209,9 @@ def show_main_menu2(active_user: dict, profile: dict):
             is_enterprise = input("🎁 Enterprise? (y/n): ").lower() == "y"
             show_redeemables_menu(is_enterprise)
 
+        
+        elif choice.lower() == "n":
+            show_notification_menu()
         elif choice.lower() == "r":
             msisdn = input("📝 Masukkan msisdn (628xxxx): ")
             nik = input("Masukkan NIK: ")
@@ -220,8 +224,6 @@ def show_main_menu2(active_user: dict, profile: dict):
             res = validate_msisdn(AuthInstance.api_key, active_user["tokens"], msisdn)
             print_panel("📑 Hasil Validasi", json.dumps(res, indent=2))
             pause()
-        elif choice.lower() == "n":
-            show_notification_menu()
         elif choice == "00":
             live_loading(text="Kembali ke menu utama...", theme=theme)
             return
@@ -317,24 +319,23 @@ def main():
                 purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
             elif choice == "8":
                 show_transaction_history(AuthInstance.api_key, active_user["tokens"])
-
             elif choice == "00":
                 show_bookmark_menu()
+
             elif choice == "55":
-                show_main_menu2(active_user, profile)   # penting: kirim active_user & profile
-            elif choice == "66":
                 show_family_grup_menu()
-            elif choice == "77":
+            elif choice == "66":
                 show_info_menu()
-            elif choice == "88":
+            elif choice == "77":
                 show_theme_menu()
+            elif choice == "88":
+                show_main_menu2(active_user, profile)
             elif choice == "99":
                 print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
                 sys.exit(0)
 
             elif choice.lower() == "y":
                 show_special_for_you_menu(active_user["tokens"])
-
             elif choice.lower() == "s":
                 enter_sentry_mode()
             else:
