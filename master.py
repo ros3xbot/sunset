@@ -169,9 +169,9 @@ def show_main_menu2():
             expand=True
         ))
 
-        menu_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-        menu_table.add_row("Kode", justify="right", style=theme["text_key"], width=6)
-        menu_table.add_row("Menu Paket", style=theme["text_body"])
+        menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+        menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
+        menu_table.add_column("Aksi", style=get_theme_style("text_body"))
         menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
         menu_table.add_row("10", "👥 Circle")
         menu_table.add_row("11", "🏬 Store Segments")
