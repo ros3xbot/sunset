@@ -60,7 +60,6 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     clear_sc()
     theme = get_theme()
 
-    # Info akun
     expired_at_ts = profile.get("balance_expired_at")
     expired_at_dt = datetime.fromtimestamp(expired_at_ts).strftime("%Y-%m-%d %H:%M:%S") if expired_at_ts else "-"
     pulsa_str = get_rupiah(profile.get("balance", 0))
@@ -87,7 +86,6 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
         )
     )
 
-    # Highlight satu paket SFY (opsional)
     special_packages = segments.get("special_packages", [])
     if special_packages:
         best = random.choice(special_packages)
@@ -116,7 +114,6 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
         )
         console.print(Align.center(f"[{theme['text_sub']}]Pilih [Y] untuk lihat semua paket spesial[/{theme['text_sub']}]"))
 
-    # Menu utama
     menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
     menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
     menu_table.add_column("Aksi", style=get_theme_style("text_body"))
@@ -152,7 +149,6 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
 def show_main_menu2(active_user: dict, profile: dict):
     theme = get_theme()
 
-    # Validasi awal untuk mencegah error jika belum login
     if not active_user or "tokens" not in active_user:
         print_error("❌", "User belum aktif, silakan login dulu.")
         pause()
@@ -358,7 +354,7 @@ if __name__ == "__main__":
         #if need_update:
             #print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
             #pause()
-            #sys.exit(0)  # hentikan agar update dilakukan dulu
+            #sys.exit(0)
         main()
     except KeyboardInterrupt:
         print_error("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
