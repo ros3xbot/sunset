@@ -131,10 +131,11 @@ def show_main_menu(profile, display_quota, segments):
     menu_table.add_row("7", "🛒 Beli Semua Paket di Family Code")
     menu_table.add_row("8", "📜 Riwayat Transaksi")
     menu_table.add_row("00", "⭐ Bookmark Paket")
+    menu_table.add_row("55", "👉 Menu berikutnya..")
     menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("77", "📢 Info Unlock Code")
     menu_table.add_row("88", "🎨 Ganti Tema CLI")
-    menu_table.add_row("99", "⛔ Tutup aplikasi")
+    menu_table.add_row("99", "⛔ f"[{theme['text_err']}]Tutup Aplikasi[/]")
 
     console.print(
         Panel(
@@ -172,7 +173,7 @@ def show_main_menu2():
         menu_table.add_row("R", "📝 Register")
         menu_table.add_row("N", "🔔 Notifikasi")
         menu_table.add_row("V", "✅ Validate MSISDN")
-        menu_table.add_row("00", f"[{theme['text_err']}]Kembali ke menu utama[/]")
+        menu_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             menu_table,
