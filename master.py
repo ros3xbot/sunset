@@ -159,7 +159,7 @@ def show_main_menu(profile, display_quota, segments):
 # Main loop
 # ============================
 def main():
-    #ensure_git()
+    ensure_git()
     theme = get_theme()
     while True:
         active_user = AuthInstance.get_active_user()
