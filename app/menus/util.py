@@ -101,7 +101,7 @@ __________             ___.
             Align.center(content),
             (1, 0)
         ),
-        style=get_theme_style("text_warn")
+        style=get_theme_style("text_sub")
     )
     #console.print(
     #    Panel(
