@@ -28,7 +28,6 @@ from app.client.engsel import (
     get_quota,
     dash_segments,
 )
-from app.menus.sfy import show_special_for_you_menu
 from app.client.famplan import validate_msisdn
 from app.client.registration import dukcapil
 from app.service.auth import AuthInstance
@@ -51,6 +50,8 @@ from app.menus.store.search import show_family_list_menu, show_store_packages_me
 from app.menus.store.redemables import show_redeemables_menu
 from app.menus.info import show_info_menu
 from app.menus.family_grup import show_family_grup_menu
+from app.menus.sfy import show_special_for_you_menu
+from app.menus.bundle import show_bundle_menu
 from app.menus.theme import show_theme_menu
 from app.config.theme_config import get_theme, get_theme_style
 
@@ -129,6 +130,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("8", "📜 Riwayat Transaksi")
     menu_table.add_row("00", "📌 Bookmark Paket")
     menu_table.add_row("", "")
+    menu_table.add_row("44", "🛒 Beli/Buat Paket Bundle (multi)")
     menu_table.add_row("55", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("66", "📢 Info Unlock Code")
     menu_table.add_row("77", "🎨 Ganti Tema CLI")
@@ -321,6 +323,8 @@ def main():
             elif choice == "00":
                 show_bookmark_menu()
 
+            elif choice == "44":
+                show_bundle_menu()
             elif choice == "55":
                 show_family_grup_menu()
             elif choice == "66":
