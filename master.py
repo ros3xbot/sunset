@@ -355,10 +355,10 @@ if __name__ == "__main__":
     try:
         with live_loading("🔄 Checking for updates...", get_theme()):
             need_update = check_for_updates()
-        if need_update:
-            print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
-            pause()
-            sys.exit(0)  # hentikan agar update dilakukan dulu
+        #if need_update:
+            #print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
+            #pause()
+            #sys.exit(0)  # hentikan agar update dilakukan dulu
         main()
     except KeyboardInterrupt:
         print_error("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
