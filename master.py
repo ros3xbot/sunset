@@ -249,7 +249,7 @@ def main():
 
             with live_loading("🔄 Memuat data akun...", get_theme()):
                 # Balance cache per akun (TTL 30 detik)
-                balance = get_cache(account_id, "balance", ttl=120)
+                balance = get_cache(account_id, "balance", ttl=150)
                 if not balance:
                     balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
                     set_cache(account_id, "balance", balance)
@@ -281,7 +281,7 @@ def main():
             point_info = "Points: N/A | Tier: N/A"
             if active_user["subscription_type"] == "PREPAID":
                 # Tiering cache per akun (TTL 300 detik)
-                tiering_data = get_cache(account_id, "tiering", ttl=300)
+                tiering_data = get_cache(account_id, "tiering", ttl=240)
                 if not tiering_data:
                     tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
                     set_cache(account_id, "tiering", tiering_data)
@@ -298,7 +298,7 @@ def main():
 
             show_main_menu(profile, display_quota, segments)
 
-            choice = console.input(f"[{theme['text_title']}]👉 Pilih menu:[/{theme['text_title']}] ").strip()
+            choice = console.input(f"[{theme['text_sub']}]👉 Pilih menu:[/{theme['text_sub']}] ").strip()
 
             if choice.lower() == "t":
                 pause()
