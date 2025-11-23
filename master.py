@@ -128,17 +128,17 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("5", "💴 Beli Paket Berdasarkan Option Code")
     menu_table.add_row("6", "💵 Beli Paket Berdasarkan Family Code")
     menu_table.add_row("7", "🔁 Beli Semua Paket di Family Code")
-    menu_table.add_row("8", "📜 Riwayat Transaksi")
-    menu_table.add_row("00", "📌 Bookmark Paket")
+    menu_table.add_row("8", "🔂 Order berulang dari Family Code")
+    menu_table.add_row("9", "🎭 Ciptakan Paket bundle (decoy)")
     menu_table.add_row("", "")
-    menu_table.add_row("33", "🔂 Order berulang dari Family Code")
-    menu_table.add_row("44", "🎭 Ciptakan Paket bundle (decoy)")
-    menu_table.add_row("55", "💾 Simpan/Kelola Family Code")
-    menu_table.add_row("66", "📢 Info Unlock Code")
-    menu_table.add_row("77", f"[{theme['text_sub']}]🎨 Ganti Tema CLI[/]")
-    menu_table.add_row("88", f"[{theme['border_warning']}]☕ Menu Berikutnya[/]")
-    menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
-    menu_table.add_row("C", f"[{theme['text_title']}]🧹 Bersihkan Cache[/]")
+    menu_table.add_row("K", "💾 Simpan/Kelola Family Code")
+    menu_table.add_row("B", "📌 Bookmark Paket")
+    menu_table.add_row("M", f"[{theme['text_title']}]☕ Menu Berikutnya[/]")
+    menu_table.add_row("", "")
+    menu_table.add_row("C", f"[{theme['text_body']}]🧹 Bersihkan Cache[/]")
+    menu_table.add_row("U", f"[{theme['text_body']}]📢 Info Unlock Code[/]")
+    menu_table.add_row("T", f"[{theme['text_sub']}]🎨 Ganti Tema CLI[/]")
+    menu_table.add_row("X", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
     console.print(
         Panel(
@@ -175,12 +175,13 @@ def show_main_menu2(active_user: dict, profile: dict):
         menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
         menu_table.add_column("Aksi", style=get_theme_style("text_body"))
 
-        menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
-        menu_table.add_row("10", "👥 Circle")
-        menu_table.add_row("11", "🏬 Store Segments")
-        menu_table.add_row("12", "📂 Store Family List")
-        menu_table.add_row("13", "📦 Store Packages")
-        menu_table.add_row("14", "🎁 Redeemables")
+        menu_table.add_row("10", "📜 Riwayat Transaksi")
+        menu_table.add_row("11", "👨‍👩‍👧‍👦 Akrab Organizer")
+        menu_table.add_row("12", "👥 Circle")
+        menu_table.add_row("13", "🏬 Store Segments")
+        menu_table.add_row("14", "📂 Store Family List")
+        menu_table.add_row("15", "📦 Store Packages")
+        menu_table.add_row("16", "🎁 Redeemables")
         menu_table.add_row("", "")
         menu_table.add_row("N", "🔔 Notifikasi")
         menu_table.add_row("R", "📝 Register")
@@ -197,20 +198,22 @@ def show_main_menu2(active_user: dict, profile: dict):
         ))
 
         choice = console.input(f"[{theme['text_title']}]Pilih menu:[/{theme['text_title']}] ").strip()
-        if choice == "9":
-            show_family_info(AuthInstance.api_key, active_user["tokens"])
-        elif choice == "10":
-            show_circle_info(AuthInstance.api_key, active_user["tokens"])
+        if choice == "10":
+            show_transaction_history(AuthInstance.api_key, active_user["tokens"])
         elif choice == "11":
+            show_family_info(AuthInstance.api_key, active_user["tokens"])
+        elif choice == "12":
+            show_circle_info(AuthInstance.api_key, active_user["tokens"])
+        elif choice == "13":
             is_enterprise = input("🏬 Enterprise store? (y/n): ").lower() == "y"
             show_store_segments_menu(is_enterprise)
-        elif choice == "12":
+        elif choice == "14":
             is_enterprise = input("📂 Enterprise? (y/n): ").lower() == "y"
             show_family_list_menu(profile["subscription_type"], is_enterprise)
-        elif choice == "13":
+        elif choice == "15":
             is_enterprise = input("📦 Enterprise? (y/n): ").lower() == "y"
             show_store_packages_menu(profile["subscription_type"], is_enterprise)
-        elif choice == "14":
+        elif choice == "16":
             is_enterprise = input("🎁 Enterprise? (y/n): ").lower() == "y"
             show_redeemables_menu(is_enterprise)
 
@@ -342,10 +345,6 @@ def main():
                     delay_seconds = 0
                 purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
             elif choice == "8":
-                show_transaction_history(AuthInstance.api_key, active_user["tokens"])
-            elif choice == "00":
-                show_bookmark_menu()
-            elif choice == "33":
                 family_code = input("Enter family code: ")
                 try:
                     order = int(input("Enter order number: ") or 1)
@@ -356,7 +355,6 @@ def main():
                 except ValueError:
                     delay = 0
                 pause_on_success = input("Aktifkan mode pause? (y/n): ").lower() == 'y'
-            
                 while True:
                     should_continue = purchase_loop(
                         family_code=family_code,
@@ -368,24 +366,28 @@ def main():
                     if not should_continue:
                         break
                 continue
-
-            elif choice == "44":
+            elif choice == "9":
                 show_bundle_menu()
-            elif choice == "55":
+
+            elif choice.lower() == "k":
                 show_family_grup_menu()
-            elif choice == "66":
-                show_info_menu()
-            elif choice == "77":
-                show_theme_menu()
-            elif choice == "88":
+            elif choice.lower() == "b":
+                show_bookmark_menu()
+            elif choice.lower() == "m":
                 show_main_menu2(active_user, profile)
+
             elif choice.lower() == "c":
                 clear_cache(account_id)
                 print_success("🧹", f"Cache untuk akun {account_id} berhasil dibersihkan.")
                 pause()
-            elif choice == "99":
+            elif choice.lower() == "u":
+                show_info_menu()
+            elif choice.lower() == "t":
+                show_theme_menu()
+            elif choice.lower() == "x":
                 print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
-                sys.exit(0)
+                sys.exit(0
+
             elif choice.lower() == "y":
                 show_special_for_you_menu(active_user["tokens"])
             elif choice.lower() == "s":
