@@ -76,8 +76,8 @@ def login_prompt(api_key: str):
 
 
 def show_account_menu():
-    ensure_git()
     clear_sc()
+    ensure_git()
     theme = get_theme()
     AuthInstance.load_tokens()
     users = AuthInstance.refresh_tokens
