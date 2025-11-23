@@ -11,6 +11,7 @@ from rich.box import MINIMAL_DOUBLE_HEAD
 from app.config.theme_config import get_theme
 from app.menus.util import live_loading, clear_screen, pause, display_html, print_panel, get_rupiah, format_quota_byte, nav_range
 from app.service.auth import AuthInstance
+from app.service.git import ensure_git
 from app.client.engsel import get_family, get_package, get_addons, get_package_details, send_api_request, unsubscribe
 from app.client.ciam import get_auth_code
 from app.service.bookmark import BookmarkInstance
@@ -507,6 +508,7 @@ def get_packages_by_family(
 
     while True:
         clear_screen()
+        ensure_git()
 
         info_text = Text()
         info_text.append("Nama: ", style=theme["text_body"])
@@ -639,6 +641,7 @@ def fetch_my_packages():
 
     while True:
         clear_screen()
+        ensure_git()
         console.print(Panel(
             Align.center("📦 Paket Aktif Saya", vertical="middle"),
             border_style=theme["border_info"],
