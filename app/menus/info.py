@@ -4,7 +4,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.align import Align
 from rich.text import Text
-from app.menus.util import clear_screen, pause, live_loading
+from app.menus.util import clear_screen, pause, live_loading, simple_number
 from app.service.git import ensure_git
 from app.config.theme_config import get_theme
 
@@ -62,6 +62,7 @@ def show_info_menu():
         expand=True,
         title_align="center"
     ))
+    simple_number()
 
     console.print(Panel(
         Align.center(qr_code_ascii),
