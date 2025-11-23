@@ -726,7 +726,7 @@ def fetch_my_packages():
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         nav_table.add_row(nav_range("", len(my_packages)), "Lihat detail paket")
-        nav_table.add_row(nav_range("del", len(my_packages)), f"[{theme['text_err']}]Unsubscribe dari paket[/]")
+        nav_table.add_row(nav_range("del", len(my_packages)), f"[{theme['text_err']}]Hapus paket[/]")
 
         console.print(Panel(
             nav_table,
@@ -735,7 +735,7 @@ def fetch_my_packages():
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_title']}]Pilihan:[/{theme['text_title']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             return "BACK"
 
