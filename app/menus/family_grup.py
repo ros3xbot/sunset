@@ -11,6 +11,7 @@ from rich.box import MINIMAL_DOUBLE_HEAD
 from app.menus.package import get_packages_by_family
 from app.menus.util import clear_screen, pause, print_panel, live_loading
 from app.config.theme_config import get_theme
+from app.service.git import ensure_git
 
 console = Console()
 FAMILY_FILE = os.path.abspath("family_codes.json")
@@ -76,6 +77,7 @@ def edit_family_name(index, new_name):
 def show_family_grup_menu(return_package_detail: bool = False):
     while True:
         clear_screen()
+        ensure_git()
         semua_kode = list_family_codes()
         theme = get_theme()
 
