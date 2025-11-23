@@ -131,7 +131,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("8", "📜 Riwayat Transaksi")
     menu_table.add_row("00", "📌 Bookmark Paket")
     menu_table.add_row("", "")
-    menu_table.add_row("33", "📜 Mode Custom (family code dan nomer order)")
+    menu_table.add_row("33", "🔁 Looping Pembelian Dari Family Code")
     menu_table.add_row("44", "🎭 Ciptakan Paket Decoy (multi)")
     menu_table.add_row("55", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("66", "📢 Info Unlock Code")
@@ -349,7 +349,7 @@ def main():
                 family_code = input("Enter family code: ").strip()
                 if not family_code:
                     print_error("❌", "Family code tidak boleh kosong.")
-                    continue
+                    pause()
             
                 try:
                     order_input = input("Enter order number: ").strip()
