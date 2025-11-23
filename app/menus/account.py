@@ -5,7 +5,7 @@ from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 
 from app.client.ciam import get_otp, submit_otp
-from app.menus.util import clear_screen, clear_sc, pause, print_panel, nav_range
+from app.menus.util import clear_screen, simple_number, pause, print_panel, nav_range
 from app.service.auth import AuthInstance
 from app.config.theme_config import get_theme
 from app.service.service import load_status, save_status
@@ -26,7 +26,7 @@ def normalize_number(raw_input: str) -> str:
 
 
 def login_prompt(api_key: str):
-    clear_sc()
+    clear_screen()
     theme = get_theme()
     console.print(Panel(
         Align.center("🔐 Login ke myXL CLI", vertical="middle"),
@@ -76,7 +76,7 @@ def login_prompt(api_key: str):
 
 
 def show_account_menu():
-    clear_sc()
+    clear_screen()
     ensure_git()
     theme = get_theme()
     AuthInstance.load_tokens()
@@ -128,6 +128,7 @@ def show_account_menu():
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         account_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         account_table.add_column("No", style=theme["text_key"], justify="right", width=3)
