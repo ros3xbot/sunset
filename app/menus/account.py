@@ -9,6 +9,7 @@ from app.menus.util import clear_screen, clear_sc, pause, print_panel, nav_range
 from app.service.auth import AuthInstance
 from app.config.theme_config import get_theme
 from app.service.service import load_status, save_status
+from app.service.git import ensure_git
 
 console = Console()
 
@@ -75,6 +76,7 @@ def login_prompt(api_key: str):
 
 
 def show_account_menu():
+    ensure_git()
     clear_sc()
     theme = get_theme()
     AuthInstance.load_tokens()
