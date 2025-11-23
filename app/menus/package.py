@@ -525,12 +525,12 @@ def get_packages_by_family(
         info_text.append(f"{family_code}\n", style=theme["border_warning"])
         info_text.append("Tipe: ", style=theme["text_sub"])
         info_text.append(f"{data['package_family']['package_family_type']}\n", style=theme["text_value"])
-        info_text.append("Jumlah Varian: ", style=theme["text_body"])
-        info_text.append(f"{len(data['package_variants'])}\n", style=theme["text_sub"])
+        info_text.append("Jumlah Varian: ", style=theme["text_sub"])
+        info_text.append(f"{len(data['package_variants'])}\n", style=theme["text_value"])
 
         console.print(Panel(
             info_text,
-            title=f"[{theme['text_title']}]Info Paket Family[/]",
+            title=f"[{theme['text_title']}]Info Family[/]",
             border_style=theme["border_info"],
             padding=(0, 2),
             expand=True
