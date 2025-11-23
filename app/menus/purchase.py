@@ -18,13 +18,13 @@ def purchase_loop(
     api_key = AuthInstance.api_key
     tokens: dict = AuthInstance.get_active_tokens() or {}
 
-    # 1. Find the package variant and option from the order
+    # 1. Cari variant & option sesuai order
     family_data = get_family(api_key, tokens, family_code)
     if not family_data:
         print(f"Failed to get family data for code: {family_code}.")
         pause()
-        return False # Stop the loop in maincopy.py
-    
+        return False
+
     target_variant = None
     target_option = None
     for variant in family_data["package_variants"]:
@@ -39,7 +39,7 @@ def purchase_loop(
     if not target_option or not target_variant:
         print(f"Option order {order} not found in family {family_code}.")
         pause()
-        return False # Stop the loop
+        return False
 
     option_name = target_option["name"]
     option_price = target_option["price"]
@@ -48,30 +48,17 @@ def purchase_loop(
     print("-------------------------------------------------------")
     print(f"Trying to buy: {target_variant['name']} - {order}. {option_name} - {option_price}")
 
-    # 2. Decoy logic (copied from purchase_n_times)
+    # 2. Decoy logic (pakai DecoyInstance)
     decoy_package_detail = None
     if use_decoy:
-        # Balance; Decoy XCP
-        url = "https://me.mashu.lol/pg-decoy-xcp.json"
-        
-        response = requests.get(url, timeout=30)
-        if response.status_code != 200:
-            print("Gagal mengambil data decoy package.")
-            # continue loop in maincopy.py
-        else:
-            decoy_data = response.json()
-            decoy_package_detail = get_package_details(
-                api_key,
-                tokens,
-                decoy_data["family_code"],
-                decoy_data["variant_code"],
-                decoy_data["order"],
-                decoy_data["is_enterprise"],
-                decoy_data["migration_type"],
-            )
+        decoy = DecoyInstance.get_decoy("balance")
+        decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
+        if not decoy_package_detail:
+            print("Failed to load decoy package details.")
+            pause()
+            return False
 
-    # 3. Prepare payment items (copied and adapted from purchase_n_times)
-    payment_items = []
+    # 3. Ambil detail package target
     try:
         target_package_detail = get_package_details(
             api_key,
@@ -85,32 +72,33 @@ def purchase_loop(
     except Exception as e:
         print(f"Exception occurred while fetching package details: {e}")
         time.sleep(delay)
-        return True # Continue loop
+        return True  # lanjut loop
 
-    payment_items.append(
+    # 4. Susun payment items
+    payment_items = [
         PaymentItem(
             item_code=target_package_detail["package_option"]["package_option_code"],
             product_type="",
             item_price=target_package_detail["package_option"]["price"],
-            item_name=str(randint(1000, 9999)) + target_package_detail["package_option"]["name"],
+            item_name=str(randint(1000, 9999)) + " " + target_package_detail["package_option"]["name"],
             tax=0,
             token_confirmation=target_package_detail["token_confirmation"],
         )
-    )
-    
+    ]
+
     if use_decoy and decoy_package_detail:
         payment_items.append(
             PaymentItem(
                 item_code=decoy_package_detail["package_option"]["package_option_code"],
                 product_type="",
                 item_price=decoy_package_detail["package_option"]["price"],
-                item_name=str(randint(1000, 9999)) + decoy_package_detail["package_option"]["name"],
+                item_name=str(randint(1000, 9999)) + " " + decoy_package_detail["package_option"]["name"],
                 tax=0,
                 token_confirmation=decoy_package_detail["token_confirmation"],
             )
         )
 
-    # 4. Settle payment (copied and adapted from purchase_n_times)
+    # 5. Settlement
     overwrite_amount = target_package_detail["package_option"]["price"]
     if use_decoy and decoy_package_detail:
         overwrite_amount += decoy_package_detail["package_option"]["price"]
@@ -124,14 +112,13 @@ def purchase_loop(
             False,
             overwrite_amount,
         )
-        
+
         if res and res.get("status", "") != "SUCCESS":
             error_msg = res.get("message", "Unknown error")
             print(f"Purchase failed: {error_msg}")
             if "Bizz-err.Amount.Total" in error_msg:
                 error_msg_arr = error_msg.split("=")
                 valid_amount = int(error_msg_arr[1].strip())
-                
                 print(f"Adjusted total amount to: {valid_amount}")
                 res = settlement_balance(
                     api_key,
@@ -141,27 +128,29 @@ def purchase_loop(
                     False,
                     valid_amount,
                 )
-        
+
         if res and res.get("status", "") == "SUCCESS":
             print("Purchase successful!")
             if pause_on_success:
                 choice = input("Lanjut Dor? (y/n): ").lower()
                 if choice == 'n':
-                    return False # Stop the loop
+                    return False
         else:
             print("Purchase was not successful. Check message above.")
 
     except Exception as e:
         print(f"Exception occurred while creating order: {e}")
 
-    # 5. Delay for the loop
-    YELLOW = '\033[93m'
-    RESET = '\033[0m'
-    for i in range(delay, 0, -1):
-        print(f"\r{YELLOW}Waiting for {i} seconds...{RESET}", end="")
-        time.sleep(1)
-    print() # Move to the next line after the countdown
-    return True # Continue loop
+    # 6. Delay loop
+    if delay > 0:
+        YELLOW = '\033[93m'
+        RESET = '\033[0m'
+        for i in range(delay, 0, -1):
+            print(f"\r{YELLOW}Waiting for {i} seconds...{RESET}", end="")
+            time.sleep(1)
+        print()
+
+    return True
 
 
 # Purchase
