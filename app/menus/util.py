@@ -70,16 +70,6 @@ __________             ___.
         ),
         style=get_theme_style("text_sub")
     )
-    #console.print(
-    #    Panel(
-    #        Align.center(content),
-    #        border_style=get_theme_style("border_primary"),
-    #        style=get_theme_style("text_warn"),
-    #        expand=True,
-    #        box=box.DOUBLE,
-    #        padding=(1, 2),
-    #    )
-    #)
     simple_number()
 
 
@@ -103,16 +93,6 @@ __________             ___.
         ),
         style=get_theme_style("text_sub")
     )
-    #console.print(
-    #    Panel(
-    #        Align.center(content),
-    #        border_style=get_theme_style("border_primary"),
-    #        style=get_theme_style("text_title"),
-    #        expand=True,
-    #        box=box.DOUBLE,
-    #        padding=(1, 2),
-    #    )
-    #)
 
 
 def pause():
@@ -198,7 +178,7 @@ def nav_range(label: str, count: int) -> str:
 
 
 def live_loading(text: str, theme: dict):
-    return console.status(f"[{theme['text_body']}]{text}[/{theme['text_body']}]", spinner="dots")
+    return console.status(f"[{theme['text_sub']}]{text}[/{theme['text_sub']}]", spinner="dots")
 
 
 def print_panel(title, content, border_style=None):
