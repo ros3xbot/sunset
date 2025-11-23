@@ -133,7 +133,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("", "")
     menu_table.add_row("K", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("B", "📌 Bookmark Paket")
-    menu_table.add_row("M", f"[{theme['text_title']}]☕ Menu Berikutnya..[/]")
+    menu_table.add_row("M", f"[{theme['text_sub']}]☕ Menu Berikutnya..[/]")
     menu_table.add_row("", "")
     menu_table.add_row("C", f"[{theme['text_body']}]🧹 Bersihkan Cache[/]")
     menu_table.add_row("U", f"[{theme['text_body']}]📢 Info Unlock Code[/]")
