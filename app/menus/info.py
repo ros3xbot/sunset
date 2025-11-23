@@ -54,7 +54,7 @@ def show_info_menu():
     console.print(Panel(
         Align.left(donate_info),
         title=f"[{theme['text_title']}]💰 Donasi Seikhlasnya[/]",
-        border_style=theme["border_success"],
+        border_style=theme["border_primary"],
         padding=(1, 2),
         expand=True,
         title_align="center"
@@ -63,7 +63,7 @@ def show_info_menu():
     console.print(Panel(
         Align.center(qr_code_ascii),
         title=f"[{theme['text_title']}]📱 Scan QRIS[/]",
-        border_style=theme["border_primary"],
+        border_style=theme["border_succes"],
         padding=(1, 2),
         expand=True,
         title_align="center"
