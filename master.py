@@ -130,7 +130,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("7", "🔁 Beli Semua Paket di Family Code")
     menu_table.add_row("8", "🔂 Order berulang dari Family Code")
     menu_table.add_row("9", "🎭 Ciptakan Paket bundle (decoy)")
-    #menu_table.add_row("", "")
+    menu_table.add_row("", "")
     menu_table.add_row("K", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("B", "📌 Bookmark Paket")
     menu_table.add_row("M", f"[{theme['text_body']}]☕ Menu Berikutnya..[/]")
