@@ -382,7 +382,7 @@ def main():
                 pause()
             elif choice.lower() == "u":
                 show_info_menu()
-            elif choice) == "69":
+            elif choice == "69":
                 show_theme_menu()
             elif choice == "99":
                 print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
