@@ -523,7 +523,7 @@ def get_packages_by_family(
 
         console.print(Panel(
             info_text,
-            title=f"[{theme['text_title']}]📦 Info Paket Family {variant_name}[/]",
+            title=f"[{theme['text_title']}]📦 Info Paket Family {data['package_family']['name']}[/]",
             border_style=theme["border_info"],
             padding=(0, 2),
             expand=True
