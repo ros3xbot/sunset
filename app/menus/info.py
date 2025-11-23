@@ -39,6 +39,7 @@ def show_info_menu():
         padding=(1, 2),
         expand=True
      ))
+    simple_number()
 
     donate_info = Text()
     donate_info.append(
@@ -62,7 +63,6 @@ def show_info_menu():
         expand=True,
         title_align="center"
     ))
-    simple_number()
 
     console.print(Panel(
         Align.center(qr_code_ascii),
