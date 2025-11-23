@@ -45,7 +45,7 @@ def show_bundle_menu():
             for i, item in enumerate(display_cart, start=1):
                 table.add_row(str(i), item["name"], get_rupiah(item["price"]))
 
-            console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
+            console.print(Panel(table, border_style=theme["border_info"], padding=(0, 1), expand=True))
             console.print(f"[{theme['text_body']}]Total Harga: Rp {get_rupiah(total_price)}[/]")
         else:
             print_panel("ℹ️", "Keranjang masih kosong.")
