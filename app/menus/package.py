@@ -547,7 +547,7 @@ def get_packages_by_family(
 
         console.print(Panel(
             table,
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(0, 0),
             expand=True
         ))
@@ -559,7 +559,7 @@ def get_packages_by_family(
 
         console.print(Panel(
             nav,
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
         ))
@@ -714,7 +714,7 @@ def fetch_my_packages():
 
             console.print(Panel(
                 Group(*panel_content),
-                border_style=theme["border_primary"],
+                border_style=theme["border_info"],
                 padding=(0, 1),
                 expand=True
             ))
@@ -736,7 +736,7 @@ def fetch_my_packages():
 
         console.print(Panel(
             nav_table,
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
         ))
