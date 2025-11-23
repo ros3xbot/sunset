@@ -346,10 +346,27 @@ def main():
             elif choice == "00":
                 show_bookmark_menu()
             elif choice == "33":
-                family_code = input("Enter family code: ")
-                order = int(input("Enter order number: "))
-                delay = int(input("Enter delay in seconds: "))
+                family_code = input("Enter family code: ").strip()
+                if not family_code:
+                    print_error("❌", "Family code tidak boleh kosong.")
+                    continue
+            
+                try:
+                    order_input = input("Enter order number: ").strip()
+                    order = int(order_input) if order_input else 1
+                except ValueError:
+                    print_warning("⚠️", "Order number tidak valid, gunakan default 1.")
+                    order = 1
+            
+                try:
+                    delay_input = input("Enter delay in seconds: ").strip()
+                    delay = int(delay_input) if delay_input else 0
+                except ValueError:
+                    print_warning("⚠️", "Delay tidak valid, gunakan default 0.")
+                    delay = 0
+            
                 pause_on_success = input("Aktifkan mode pause? (y/n): ").lower() == 'y'
+            
                 while True:
                     purchase_loop(
                         family_code=family_code,
@@ -358,7 +375,7 @@ def main():
                         delay=delay,
                         pause_on_success=pause_on_success
                     )
-                continue
+                
             elif choice == "44":
                 show_bundle_menu()
             elif choice == "55":
