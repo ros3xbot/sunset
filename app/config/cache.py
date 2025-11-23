@@ -27,7 +27,8 @@ def _save_file_cache(cache: dict):
             oldest = min(cache.items(), key=lambda x: x[1]["time"])[0]
             del cache[oldest]
         with open(CACHE_FILE, "w", encoding="utf-8") as f:
-            json.dump(cache, f)
+            # indent=2 membuat JSON rapi, tiap level masuk 2 spasi
+            json.dump(cache, f, indent=2, ensure_ascii=False)
     except Exception:
         pass
 
