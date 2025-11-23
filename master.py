@@ -358,6 +358,7 @@ def main():
                         delay=delay,
                         pause_on_success=pause_on_success
                     )
+                continue
             elif choice == "44":
                 show_bundle_menu()
             elif choice == "55":
