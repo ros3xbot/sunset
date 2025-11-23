@@ -130,7 +130,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("8", "🔂 Beli berulang dari Family Code")
     menu_table.add_row("", "")
     menu_table.add_row("D", "🎭 Ciptakan Paket bundle (decoy)")
-    menu_table.add_row("K", "💾 Simpan/Kelola Family Code")
+    menu_table.add_row("F", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("B", "📌 List Bookmark Paket")
     menu_table.add_row("C", f"[{theme['text_body']}]🧹 Bersihkan Cache akun[/]")
     menu_table.add_row("M", f"[{theme['text_body']}]☕ Menu Berikutnya..[/]")
@@ -368,7 +368,7 @@ def main():
  
             elif choice.lower() == "d":
                 show_bundle_menu()
-            elif choice.lower() == "k":
+            elif choice.lower() == "f":
                 show_family_grup_menu()
             elif choice.lower() == "b":
                 show_bookmark_menu()
