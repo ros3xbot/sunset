@@ -5,7 +5,7 @@ from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 
 from app.service.auth import AuthInstance
-from app.menus.util import clear_screen, pause, print_panel
+from app.menus.util import clear_screen, pause, print_panel, simple_number
 from app.service.bookmark import BookmarkInstance
 from app.client.engsel import get_family
 from app.menus.package import show_package_details, get_package_details
@@ -29,6 +29,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         bookmarks = BookmarkInstance.get_bookmarks()
         if not bookmarks:
