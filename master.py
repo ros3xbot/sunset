@@ -59,11 +59,6 @@ from app.config.cache import get_cache, set_cache, clear_cache
 console = Console()
 
 
-def re_cache_action(account_id):
-    clear_cache(account_id)
-    print_success("♻️", f"Cache akun {account_id} direset karena ada perubahan data.")
-
-
 def show_main_menu(profile: dict, display_quota: str, segments: dict):
     clear_sc()
     theme = get_theme()
@@ -312,22 +307,18 @@ def main():
                 continue
             elif choice == "3":
                 show_hot_menu()
-                re_cache_action(account_id)
             elif choice == "4":
                 show_hot_menu2()
-                re_cache_action(account_id)
             elif choice == "5":
                 option_code = input("🔍 Masukkan option code: ")
                 if option_code == "99":
                     continue
                 show_package_details(AuthInstance.api_key, active_user["tokens"], option_code, False)
-                re_cache_action(account_id)
             elif choice == "6":
                 family_code = input("💵 Masukkan family code: ")
                 if family_code == "99":
                     continue
                 get_packages_by_family(family_code)
-                re_cache_action(account_id)
             elif choice == "7":
                 family_code = input("🔁 Masukkan family code: ")
                 if family_code == "99":
@@ -345,14 +336,12 @@ def main():
                 except ValueError:
                     delay_seconds = 0
                 purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
-                re_cache_action(account_id)
             elif choice == "8":
                 show_transaction_history(AuthInstance.api_key, active_user["tokens"])
             elif choice == "00":
                 show_bookmark_menu()
             elif choice == "44":
                 show_bundle_menu()
-                re_cache_action(account_id)
             elif choice == "55":
                 show_family_grup_menu()
             elif choice == "66":
@@ -370,7 +359,6 @@ def main():
                 sys.exit(0)
             elif choice.lower() == "y":
                 show_special_for_you_menu(active_user["tokens"])
-                re_cache_action(account_id)
             elif choice.lower() == "s":
                 enter_sentry_mode()
             else:
@@ -380,7 +368,6 @@ def main():
             selected_user_number = show_account_menu()
             if selected_user_number:
                 AuthInstance.set_active_user(selected_user_number)
-                re_cache_action(selected_user_number)
                 print_success("🔐", f"Akun aktif diganti ke {selected_user_number}")
             else:
                 print_error("❌", "Tidak ada user terpilih atau gagal memuat user.")
