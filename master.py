@@ -349,7 +349,7 @@ def main():
                 family_code = input("Enter family code: ").strip()
                 if not family_code:
                     print_error("❌", "Family code tidak boleh kosong.")
-                    pause()
+                    continue
             
                 try:
                     order_input = input("Enter order number: ").strip()
@@ -375,7 +375,7 @@ def main():
                         delay=delay,
                         pause_on_success=pause_on_success
                     )
-                
+                continue
             elif choice == "44":
                 show_bundle_menu()
             elif choice == "55":
