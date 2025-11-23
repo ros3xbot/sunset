@@ -30,8 +30,15 @@ def show_info_menu():
     with live_loading("Menyiapkan QRIS...", theme):
         qr_code_ascii = generate_qr_ascii(qris_url)
 
+    console.print(Panel(
+        Align.center("Dukung Pengembangan MyXL CLI", vertical="middle"),
+        border_style=theme["border_info"],
+        padding=(1, 2),
+        expand=True
+     ))
+
     donate_info = Text()
-    donate_info.append("Dukung Pengembangan MyXL CLI!\n\n", style=f"{theme['text_title']} bold")
+    #donate_info.append("Dukung Pengembangan MyXL CLI!\n\n", style=f"{theme['text_title']} bold")
     donate_info.append(
         "Jika Anda butuh Kode Unlock untuk menambahkan lebih banyak akun, hubungi saya di Telegram (@barbex_id), tebus seikhlasnya 😁\n\n",
         style=theme["text_body"]
