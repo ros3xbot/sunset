@@ -34,7 +34,7 @@ def login_prompt(api_key: str):
         expand=True
     ))
     console.print(f" Masukkan nomor XL, Supported (08xx / 628xx / +628xx) ")
-    raw_input = console.input(f"[{theme['text_title']}] Nomor: [/{theme['text_title']}] ").strip()
+    raw_input = console.input(f"[{theme['text_sub']}] Nomor: [/{theme['text_sub']}] ").strip()
     phone_number = normalize_number(raw_input)
 
     if not phone_number.startswith("628") or len(phone_number) < 10 or len(phone_number) > 14:
@@ -158,7 +158,7 @@ def show_account_menu():
         console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
         console.print(f"Masukkan nomor akun (1 - {len(users)}) untuk berganti.")
 
-        input_str = choice = console.input(f"[{theme['text_title']}]Pilihan:[/{theme['text_title']}] ").strip()
+        input_str = choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         
         if input_str == "00":
             return active_user["number"] if active_user else None
