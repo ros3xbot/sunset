@@ -310,17 +310,17 @@ def main():
             elif choice == "4":
                 show_hot_menu2()
             elif choice == "5":
-                option_code = input("✏️ Masukkan option code: ")
+                option_code = input("🔎 Masukkan option code: ")
                 if option_code == "99":
                     continue
                 show_package_details(AuthInstance.api_key, active_user["tokens"], option_code, False)
             elif choice == "6":
-                family_code = input("✏️ Masukkan family code: ")
+                family_code = input("🔎 Masukkan family code: ")
                 if family_code == "99":
                     continue
                 get_packages_by_family(family_code)
             elif choice == "7":
-                family_code = input("✏️ Masukkan family code: ")
+                family_code = input("🔎 Masukkan family code: ")
                 if family_code == "99":
                     continue
                 start_from_option = input("Mulai dari option number (default 1): ")
