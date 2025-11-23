@@ -136,7 +136,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("66", "📢 Info Unlock Code")
     menu_table.add_row("77", f"[{theme['border_warning']}]🎨 Ganti Tema CLI[/]")
     menu_table.add_row("88", f"[{theme['text_sub']}]☕ Menu Berikutnya[/]")
-  #  menu_table.add_row("CC", f"[{theme['text_sub']}]🧹 Clear Cache[/]")
+  #  menu_table.add_row("C", f"[{theme['text_sub']}]🧹 Clear Cache[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
     console.print(
@@ -234,34 +234,37 @@ def show_main_menu2(active_user: dict, profile: dict):
             print_warning("⚠️", "Pilihan tidak valid. Silakan coba lagi.")
             pause()
 
+
 def main():
     ensure_git()
     theme = get_theme()
     while True:
         active_user = AuthInstance.get_active_user()
         if active_user is not None:
+            account_id = active_user["number"]
+
             with live_loading("🔄 Memuat data akun...", get_theme()):
-                # Balance cache (TTL 30 detik)
-                balance = get_cache("balance", ttl=60)
+                # Balance cache per akun (TTL 30 detik)
+                balance = get_cache(account_id, "balance", ttl=60)
                 if not balance:
                     balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
-                    set_cache("balance", balance)
+                    set_cache(account_id, "balance", balance)
 
-                # Quota cache (TTL 30 detik)
-                quota = get_cache("quota", ttl=60)
+                # Quota cache per akun (TTL 30 detik)
+                quota = get_cache(account_id, "quota", ttl=60)
                 if not quota:
                     quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
-                    set_cache("quota", quota)
+                    set_cache(account_id, "quota", quota)
 
-                # Segments cache (TTL 300 detik, file-based)
-                segments = get_cache("segments", ttl=300, use_file=True)
+                # Segments cache per akun (TTL 300 detik, file-based)
+                segments = get_cache(account_id, "segments", ttl=300, use_file=True)
                 if not segments:
                     segments = dash_segments(
                         AuthInstance.api_key,
                         active_user["tokens"]["id_token"],
                         active_user["tokens"]["access_token"]
                     ) or {}
-                    set_cache("segments", segments, use_file=True)
+                    set_cache(account_id, "segments", segments, use_file=True)
 
             remaining = quota.get("remaining", 0)
             total = quota.get("total", 0)
@@ -347,12 +350,10 @@ def main():
                 show_theme_menu()
             elif choice == "88":
                 show_main_menu2(active_user, profile)
-
-            elif choice.lower() == "cc":
-                clear_cache()
-                print_success("🧹", "Cache berhasil dibersihkan.")
+            elif choice.lower() == "c":
+                clear_cache(account_id)
+                print_success("🧹", f"Cache untuk akun {account_id} berhasil dibersihkan.")
                 pause()
-
             elif choice == "99":
                 print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
                 sys.exit(0)
