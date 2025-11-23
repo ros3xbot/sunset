@@ -12,7 +12,6 @@ from rich.box import MINIMAL_DOUBLE_HEAD
 from app.service.git import check_for_updates, ensure_git
 from app.menus.util import (
     clear_screen,
-    clear_sc,
     simple_number,
     pause,
     print_panel,
@@ -60,7 +59,7 @@ console = Console()
 
 
 def show_main_menu(profile: dict, display_quota: str, segments: dict):
-    clear_sc()
+    clear_screen()
     theme = get_theme()
 
     expired_at_ts = profile.get("balance_expired_at")
@@ -161,7 +160,7 @@ def show_main_menu2(active_user: dict, profile: dict):
         return
 
     while True:
-        clear_sc()
+        clear_screen()
 
         console.print(Panel(
             Align.center("☕ Halaman Menu-2", vertical="middle"),
