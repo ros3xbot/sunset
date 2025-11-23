@@ -511,7 +511,7 @@ def get_packages_by_family(
         clear_screen()
         ensure_git()
         console.print(Panel(
-            Align.center(f"📦 Family {data['package_family']['name']}", vertical="middle"),
+            Align.center(f"📦 Paket {data['package_family']['name']}", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -530,7 +530,7 @@ def get_packages_by_family(
 
         console.print(Panel(
             info_text,
-            title=f"[{theme['text_title']}]Info Family[/]",
+            #title=f"[{theme['text_title']}]📦 Info Paket Family[/]",
             border_style=theme["border_info"],
             padding=(0, 2),
             expand=True
