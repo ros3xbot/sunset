@@ -510,6 +510,13 @@ def get_packages_by_family(
     while True:
         clear_screen()
         ensure_git()
+        console.print(Panel(
+            Align.center("📦 Paket {data['package_family']['name']}", vertical="middle"),
+            border_style=theme["border_info"],
+            padding=(1, 2),
+            expand=True
+        ))
+        simple_number()
 
         info_text = Text()
         info_text.append("Nama: ", style=theme["text_body"])
@@ -523,12 +530,11 @@ def get_packages_by_family(
 
         console.print(Panel(
             info_text,
-            title=f"[{theme['text_title']}]📦 Info Paket Family {data['package_family']['name']}[/]",
+            title=f"[{theme['text_title']}]📋 Info Paket Family [/]",
             border_style=theme["border_info"],
             padding=(0, 2),
             expand=True
         ))
-        simple_number()
 
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_key"], width=4)
