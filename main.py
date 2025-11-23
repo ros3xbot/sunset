@@ -150,7 +150,7 @@ def run_main():
         print_panel("👋 Keluar", "Aplikasi dihentikan oleh pengguna", border_style=get_theme_style("border_info"))
         sys.exit(0)
     except Exception as e:
-        print_error("❌ Gagal menjalankan menu utama", f"{type(e).__name__} - {e}")
+        print_error("❌ Gagal menjalankan aplikasi", f"{type(e).__name__} - {e}")
         pause()
         sys.exit(1)
 
