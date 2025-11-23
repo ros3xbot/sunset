@@ -386,7 +386,7 @@ def main():
                 show_theme_menu()
             elif choice.lower() == "x":
                 print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
-                sys.exit(0
+                sys.exit(0)
 
             elif choice.lower() == "y":
                 show_special_for_you_menu(active_user["tokens"])
