@@ -187,7 +187,7 @@ def show_main_menu2(active_user: dict, profile: dict):
         menu_table.add_row("R", "📝 Register")
         menu_table.add_row("V", "✅ Validate MSISDN")
         menu_table.add_row("", "")
-        menu_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        menu_table.add_row("00", f"[{theme['text_title']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             menu_table,
@@ -197,7 +197,7 @@ def show_main_menu2(active_user: dict, profile: dict):
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_title']}]Pilih menu:[/{theme['text_title']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Pilih menu:[/{theme['text_sub']}] ").strip()
         if choice == "10":
             show_transaction_history(AuthInstance.api_key, active_user["tokens"])
         elif choice == "11":
