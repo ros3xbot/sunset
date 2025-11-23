@@ -8,8 +8,8 @@ CACHE_FILE = ".cache.json"
 # Cache in-memory
 _memory_cache = {}
 
-# Limit jumlah key di file cache
-MAX_KEYS = 50  # bisa disesuaikan
+# Limit jumlah key di file cache (default 50)
+MAX_KEYS = 500  # bisa disesuaikan
 
 def _load_file_cache():
     if os.path.exists(CACHE_FILE):
