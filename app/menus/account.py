@@ -145,7 +145,7 @@ def show_account_menu():
                 status
             )
 
-        console.print(Panel(account_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
+        console.print(Panel(account_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
@@ -155,7 +155,7 @@ def show_account_menu():
         nav_table.add_row("H", f"[{theme['text_err']}]Hapus akun tersimpan[/]")
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
-        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
+        console.print(Panel(nav_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
         console.print(f"Masukkan nomor akun (1 - {len(users)}) untuk berganti.")
 
         input_str = choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
