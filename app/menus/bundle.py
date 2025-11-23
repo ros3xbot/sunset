@@ -63,7 +63,7 @@ def show_bundle_menu():
 
         console.print(Panel(nav, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
-        choice = console.input(f"[{theme['text_title']}]Pilihan:[/{theme['text_title']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
         def add_to_cart(detail, name):
             nonlocal total_price
