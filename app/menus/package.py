@@ -9,7 +9,7 @@ from rich.text import Text
 from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 from app.config.theme_config import get_theme
-from app.menus.util import live_loading, clear_screen, pause, display_html, print_panel, get_rupiah, format_quota_byte, nav_range
+from app.menus.util import live_loading, clear_screen, pause, display_html, print_panel, get_rupiah, format_quota_byte, nav_range, simple_number
 from app.service.auth import AuthInstance
 from app.service.git import ensure_git
 from app.client.engsel import get_family, get_package, get_addons, get_package_details, send_api_request, unsubscribe
@@ -32,6 +32,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     subscription_type = active_user.get("subscription_type", "")
     
     clear_screen()
+    simple_number()
     print("-------------------------------------------------------")
     print("Detail Paket")
     print("-------------------------------------------------------")
@@ -522,11 +523,12 @@ def get_packages_by_family(
 
         console.print(Panel(
             info_text,
-            title=f"[{theme['text_title']}]📦 Info Paket Family[/]",
+            title=f"[{theme['text_title']}]📦 Info Paket Family {variant_name}[/]",
             border_style=theme["border_info"],
             padding=(0, 2),
             expand=True
         ))
+        simple_number()
 
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_key"], width=4)
@@ -648,6 +650,7 @@ def fetch_my_packages():
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         my_packages = []
         for num, quota in enumerate(quotas, start=1):
