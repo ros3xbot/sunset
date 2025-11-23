@@ -130,13 +130,13 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("7", "🔁 Beli Semua Paket di Family Code")
     menu_table.add_row("8", "🔂 Order berulang dari Family Code")
     menu_table.add_row("", "")
-    menu_table.add_row("9", "🎭 Ciptakan Paket bundle (decoy)")
+    menu_table.add_row("D", "🎭 Ciptakan Paket bundle (decoy)")
     menu_table.add_row("K", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("B", "📌 Bookmark Paket")
     menu_table.add_row("C", f"[{theme['text_body']}]🧹 Bersihkan Cache[/]")
     menu_table.add_row("M", f"[{theme['text_body']}]☕ Menu Berikutnya..[/]")
     menu_table.add_row("", "")
-    menu_table.add_row("U", f"[{theme['border_warning']}]📢 Info Unlock Code[/]")
+    menu_table.add_row("66", f"[{theme['border_warning']}]📢 Info Unlock Code[/]")
     menu_table.add_row("69", f"[{theme['text_sub']}]🎨 Ganti Tema CLI[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
@@ -366,21 +366,21 @@ def main():
                     if not should_continue:
                         break
                 continue
-            elif choice == "9":
+ 
+            elif choice.lower() == "d":
                 show_bundle_menu()
-
             elif choice.lower() == "k":
                 show_family_grup_menu()
             elif choice.lower() == "b":
                 show_bookmark_menu()
             elif choice.lower() == "m":
                 show_main_menu2(active_user, profile)
-
             elif choice.lower() == "c":
                 clear_cache(account_id)
                 print_success("🧹", f"Cache untuk akun {account_id} berhasil dibersihkan.")
                 pause()
-            elif choice.lower() == "u":
+
+            elif choice == "66":
                 show_info_menu()
             elif choice == "69":
                 show_theme_menu()
