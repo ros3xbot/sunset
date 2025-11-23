@@ -2,11 +2,14 @@ import os
 import json
 import time
 
+# File cache lokal (hidden file)
 CACHE_FILE = ".cache.json"
 
+# Cache in-memory
 _memory_cache = {}
 
-MAX_KEYS = 50
+# Limit jumlah key di file cache
+MAX_KEYS = 50  # bisa disesuaikan
 
 def _load_file_cache():
     if os.path.exists(CACHE_FILE):
@@ -19,6 +22,7 @@ def _load_file_cache():
 
 def _save_file_cache(cache: dict):
     try:
+        # Batasi jumlah key agar file tidak membesar
         if len(cache) > MAX_KEYS:
             oldest = min(cache.items(), key=lambda x: x[1]["time"])[0]
             del cache[oldest]
@@ -27,33 +31,66 @@ def _save_file_cache(cache: dict):
     except Exception:
         pass
 
-def get_cache(key: str, ttl: int = 60, use_file: bool = False, default=None):
+def _make_key(account_id: str, key: str) -> str:
+    """Gabungkan account_id dengan key agar cache per akun."""
+    return f"{account_id}_{key}"
+
+def get_cache(account_id: str, key: str, ttl: int = 60, use_file: bool = False, default=None):
+    """
+    Ambil data dari cache per akun.
+    - account_id: identifier akun (misalnya nomor/subscriber_id)
+    - key: nama data (balance, quota, segments)
+    - ttl: waktu hidup cache (detik)
+    - use_file: True untuk cache file, False untuk cache memory
+    - default: nilai default jika cache kosong/kadaluarsa
+    """
     now = time.monotonic()
+    full_key = _make_key(account_id, key)
+
     if use_file:
         cache = _load_file_cache()
-        if key in cache:
-            if now - cache[key]["time"] < ttl:
-                return cache[key]["value"]
+        if full_key in cache:
+            if now - cache[full_key]["time"] < ttl:
+                return cache[full_key]["value"]
     else:
-        data = _memory_cache.get(key)
+        data = _memory_cache.get(full_key)
         if data and (now - data["time"] < ttl):
             return data["value"]
     return default
 
-def set_cache(key: str, value, use_file: bool = False):
+def set_cache(account_id: str, key: str, value, use_file: bool = False):
+    """
+    Simpan data ke cache per akun.
+    """
     now = time.monotonic()
+    full_key = _make_key(account_id, key)
+
     if use_file:
         cache = _load_file_cache()
-        cache[key] = {"value": value, "time": now}
+        cache[full_key] = {"value": value, "time": now}
         _save_file_cache(cache)
     else:
-        _memory_cache[key] = {"value": value, "time": now}
+        _memory_cache[full_key] = {"value": value, "time": now}
 
-def clear_cache():
+def clear_cache(account_id: str = None):
+    """
+    Bersihkan cache.
+    - Jika account_id diberikan, hanya cache untuk akun itu yang dihapus.
+    - Jika tidak, semua cache dihapus.
+    """
     global _memory_cache
-    _memory_cache = {}
-    if os.path.exists(CACHE_FILE):
-        try:
-            os.remove(CACHE_FILE)
-        except Exception:
-            pass
+    if account_id:
+        # Hapus cache memory per akun
+        _memory_cache = {k: v for k, v in _memory_cache.items() if not k.startswith(f"{account_id}_")}
+        # Hapus cache file per akun
+        cache = _load_file_cache()
+        cache = {k: v for k, v in cache.items() if not k.startswith(f"{account_id}_")}
+        _save_file_cache(cache)
+    else:
+        # Hapus semua cache
+        _memory_cache = {}
+        if os.path.exists(CACHE_FILE):
+            try:
+                os.remove(CACHE_FILE)
+            except Exception:
+                pass
