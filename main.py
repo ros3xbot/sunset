@@ -10,8 +10,10 @@ from rich.console import Console
 from app.service.git import check_for_updates, ensure_git
 from app.menus.util import pause, live_loading, print_panel, print_error
 from app.config.theme_config import get_theme, get_theme_style
+from app.config.cache import clear_cache
 
 console = Console()
+
 
 def is_rebase_in_progress():
     return os.path.exists(".git/rebase-apply") or os.path.exists(".git/rebase-merge")
@@ -164,5 +166,5 @@ if __name__ == "__main__":
 
     if need_update:
         git_pull_rebase()
-
+    clear_cache(account_id)
     run_main()
