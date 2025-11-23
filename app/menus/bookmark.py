@@ -19,10 +19,10 @@ def show_bookmark_menu(return_package_detail: bool = False):
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
     theme = get_theme()
-    ensure_git()
 
     while True:
         clear_screen()
+        ensure_git()
         console.print(Panel(
             Align.center("📌 Daftar Bookmark Paket", vertical="middle"),
             border_style=theme["border_info"],
