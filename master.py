@@ -245,13 +245,13 @@ def main():
 
             with live_loading("🔄 Memuat data akun...", get_theme()):
                 # Balance cache per akun (TTL 30 detik)
-                balance = get_cache(account_id, "balance", ttl=60)
+                balance = get_cache(account_id, "balance", ttl=120)
                 if not balance:
                     balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
                     set_cache(account_id, "balance", balance)
 
                 # Quota cache per akun (TTL 30 detik)
-                quota = get_cache(account_id, "quota", ttl=60)
+                quota = get_cache(account_id, "quota", ttl=120)
                 if not quota:
                     quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
                     set_cache(account_id, "quota", quota)
@@ -276,7 +276,11 @@ def main():
 
             point_info = "Points: N/A | Tier: N/A"
             if active_user["subscription_type"] == "PREPAID":
-                tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
+                # Tiering cache per akun (TTL 300 detik)
+                tiering_data = get_cache(account_id, "tiering", ttl=300)
+                if not tiering_data:
+                    tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
+                    set_cache(account_id, "tiering", tiering_data)
                 point_info = f"Points: {tiering_data.get('current_point',0)} | Tier: {tiering_data.get('tier',0)}"
 
             profile = {
