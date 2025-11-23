@@ -136,7 +136,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("M", f"[{theme['text_body']}]☕ Menu Berikutnya..[/]")
     menu_table.add_row("", "")
     menu_table.add_row("C", f"[{theme['text_body']}]🧹 Bersihkan Cache[/]")
-    menu_table.add_row("U", f"[{theme['bordr_warning']}]📢 Info Unlock Code[/]")
+    menu_table.add_row("U", f"[{theme['border_warning']}]📢 Info Unlock Code[/]")
     menu_table.add_row("69", f"[{theme['text_sub']}]🎨 Ganti Tema CLI[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
