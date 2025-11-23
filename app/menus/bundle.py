@@ -23,7 +23,6 @@ def show_bundle_menu():
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
     theme = get_theme()
-    ensure_git()
 
     cart_items = []
     display_cart = []
@@ -31,6 +30,7 @@ def show_bundle_menu():
 
     while True:
         clear_screen()
+        ensure_git()
         console.print(Panel(
             Align.center("🛒 Keranjang Paket", vertical="middle"),
             border_style=theme["border_info"],
