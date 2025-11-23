@@ -7,6 +7,7 @@ from app.config.theme_config import get_theme
 from app.menus.package import get_packages_by_family
 from app.menus.family_grup import show_family_grup_menu
 from app.menus.bookmark import show_bookmark_menu
+from app.service.git import ensure_git
 from app.type_dict import PaymentItem
 from rich.console import Console
 from rich.panel import Panel
@@ -22,6 +23,7 @@ def show_bundle_menu():
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
     theme = get_theme()
+    ensure_git()
 
     cart_items = []
     display_cart = []
