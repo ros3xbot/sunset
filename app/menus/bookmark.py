@@ -42,7 +42,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
             label = f"{bm['family_name']} - {bm['variant_name']} - {bm['option_name']}"
             table.add_row(str(idx + 1), label)
 
-        console.print(Panel(table, border_style=theme["border_primary"], expand=True))
+        console.print(Panel(table, border_style=theme["border_info"], expand=True))
 
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
@@ -50,7 +50,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
         nav.add_row("00", f"[{theme['text_sub']}]⬅️ Kembali ke menu awal[/]")
         nav.add_row("000", f"[{theme['text_err']}]🗑️ Hapus Bookmark[/]")
 
-        console.print(Panel(nav, border_style=theme["border_info"], expand=True))
+        console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
 
         choice = console.input(f"[{theme['text_title']}]Pilih bookmark (nomor):[/{theme['text_title']}] ").strip()
 
