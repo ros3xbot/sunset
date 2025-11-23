@@ -41,7 +41,7 @@ from app.menus.package import (
     show_package_details,
 )
 from app.menus.hot import show_hot_menu, show_hot_menu2
-from app.menus.purchase import purchase_by_family
+from app.menus.purchase import purchase_by_family, purchase_loop
 from app.menus.famplan import show_family_info
 from app.menus.circle import show_circle_info
 from app.menus.notification import show_notification_menu
@@ -131,6 +131,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("8", "📜 Riwayat Transaksi")
     menu_table.add_row("00", "📌 Bookmark Paket")
     menu_table.add_row("", "")
+    menu_table.add_row("33", "📜 Mode Custom (family code dan nomer order)")
     menu_table.add_row("44", "🎭 Ciptakan Paket Decoy (multi)")
     menu_table.add_row("55", "💾 Simpan/Kelola Family Code")
     menu_table.add_row("66", "📢 Info Unlock Code")
@@ -344,6 +345,19 @@ def main():
                 show_transaction_history(AuthInstance.api_key, active_user["tokens"])
             elif choice == "00":
                 show_bookmark_menu()
+            elif choice == "33":
+                family_code = input("Enter family code: ")
+                order = int(input("Enter order number: "))
+                delay = int(input("Enter delay in seconds: "))
+                pause_on_success = input("Aktifkan mode pause? (y/n): ").lower() == 'y'
+                while True:
+                    purchase_loop(
+                        family_code=family_code,
+                        order=order,
+                        use_decoy=True,
+                        delay=delay,
+                        pause_on_success=pause_on_success
+                    )
             elif choice == "44":
                 show_bundle_menu()
             elif choice == "55":
