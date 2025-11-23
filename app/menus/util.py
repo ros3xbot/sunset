@@ -6,6 +6,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.align import Align
+from rich.padding import Padding
 from rich import box
 from app.config.theme_config import get_theme, get_theme_style
 
@@ -47,33 +48,7 @@ def simple_number():
     ))
 
 
-from rich.align import Align
-from rich.padding import Padding
-
 def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
-    ascii_art = r"""
-__________             ___.                  
-\______   \_____ ______\_ |__   ____ ___  ___    ▄   ▄
-|    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  / ▄█▄ █▀█▀█ ▄█▄
-|    |   \ / __ \|  | \/ \_\ \  ___/ >    < ▀▀████▄█▄████▀▀
-|______  /(____  /__|  |___  /\___  >__/\_ \     ▀█▀█▀
-       \/      \/          \/     \/      \/"""
-
-    version_text = f"[{get_theme_style('text_body')}]myXL CLI v8.9.1 sunset[/{get_theme_style('text_body')}]"
-    
-    content = f"{ascii_art}\n                  {version_text}"
-    console.print(
-        Padding(
-            Align.center(content),
-            (1, 0)
-        ),
-        style=get_theme_style("text_sub")
-    )
-    simple_number()
-
-
-def clear_sc():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
 __________             ___.                  
