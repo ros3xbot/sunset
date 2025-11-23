@@ -9,7 +9,7 @@ from rich.text import Text
 from rich.box import MINIMAL_DOUBLE_HEAD
 
 from app.menus.package import get_packages_by_family
-from app.menus.util import clear_screen, pause, print_panel, live_loading
+from app.menus.util import clear_screen, pause, print_panel, live_loading, simple_number
 from app.config.theme_config import get_theme
 from app.service.git import ensure_git
 
@@ -87,6 +87,7 @@ def show_family_grup_menu(return_package_detail: bool = False):
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         packages = []
         if semua_kode:
@@ -186,7 +187,6 @@ def show_family_grup_menu(return_package_detail: bool = False):
                         return None
                     elif result == "BACK":
                         continue
-                    #pause()
                 except Exception as e:
                     print_panel("❌ Error", f"Gagal menampilkan paket: {e}")
             else:
