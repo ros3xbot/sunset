@@ -9,7 +9,7 @@ from rich.text import Text
 from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 from app.config.theme_config import get_theme
-from app.menus.util import clear_screen, pause, display_html, print_panel, get_rupiah, format_quota_byte, nav_range
+from app.menus.util import live_loading, clear_screen, pause, display_html, print_panel, get_rupiah, format_quota_byte, nav_range
 from app.service.auth import AuthInstance
 from app.client.engsel import get_family, get_package, get_addons, get_package_details, send_api_request, unsubscribe
 from app.client.ciam import get_auth_code
@@ -623,7 +623,7 @@ def fetch_my_packages():
         "family_member_id": ""
     }
 
-    with console.status("🔄 Mengambil paket aktif..."):
+    with live_loading("🔄 Mengambil paket aktif...", theme):
         res = send_api_request(api_key, path, payload, id_token, "POST")
 
     if res.get("status") != "SUCCESS":
@@ -686,8 +686,7 @@ def fetch_my_packages():
 
                     benefit_table.add_row(name, dt, f"{r_str} / {t_str}")
 
-            #with console.status(f"🔍 Memuat detail paket #{num}..."):
-            with console.status(f"{num}"):
+            with live_loading(f"🔍 Memuat detail paket #{num}...", theme):
                 package_details = get_package(api_key, tokens, quota_code)
             if package_details:
                 family_code = package_details["package_family"]["package_family_code"]
@@ -766,7 +765,7 @@ def fetch_my_packages():
 
             confirm = console.input(f"[{theme['text_sub']}]Yakin ingin unsubscribe dari paket {nomor}. {selected['name']}? (y/n):[/{theme['text_sub']}] ").strip().lower()
             if confirm == "y":
-                with console.status("🔄 Menghapus paket..."):
+                with live_loading("🔄 Menghapus paket...", theme):
                     success = unsubscribe(
                         api_key,
                         tokens,
