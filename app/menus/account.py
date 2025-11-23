@@ -28,7 +28,7 @@ def login_prompt(api_key: str):
     clear_sc()
     theme = get_theme()
     console.print(Panel(
-        Align.center("🔐 Login ke MyXL", vertical="middle"),
+        Align.center("🔐 Login ke myXL CLI", vertical="middle"),
         border_style=theme["border_info"],
         padding=(1, 2),
         expand=True
