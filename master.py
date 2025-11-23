@@ -137,8 +137,8 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("", "")
     menu_table.add_row("C", f"[{theme['text_body']}]🧹 Bersihkan Cache[/]")
     menu_table.add_row("U", f"[{theme['text_body']}]📢 Info Unlock Code[/]")
-    menu_table.add_row("T", f"[{theme['text_sub']}]🎨 Ganti Tema CLI[/]")
-    menu_table.add_row("X", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
+    menu_table.add_row("69", f"[{theme['text_sub']}]🎨 Ganti Tema CLI[/]")
+    menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
     console.print(
         Panel(
@@ -382,9 +382,9 @@ def main():
                 pause()
             elif choice.lower() == "u":
                 show_info_menu()
-            elif choice.lower() == "t":
+            elif choice) == "69":
                 show_theme_menu()
-            elif choice.lower() == "x":
+            elif choice == "99":
                 print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
                 sys.exit(0)
 
