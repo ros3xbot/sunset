@@ -43,7 +43,7 @@ def show_theme_menu():
             )
             table.add_row(str(idx), name.replace("_", " ").title(), preview)
 
-        console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
+        console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
 
         # Navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -51,7 +51,7 @@ def show_theme_menu():
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
-        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
+        console.print(Panel(nav_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
         # Input pilihan
         choice = console.input(f"[{theme['text_title']}]Pilih nomor tema:[/{theme['text_title']}] ").strip()
