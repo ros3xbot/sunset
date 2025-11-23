@@ -249,13 +249,13 @@ def main():
 
             with live_loading("🔄 Memuat data akun...", get_theme()):
                 # Balance cache per akun (TTL 30 detik)
-                balance = get_cache(account_id, "balance", ttl=150)
+                balance = get_cache(account_id, "balance", ttl=90)
                 if not balance:
                     balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
                     set_cache(account_id, "balance", balance)
 
                 # Quota cache per akun (TTL 30 detik)
-                quota = get_cache(account_id, "quota", ttl=120)
+                quota = get_cache(account_id, "quota", ttl=60)
                 if not quota:
                     quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
                     set_cache(account_id, "quota", quota)
