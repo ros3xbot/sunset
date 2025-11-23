@@ -101,7 +101,7 @@ def show_family_grup_menu(return_package_detail: bool = False):
                     "name": item["name"]
                 })
 
-            console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
+            console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
         else:
             console.print(Panel(
                 "[italic]Belum ada family code yang terdaftar.[/italic]",
@@ -119,7 +119,7 @@ def show_family_grup_menu(return_package_detail: bool = False):
             nav_table.add_row("H", f"[{theme['text_err']}]Hapus family code[/]")
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
 
-        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
+        console.print(Panel(nav_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
         aksi = console.input(f"[{theme['text_title']}]Pilih aksi atau nomor kode:[/{theme['text_title']}] ").strip().lower()
 
