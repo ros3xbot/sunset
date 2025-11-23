@@ -5,6 +5,7 @@ from rich.panel import Panel
 from rich.align import Align
 from rich.text import Text
 from app.menus.util import clear_screen, pause, live_loading
+from app.service.git import ensure_git
 from app.config.theme_config import get_theme
 
 console = Console()
@@ -21,6 +22,7 @@ def generate_qr_ascii(data: str) -> str:
 
 def show_info_menu():
     clear_screen()
+    ensure_git()
     theme = get_theme()
     qris_url = (
         "00020101021126570011ID.DANA.WWW011893600915324993094502092499309450303UMI"
