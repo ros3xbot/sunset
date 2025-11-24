@@ -25,6 +25,7 @@ from app.menus.util import (
 from app.service.auth import AuthInstance
 from app.service.decoy import DecoyInstance
 from app.service.bookmark import BookmarkInstance
+from app.service.git import check_for_updates, ensure_git
 from app.client.engsel import get_family, get_package, get_package_details
 from app.type_dict import PaymentItem
 
@@ -59,4 +60,6 @@ __all__ = [
     "PaymentItem",
     "get_packages_by_family",
     "show_package_details",
+    "check_for_updates",
+    "ensure_git",
 ]
