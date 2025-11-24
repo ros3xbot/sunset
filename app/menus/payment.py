@@ -1,13 +1,7 @@
 from datetime import datetime, timedelta
 
 from app.client.engsel import get_transaction_history
-from app.menus.util import clear_screen, pause, print_panel
-from app.config.theme_config import get_theme
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
+from app.config.imports import *
 
 console = Console()
 
@@ -18,13 +12,14 @@ def show_transaction_history(api_key, tokens):
 
     while in_transaction_menu:
         clear_screen()
-        #console.print(Panel("📄 Riwayat Transaksi", title="💰 Transaksi", border_style=theme["border_info"], expand=True))
+        ensure_git()
         console.print(Panel(
             Align.center("📄 Riwayat Transaksi", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         try:
             data = get_transaction_history(api_key, tokens)
