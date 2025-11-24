@@ -1,5 +1,5 @@
-from app.menus.util import clear_screen, pause, print_panel, simple_number
-from app.client.engsel import get_notification_detail, dashboard_segments
+from app.menus.util import clear_screen, pause, print_panel, simple_number, live_loading
+from app.client.engsel import get_notification_detail, dashboard_segments, delete_notification
 from app.config.theme_config import get_theme
 from app.service.auth import AuthInstance
 from rich.console import Console
@@ -27,7 +27,10 @@ def show_notification_menu():
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
 
-        notifications_res = dashboard_segments(api_key, tokens)
+        # Pakai live_loading saat memuat notifikasi
+        with live_loading("🔄 Mengambil notifikasi...", theme):
+            notifications_res = dashboard_segments(api_key, tokens)
+
         if not notifications_res:
             print_panel("ℹ️ Info", "No notifications found.")
             pause()
@@ -68,7 +71,7 @@ def show_notification_menu():
                 expand=True
             ))
 
-        # Total & Unread
+        # Total & Unread dengan warna
         console.print(
             f"[{theme['text_title']}]Total: {len(notifications)}[/] | "
             f"[{theme['text_err']}]Unread: {unread_count}[/]"
@@ -80,6 +83,7 @@ def show_notification_menu():
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("1", "Read All Unread Notifications")
         nav_table.add_row("2", "Mark Single Notification as Read")
+        nav_table.add_row("3", f"[{theme['text_err']}]Delete Notification[/]")
         nav_table.add_row("00", f"[{theme['text_sub']}]Back to Main Menu[/]")
 
         console.print(Panel(
@@ -120,6 +124,28 @@ def show_notification_menu():
             detail = get_notification_detail(api_key, tokens, notification_id)
             if detail:
                 print_panel("✅ Info", f"Mark as READ notification ID: {notification_id}")
+            pause()
+
+        elif choice == "3":
+            nomor = console.input(f"[{theme['text_sub']}]Masukkan nomor notifikasi yang ingin dihapus:[/{theme['text_sub']}] ").strip()
+            if not nomor.isdigit():
+                print_panel("❌ Error", "Nomor tidak valid.")
+                pause()
+                continue
+            nomor = int(nomor)
+            selected = next((n for i, n in enumerate(notifications, start=1) if i == nomor), None)
+            if not selected:
+                print_panel("❌ Error", "Nomor notifikasi tidak ditemukan.")
+                pause()
+                continue
+            notification_id = selected.get("notification_id")
+            confirm = console.input(f"[{theme['text_sub']}]Yakin hapus notifikasi {nomor}? (y/n):[/{theme['text_sub']}] ").strip().lower()
+            if confirm == "y":
+                with live_loading("🗑️ Menghapus notifikasi...", theme):
+                    success = delete_notification(api_key, tokens, notification_id)
+                print_panel("✅ Info" if success else "❌ Error", "Notifikasi berhasil dihapus." if success else "Gagal menghapus notifikasi.")
+            else:
+                print_panel("ℹ️ Info", "Penghapusan dibatalkan.")
             pause()
 
         elif choice == "00":
