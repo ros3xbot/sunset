@@ -17,6 +17,7 @@ from app.menus.util import (
     display_html,
     simple_number,
     format_quota_byte,
+    live_loading,
     nav_range
 )
 
@@ -48,6 +49,7 @@ __all__ = [
     "simple_number",
     "format_quota_byte",
     "nav_range",
+    "live_loading",
     "AuthInstance",
     "DecoyInstance",
     "BookmarkInstance",
