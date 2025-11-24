@@ -541,7 +541,7 @@ def get_packages_by_family(
         console.print(Panel(
             info_text,
             #title=f"[{theme['text_title']}]📦 Info Paket Family[/]",
-            border_style=theme["border_primary"],
+            border_style=theme["border_info"],
             padding=(0, 2),
             expand=True
         ))
