@@ -7,6 +7,7 @@ from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 
 # Utilitas internal
+from app.menus.package import get_packages_by_family, show_package_details
 from app.config.theme_config import get_theme
 from app.menus.util import (
     clear_screen,
@@ -53,4 +54,6 @@ __all__ = [
     "get_package",
     "get_package_details",
     "PaymentItem",
+    "get_packages_by_family",
+    "show_package_details",
 ]
