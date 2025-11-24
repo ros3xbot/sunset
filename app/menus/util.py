@@ -35,14 +35,14 @@ def simple_number():
     active_user = AuthInstance.get_active_user()
 
     if not active_user:
-        text = f"[bold {get_theme_style('text_err')}]Tidak ada akun aktif saat ini.[/]"
+        text = f"[bold {theme['text_err']}]Tidak ada akun aktif saat ini.[/]"
     else:
         number = active_user.get("number", "-")
-        text = f"[bold {get_theme_style('text_body')}]Akun (nomor) aktif ✨ {number} ✨[/]"
+        text = f"[bold {theme['text_body']}]Akun (nomor) aktif ✨ {number} ✨[/]"
 
     console.print(Panel(
         Align.center(text),
-        border_style=get_theme("text_primary"),
+        border_style=theme["text_primary"],
         padding=(0, 0),
         expand=True
     ))
