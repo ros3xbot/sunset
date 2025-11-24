@@ -110,7 +110,7 @@ def show_hot_menu():
             continue
 
 
-
+WIDTH = 55
 def show_hot_menu2():
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
