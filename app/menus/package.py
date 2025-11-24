@@ -31,21 +31,25 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     theme = get_theme()
     clear_screen()
 
+    # Ambil data paket
     package = get_package(api_key, tokens, package_option_code)
     if not package:
         print_panel("⚠️ Error", "Gagal memuat detail paket.")
         pause()
-        return False
+        return "BACK"
 
+    # Ekstrak field utama
     option = package.get("package_option", {})
     family = package.get("package_family", {})
     variant = package.get("package_detail_variant", {})
+
     price = option.get("price", 0)
     formatted_price = get_rupiah(price)
     validity = option.get("validity", "-")
     point = option.get("point", "-")
     plan_type = family.get("plan_type", "-")
     payment_for = family.get("payment_for", "") or "BUY_PACKAGE"
+
     token_confirmation = package.get("token_confirmation", "")
     ts_to_sign = package.get("timestamp", "")
     detail = display_html(option.get("tnc", ""))
@@ -53,6 +57,12 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     option_name = option.get("name", "")
     family_name = family.get("name", "")
     variant_name = variant.get("name", "")
+    title = f"{family_name} - {variant_name} - {option_name}".strip()
+
+    family_code = family.get("package_family_code", "")
+    parent_code = package.get("package_addon", {}).get("parent_code", "") or "N/A"
+
+    # Base payment item
     payment_items = [
         PaymentItem(
             item_code=package_option_code,
@@ -63,11 +73,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             token_confirmation=token_confirmation,
         )
     ]
-    title = f"{family_name} - {variant_name} - {option_name}".strip()
 
-    family_code = family.get("package_family_code", "")
-    parent_code = package.get("package_addon", {}).get("parent_code", "") or "N/A"
-
+    # Panel judul
     console.print(Panel(
         Align.center(f"📦 {family_name}", vertical="middle"),
         border_style=theme["border_info"],
@@ -89,7 +96,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     info_table.add_row("Family Code", f": [{theme['border_warning']}]{family_code}[/]")
     info_table.add_row("Parent Code", f": [{theme['text_sub']}]{parent_code}[/]")
 
-    #console.print(Panel(info_table, title="📦 Detail Paket", border_style=theme["border_info"], expand=True))
     console.print(Panel(
         info_table,
         title=f"[{theme['text_title']}]📦 Detail Paket[/]",
@@ -139,16 +145,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             expand=True
         ))
 
-    # Addons
-    # addons = get_addons(api_key, tokens, package_option_code)
-    # if addons:
-    #     console.print(Panel(
-    #         json.dumps(addons, indent=2),
-    #         title=f"[{theme['text_title']}]🧩 Addons[/]",
-    #         border_style=theme["border_info"],  # bisa pakai border_warning kalau mau beda
-    #         expand=True
-    #     ))
-
     # Syarat & Ketentuan
     console.print(Panel(
         detail,
@@ -177,7 +173,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         nav_table.add_row("0", "🔖 Tambah ke Bookmark")
     nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
 
-    # Navigasi Pembelian
     console.print(Panel(
         nav_table,
         title=f"[{theme['text_title']}]🛒 Opsi Pembelian[/]",
@@ -188,10 +183,12 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     # Input pilihan
     choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
+    # Kembali
     if choice == "00":
-        return False
+        return "BACK"
+
+    # Bookmark
     elif choice == "0" and option_order != -1:
-        # Add to bookmark
         success = BookmarkInstance.add_bookmark(
             family_code=package.get("package_family", {}).get("package_family_code",""),
             family_name=package.get("package_family", {}).get("name",""),
@@ -207,47 +204,69 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
+    # Pulsa langsung
     elif choice == "1":
-        settlement_balance(
-            api_key,
-            tokens,
-            payment_items,
-            payment_for,
-            True
-        )
-        console.input("Silahkan cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
+        settlement_balance(api_key, tokens, payment_items, payment_for, True)
+        pause()
         return True
 
-    elif choice == '2':
-        show_multipayment(
-            api_key,
-            tokens,
-            payment_items,
-            payment_for,
-            True,
-        )
-        console.input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
+    # E-Wallet
+    elif choice == "2":
+        show_multipayment(api_key, tokens, payment_items, payment_for, True)
+        pause()
         return True
 
-    elif choice == '3':
-        show_qris_payment(
-            api_key,
-            tokens,
-            payment_items,
-            payment_for,
-            True,
-        )
-        console.input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
+    # QRIS
+    elif choice == "3":
+        show_qris_payment(api_key, tokens, payment_items, payment_for, True)
+        pause()
         return True
 
-    elif choice == '4':
-        # Balance with Decoy            
+    # Pulsa + Decoy
+    elif choice == "4":
         decoy = DecoyInstance.get_decoy("balance")
         decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
         if not decoy_package_detail:
             print_panel("❌ Error", "Gagal memuat detail paket decoy.")
             pause()
-            return False
+            return "BACK"
+
+        payment_items.append(
+            PaymentItem(
+                item_code=decoy_package_detail["package_option"]["package_option_code"],
+                product_type="",
+                item_price=decoy_package_detail["package_option"]["price"],
+                item_name=decoy_package_detail["package_option"]["name"],
+                tax=0,
+                token_confirmation=decoy_package_detail["token_confirmation"],
+            )
+        )
+
+        overwrite_amount = price + decoy_package_detail["package_option"]["price"]
+        res = settlement_balance(api_key, tokens, payment_items, payment_for, False, overwrite_amount=overwrite_amount)
+
+        if res and res.get("status", "") != "SUCCESS":
+            error_msg = res.get("message", "Unknown error")
+            if "Bizz-err.Amount.Total" in error_msg:
+                error_msg_arr = error_msg.split("=")
+                valid_amount = int(error_msg_arr[1].strip())
+                print_panel("ℹ️ Info", f"Adjusted total amount to: {valid_amount}")
+                res = settlement_balance(api_key, tokens, payment_items, payment_for, False, overwrite_amount=valid_amount)
+                if res and res.get("status", "") == "SUCCESS":
+                    print_panel("✅ Success", "Purchase berhasil!")
+        else:
+            print_panel("✅ Success", "Purchase berhasil!")
+        pause()
+        return True
+
+    # Pulsa + Decoy V2 (token idx)
+    elif choice == "5":
+        decoy = DecoyInstance.get_decoy("balance")
+        decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
+        if not decoy_package_detail:
+            print_panel("❌ Error", "Gagal memuat detail paket decoy.")
+            pause()
+            return "BACK"
 
         payment_items.append(
             PaymentItem(
@@ -262,12 +281,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
         overwrite_amount = price + decoy_package_detail["package_option"]["price"]
         res = settlement_balance(
-            api_key,
-            tokens,
-            payment_items,
-            payment_for,
-            False,
-            overwrite_amount=overwrite_amount,
+            api_key, tokens, payment_items, "🤫", False,
+            overwrite_amount=overwrite_amount, token_confirmation_idx=1
         )
 
         if res and res.get("status", "") != "SUCCESS":
@@ -277,12 +292,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                 valid_amount = int(error_msg_arr[1].strip())
                 print_panel("ℹ️ Info", f"Adjusted total amount to: {valid_amount}")
                 res = settlement_balance(
-                    api_key,
-                    tokens,
-                    payment_items,
-                    payment_for,
-                    False,
-                    overwrite_amount=valid_amount,
+                    api_key, tokens, payment_items, "🤫", False,
+                    overwrite_amount=valid_amount, token_confirmation_idx=-1
                 )
                 if res and res.get("status", "") == "SUCCESS":
                     print_panel("✅ Success", "Purchase berhasil!")
@@ -291,67 +302,14 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    elif choice == '5':
-        # Balance with Decoy v2
-        decoy = DecoyInstance.get_decoy("balance")
-        decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
-        if not decoy_package_detail:
-            print_panel("❌ Error", "Gagal memuat detail paket decoy.")
-            pause()
-            return False
-
-        payment_items.append(
-            PaymentItem(
-                item_code=decoy_package_detail["package_option"]["package_option_code"],
-                product_type="",
-                item_price=decoy_package_detail["package_option"]["price"],
-                item_name=decoy_package_detail["package_option"]["name"],
-                tax=0,
-                token_confirmation=decoy_package_detail["token_confirmation"],
-            )
-        )
-
-        overwrite_amount = price + decoy_package_detail["package_option"]["price"]
-        res = settlement_balance(
-            api_key,
-            tokens,
-            payment_items,
-            "🤫",
-            False,
-            overwrite_amount=overwrite_amount,
-            token_confirmation_idx=1
-        )
-
-        if res and res.get("status", "") != "SUCCESS":
-            error_msg = res.get("message", "Unknown error")
-            if "Bizz-err.Amount.Total" in error_msg:
-                error_msg_arr = error_msg.split("=")
-                valid_amount = int(error_msg_arr[1].strip())
-                print_panel("ℹ️ Info", f"Adjusted total amount to: {valid_amount}")
-                res = settlement_balance(
-                    api_key,
-                    tokens,
-                    payment_items,
-                    "🤫",
-                    False,
-                    overwrite_amount=valid_amount,
-                    token_confirmation_idx=-1
-                )
-                if res and res.get("status", "") == "SUCCESS":
-                    print_panel("✅ Success", "Purchase berhasil!")
-        else:
-            print_panel("✅ Success", "Purchase berhasil!")
-        pause()
-        return True
-
-    elif choice == '6':
-        # QRIS decoy + Rpx
+    # QRIS + Decoy (+1K)
+    elif choice == "6":
         decoy = DecoyInstance.get_decoy("qris")
         decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
         if not decoy_package_detail:
             print_panel("❌ Error", "Gagal memuat detail paket decoy.")
             pause()
-            return False
+            return "BACK"
 
         payment_items.append(
             PaymentItem(
@@ -370,25 +328,18 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         console.print("Silahkan sesuaikan amount (trial & error, 0 = malformed)")
         console.print("-"*55)
 
-        show_qris_payment(
-            api_key,
-            tokens,
-            payment_items,
-            "SHARE_PACKAGE",
-            True,
-            token_confirmation_idx=1
-        )
-        console.input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
+        show_qris_payment(api_key, tokens, payment_items, "SHARE_PACKAGE", True, token_confirmation_idx=1)
+        pause()
         return True
 
-    elif choice == '7':
-        # QRIS decoy + Rp0
+    # QRIS + Decoy V2 (Rp0)
+    elif choice == "7":
         decoy = DecoyInstance.get_decoy("qris0")
         decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
         if not decoy_package_detail:
             print_panel("❌ Error", "Gagal memuat detail paket decoy.")
             pause()
-            return False
+            return "BACK"
 
         payment_items.append(
             PaymentItem(
@@ -407,19 +358,12 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         console.print("Silahkan sesuaikan amount (trial & error, 0 = malformed)")
         console.print("-"*55)
 
-        show_qris_payment(
-            api_key,
-            tokens,
-            payment_items,
-            "SHARE_PACKAGE",
-            True,
-            token_confirmation_idx=1
-        )
-        console.input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
+        show_qris_payment(api_key, tokens, payment_items, "SHARE_PACKAGE", True, token_confirmation_idx=1)
+        pause()
         return True
 
-    elif choice == '8':
-        # Pulsa N kali
+    # Pulsa N kali
+    elif choice == "8":
         use_decoy_for_n_times = console.input("Use decoy package? (y/n): ").strip().lower() == 'y'
         n_times_str = console.input("Enter number of times to purchase (e.g., 3): ").strip()
         delay_seconds_str = console.input("Enter delay between purchases in seconds (e.g., 25): ").strip()
@@ -433,7 +377,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         except ValueError:
             print_panel("❌ Error", "Invalid number entered. Masukkan integer yang valid.")
             pause()
-            return False
+            return "BACK"
 
         purchase_n_times_by_option_code(
             n_times,
@@ -443,9 +387,11 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             pause_on_success=False,
             token_confirmation_idx=1
         )
+        pause()
         return True
 
-    elif choice.lower() == 'b':
+    # Bonus (ambil)
+    elif choice.lower() == "b":
         settlement_bounty(
             api_key=api_key,
             tokens=tokens,
@@ -455,10 +401,11 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             price=price,
             item_name=variant_name
         )
-        console.input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
+        pause()
         return True
 
-    elif choice.lower() == 'ba':
+    # Bonus (kirim)
+    elif choice.lower() == "ba":
         destination_msisdn = console.input("Masukkan nomor tujuan bonus (mulai dengan 62): ").strip()
         bounty_allotment(
             api_key=api_key,
@@ -472,7 +419,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    elif choice.lower() == 'l':
+    # Loyalti (poin)
+    elif choice.lower() == "l":
         settlement_loyalty(
             api_key=api_key,
             tokens=tokens,
@@ -481,15 +429,14 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             payment_target=package_option_code,
             price=price,
         )
-        console.input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
+        pause()
         return True
 
+    # Cancel
     else:
         print_panel("ℹ️ Info", "Purchase cancelled.")
-        return False
-
-    pause()
-    sys.exit(0)
+        pause()
+        return "BACK"
 
 
 def get_packages_by_family(
