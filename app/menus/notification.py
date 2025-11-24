@@ -1,17 +1,25 @@
-from app.menus.util import clear_screen, pause, print_panel
+from app.menus.util import clear_screen, pause, print_panel, get_theme
 from app.client.engsel import get_notification_detail, dashboard_segments
 from app.service.auth import AuthInstance
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
+from rich.table import Table
+from rich.align import Align
 
 console = Console()
 
 def show_notification_menu():
+    theme = get_theme()
     in_notification_menu = True
     while in_notification_menu:
         clear_screen()
-        console.print(Panel("📩 Fetching notifications...", border_style="yellow"))
+        console.print(Panel(
+            Align.center("📩 Fetching notifications...", vertical="middle"),
+            border_style=theme["border_warning"],
+            padding=(1, 2),
+            expand=True
+        ))
 
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
@@ -28,7 +36,7 @@ def show_notification_menu():
             pause()
             return
 
-        console.rule("[bold blue]📢 Notifications[/]")
+        console.rule(f"[{theme['text_title']}]📢 Notifications[/]")
 
         unread_count = 0
         for idx, notification in enumerate(notifications, start=1):
@@ -41,32 +49,43 @@ def show_notification_menu():
             if not is_read:
                 unread_count += 1
 
-            # Panel per notifikasi
             notif_text = Text()
             notif_text.append(f"🔔 Notification {idx}\n", style="bold")
-            notif_text.append("Status: ", style="magenta")
-            notif_text.append(f"{status}\n", style="cyan" if status == "UNREAD" else "green")
-            notif_text.append("Pesan Singkat: ", style="yellow")
-            notif_text.append(f"{brief_message}\n", style="white")
-            notif_text.append("Waktu: ", style="green")
-            notif_text.append(f"{time}\n", style="white")
-            notif_text.append("Pesan Lengkap:\n", style="yellow")
-            notif_text.append(f"{full_message}\n", style="white")
+            notif_text.append("Status: ", style=theme["text_key"])
+            notif_text.append(f"{status}\n", style=theme["text_err"] if status == "UNREAD" else theme["text_success"])
+            notif_text.append("Pesan Singkat: ", style=theme["text_key"])
+            notif_text.append(f"{brief_message}\n", style=theme["text_body"])
+            notif_text.append("Waktu: ", style=theme["text_key"])
+            notif_text.append(f"{time}\n", style=theme["text_sub"])
+            notif_text.append("Pesan Lengkap:\n", style=theme["text_key"])
+            notif_text.append(f"{full_message}\n", style=theme["text_body"])
 
-            console.print(Panel(notif_text, border_style="blue", expand=True))
+            console.print(Panel(
+                notif_text,
+                border_style=theme["border_info"],
+                padding=(0, 1),
+                expand=True
+            ))
 
-        console.print(f"Total: {len(notifications)} | Unread: {unread_count}")
+        console.print(f"[{theme['text_title']}]Total: {len(notifications)} | Unread: {unread_count}[/]")
 
-        # Navigasi
-        console.rule("[bold green]🔧 Menu[/]")
-        nav_text = (
-            "1. 📖 Read All Unread Notifications\n"
-            "2. 📌 Mark Single Notification as Read (masukkan nomor)\n"
-            "00. ↩️ Back to Main Menu"
-        )
-        console.print(Panel(nav_text, border_style="green", expand=True))
+        # Navigasi konsisten
+        console.rule(f"[{theme['text_title']}]🔧 Menu[/]")
+        nav_table = Table(show_header=False, expand=True)
+        nav_table.add_column(justify="right", style=theme["text_key"], width=6)
+        nav_table.add_column(style=theme["text_body"])
+        nav_table.add_row("1", "📖 Read All Unread Notifications")
+        nav_table.add_row("2", "📌 Mark Single Notification as Read (masukkan nomor)")
+        nav_table.add_row("00", f"[{theme['text_sub']}]↩️ Back to Main Menu[/]")
 
-        choice = console.input("Enter your choice: ").strip()
+        console.print(Panel(
+            nav_table,
+            border_style=theme["border_primary"],
+            padding=(0, 1),
+            expand=True
+        ))
+
+        choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         if choice == "1":
             for notification in notifications:
                 if notification.get("is_read", False):
@@ -78,7 +97,7 @@ def show_notification_menu():
             pause()
 
         elif choice == "2":
-            nomor = console.input("Masukkan nomor notifikasi yang ingin ditandai READ: ").strip()
+            nomor = console.input(f"[{theme['text_sub']}]Masukkan nomor notifikasi:[/{theme['text_sub']}] ").strip()
             if not nomor.isdigit():
                 print_panel("❌ Error", "Nomor tidak valid.")
                 pause()
