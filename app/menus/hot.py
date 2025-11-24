@@ -291,6 +291,7 @@ def show_hot_menu2():
                     benefit_table,
                     title=f"[{theme['text_title']}]🎁 Benefit Paket[/]",
                     border_style=theme["border_success"],
+                    padding=(0, 0),
                     expand=True
                 ))
 
