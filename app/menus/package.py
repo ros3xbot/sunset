@@ -53,6 +53,16 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     option_name = option.get("name", "")
     family_name = family.get("name", "")
     variant_name = variant.get("name", "")
+    payment_items = [
+        PaymentItem(
+            item_code=package_option_code,
+            product_type="",
+            item_price=price,
+            item_name=f"{variant_name} {option_name}".strip(),
+            tax=0,
+            token_confirmation=token_confirmation,
+        )
+    ]
     title = f"{family_name} - {variant_name} - {option_name}".strip()
 
     family_code = family.get("package_family_code", "")
