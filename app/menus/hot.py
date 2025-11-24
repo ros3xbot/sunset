@@ -186,7 +186,7 @@ def show_hot_menu2():
                     package["variant_code"],
                     package["order"],
                     package["is_enterprise"],
-                    package["migration_type"],  # dipertahankan sesuai file ke-2
+                    package["migration_type"],
                 )
 
                 if pkg_idx == 0:
@@ -236,42 +236,37 @@ def show_hot_menu2():
                 expand=True
             ))
 
-            # Panel Main Package Details (mempertahankan semua field dari file ke-2)
-            # Extract field sama persis seperti file ke-2
+            # Panel Main Package Details
             price = main_package_detail["package_option"]["price"]
             validity = main_package_detail["package_option"]["validity"]
             detail_tnc = display_html(main_package_detail["package_option"]["tnc"])
 
             option_name = main_package_detail.get("package_option", {}).get("name", "")
             family_name = main_package_detail.get("package_family", {}).get("name", "")
-            # catatan: file ke-2 memakai get("package_detail_variant", "") lalu .get("name","")
-            # aman: pastikan dict
             variant_name = (main_package_detail.get("package_detail_variant") or {}).get("name", "")
 
             title = f"{family_name} - {variant_name} - {option_name}".strip()
 
             family_code = main_package_detail.get("package_family", {}).get("package_family_code", "")
             parent_code = main_package_detail.get("package_addon", {}).get("parent_code", "") or "N/A"
-
             payment_for_from_detail = main_package_detail["package_family"]["payment_for"]
 
-            
-            # Ambil parameter pembayaran dari selected_package (dipertahankan)
+            # Ambil parameter pembayaran dari selected_package
             payment_for = selected_package.get("payment_for", "BUY_PACKAGE")
             ask_overwrite = selected_package.get("ask_overwrite", False)
             overwrite_amount = selected_package.get("overwrite_amount", -1)
             token_confirmation_idx = selected_package.get("token_confirmation_idx", 0)
             amount_idx = selected_package.get("amount_idx", -1)
 
-            # Menu pembayaran (dengan opsi yang sama persis)
+            # Menu pembayaran
             in_payment_menu = True
             while in_payment_menu:
                 method_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
                 method_table.add_column(justify="right", style=theme["text_key"], width=6)
                 method_table.add_column(style=theme["text_body"])
-                method_table.add_row("1", "Balance")
-                method_table.add_row("2", "E-Wallet")
-                method_table.add_row("3", "QRIS")
+                method_table.add_row("1", "💰 Balance")
+                method_table.add_row("2", "💳 E-Wallet")
+                method_table.add_row("3", "📱 QRIS")
                 method_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
 
                 console.print(Panel(
@@ -286,7 +281,6 @@ def show_hot_menu2():
 
                 if input_method == "1":
                     if overwrite_amount == -1:
-                        # Menjaga teks peringatan khas dari file ke-2
                         last_price = payment_items[-1].item_price if hasattr(payment_items[-1], "item_price") else payment_items[-1]["item_price"]
                         warn_price_str = get_rupiah(last_price) if isinstance(last_price, (int, float)) else str(last_price)
                         console.print(f"[{theme['text_warn']}]Pastikan sisa balance KURANG DARI Rp{warn_price_str}!!![/]")
