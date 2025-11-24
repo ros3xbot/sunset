@@ -305,6 +305,12 @@ def show_hot_menu2():
                 expand=True
             ))
 
+            payment_for = selected_package.get("payment_for", "BUY_PACKAGE")
+            ask_overwrite = selected_package.get("ask_overwrite", False)
+            overwrite_amount = selected_package.get("overwrite_amount", -1)
+            token_confirmation_idx = selected_package.get("token_confirmation_idx", 0)
+            amount_idx = selected_package.get("amount_idx", -1)
+
             # Panel Info Paket utama
             console.print(Panel(
                 Align.center(f"📦 {selected_package['name']}", vertical="middle"),
