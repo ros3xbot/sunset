@@ -144,7 +144,7 @@ def show_hot_menu2():
         for idx, p in enumerate(hot_packages, start=1):
             table.add_row(str(idx), p["name"], get_rupiah(p["price"]))
 
-        console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
+        console.print(Panel(table, border_style=theme["border_info"], expand=True))
 
         # Navigasi awal
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -171,7 +171,7 @@ def show_hot_menu2():
             pause()
             continue
 
-        # Ambil detail paket utama (paket index 0)
+        # Ambil detail paket utama
         package = get_package_details(
             api_key,
             tokens,
@@ -186,12 +186,11 @@ def show_hot_menu2():
             pause()
             continue
 
-        # Ekstrak field utama
         option = package.get("package_option", {})
         family = package.get("package_family", {})
         variant = package.get("package_detail_variant", {})
 
-        # Harga: fallback ke JSON jika API kosong/0
+        # Harga fallback
         price_api = option.get("price", 0)
         price = price_api if (price_api and price_api > 0) else selected_package.get("price", 0)
         formatted_price = get_rupiah(price)
@@ -210,7 +209,7 @@ def show_hot_menu2():
         family_code = family.get("package_family_code", "")
         parent_code = package.get("package_addon", {}).get("parent_code", "") or "N/A"
 
-        # Base payment item (TypedDict dict-style)
+        # PaymentItem dict-style
         payment_items: list[PaymentItem] = [
             {
                 "item_code": option.get("package_option_code", ""),
@@ -221,16 +220,6 @@ def show_hot_menu2():
                 "token_confirmation": package.get("token_confirmation", ""),
             }
         ]
-
-        # Header panel
-        clear_screen()
-        console.print(Panel(
-            Align.center(f"📦 {selected_package['name']} - {formatted_price}", vertical="middle"),
-            border_style=theme["border_info"],
-            padding=(1, 2),
-            expand=True
-        ))
-        simple_number()
 
         # Panel Info Paket
         info_table = Table.grid(padding=(0, 1))
@@ -245,14 +234,10 @@ def show_hot_menu2():
         info_table.add_row("Family Code", f": [{theme['border_warning']}]{family_code}[/]")
         info_table.add_row("Parent Code", f": [{theme['text_sub']}]{parent_code}[/]")
 
-        console.print(Panel(
-            info_table,
-            title=f"[{theme['text_title']}]📦 Detail Paket[/]",
-            border_style=theme["border_info"],
-            expand=True
-        ))
+        console.print(Panel(info_table, title=f"[{theme['text_title']}]📦 Detail Paket[/]",
+                            border_style=theme["border_info"], expand=True))
 
-        # Panel Benefit Paket
+        # Benefit Paket
         benefits = option.get("benefits", [])
         if benefits:
             benefit_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -280,21 +265,12 @@ def show_hot_menu2():
 
                 benefit_table.add_row(b.get("name", "-"), dt, "YES" if is_unli else "-", total_str)
 
-            console.print(Panel(
-                benefit_table,
-                title=f"[{theme['text_title']}]🎁 Benefit Paket[/]",
-                border_style=theme["border_success"],
-                padding=(0, 0),
-                expand=True
-            ))
+            console.print(Panel(benefit_table, title=f"[{theme['text_title']}]🎁 Benefit Paket[/]",
+                                border_style=theme["border_success"], expand=True))
 
         # Syarat & Ketentuan
-        console.print(Panel(
-            detail_html,
-            title=f"[{theme['text_title']}]📜 Syarat & Ketentuan[/]",
-            border_style=theme["border_warning"],
-            expand=True
-        ))
+        console.print(Panel(detail_html, title=f"[{theme['text_title']}]📜 Syarat & Ketentuan[/]",
+                            border_style=theme["border_warning"], expand=True))
 
         # Navigasi Pembelian
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -305,18 +281,13 @@ def show_hot_menu2():
         nav_table.add_row("3", "📱 QRIS")
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
 
-        console.print(Panel(
-            nav_table,
-            title=f"[{theme['text_title']}]🛒 Opsi Pembelian[/]",
-            border_style=theme["border_primary"],
-            expand=True
-        ))
+        console.print(Panel(nav_table, title=f"[{theme['text_title']}]🛒 Opsi Pembelian[/]",
+                            border_style=theme["border_primary"], expand=True))
 
         # Input pilihan
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
-
-        # Validasi harga sebelum settlement
         last_price = payment_items[-1]["item_price"]
+
         if choice in ("1", "2", "3") and (last_price is None or last_price <= 0):
             print_panel("⚠️ Error", "Harga paket tidak valid (0).")
             pause()
@@ -380,8 +351,3 @@ def show_hot_menu2():
             pause()
             continue
 
-
-    else:
-        print_panel("⚠️ Error", "Pilihan tidak valid. Silahkan coba lagi.")
-        pause()
-        continue
