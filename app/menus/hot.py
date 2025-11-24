@@ -142,14 +142,9 @@ def show_hot_menu2():
 
         for idx, p in enumerate(hot_packages, start=1):
             formatted_price = get_rupiah(p["price"])
-            table.add_row(str(idx), p["name"], f"{formatted_price}")
+            table.add_row(str(idx), p["name"], formatted_price)
 
-        console.print(Panel(
-            table,
-            border_style=theme["border_info"],
-            padding=(0, 0),
-            expand=True
-        ))
+        console.print(Panel(table, border_style=theme["border_info"], expand=True))
 
         # Navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -157,11 +152,7 @@ def show_hot_menu2():
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
-        console.print(Panel(
-            nav_table,
-            border_style=theme["border_primary"],
-            expand=True
-        ))
+        console.print(Panel(nav_table, border_style=theme["border_primary"], expand=True))
 
         choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
         if choice == "00":
@@ -212,16 +203,16 @@ def show_hot_menu2():
             family_code = family.get("package_family_code", "")
             parent_code = package.get("package_addon", {}).get("parent_code", "") or "N/A"
 
-            # Base payment item
+            # Base payment item (dict style)
             payment_items = [
-                PaymentItem(
-                    item_code=option.get("package_option_code", ""),
-                    product_type="",
-                    item_price=price,
-                    item_name=f"{variant_name} {option_name}".strip(),
-                    tax=0,
-                    token_confirmation=package.get("token_confirmation", ""),
-                )
+                {
+                    "item_code": option.get("package_option_code", ""),
+                    "product_type": "",
+                    "item_price": price,
+                    "item_name": f"{variant_name} {option_name}".strip(),
+                    "tax": 0,
+                    "token_confirmation": package.get("token_confirmation", ""),
+                }
             ]
 
             clear_screen()
@@ -246,12 +237,8 @@ def show_hot_menu2():
             info_table.add_row("Family Code", f": [{theme['border_warning']}]{family_code}[/]")
             info_table.add_row("Parent Code", f": [{theme['text_sub']}]{parent_code}[/]")
 
-            console.print(Panel(
-                info_table,
-                title=f"[{theme['text_title']}]📦 Detail Paket[/]",
-                border_style=theme["border_info"],
-                expand=True
-            ))
+            console.print(Panel(info_table, title=f"[{theme['text_title']}]📦 Detail Paket[/]",
+                                border_style=theme["border_info"], expand=True))
 
             # Benefit Paket
             benefits = option.get("benefits", [])
@@ -266,7 +253,7 @@ def show_hot_menu2():
                     dt = b["data_type"]
                     total = b["total"]
                     is_unli = b["is_unlimited"]
-        
+
                     if is_unli:
                         total_str = {"VOICE": "menit", "TEXT": "SMS", "DATA": "kuota"}.get(dt, dt)
                     else:
@@ -275,93 +262,18 @@ def show_hot_menu2():
                         elif dt == "TEXT":
                             total_str = f"{total} SMS"
                         elif dt == "DATA":
-                            if total >= 1_000_000_000:
-                                total_str = f"{total / (1024 ** 3):.2f} GB"
-                            elif total >= 1_000_000:
-                                total_str = f"{total / (1024 ** 2):.2f} MB"
-                            elif total >= 1_000:
-                                total_str = f"{total / 1024:.2f} KB"
-                            else:
-                                total_str = f"{total} B"
+                            total_str = format_quota_byte(total)
                         else:
                             total_str = f"{total} ({dt})"
-        
+
                     benefit_table.add_row(b["name"], dt, "YES" if is_unli else "-", total_str)
 
-                console.print(Panel(
-                    benefit_table,
-                    title=f"[{theme['text_title']}]🎁 Benefit Paket[/]",
-                    border_style=theme["border_success"],
-                    padding=(0, 0),
-                    expand=True
-                ))
+                console.print(Panel(benefit_table, title=f"[{theme['text_title']}]🎁 Benefit Paket[/]",
+                                    border_style=theme["border_success"], expand=True))
 
             # Syarat & Ketentuan
-            console.print(Panel(
-                detail,
-                title=f"[{theme['text_title']}]📜 Syarat & Ketentuan[/]",
-                border_style=theme["border_warning"],
-                expand=True
-            ))
-
-            # Panel Info Paket utama
-            console.print(Panel(
-                Align.center(f"📦 {selected_package['name']}", vertical="middle"),
-                border_style=theme["border_info"],
-                padding=(1, 2),
-                expand=True
-            ))
-            simple_number()
-
-            info_text = Text()
-            info_text.append(f"{selected_package['name']}\n", style="bold")
-            info_text.append(f"Harga: Rp {get_rupiah(selected_package['price'])}\n", style=theme["text_money"])
-            info_text.append("Detail:\n", style=theme["text_body"])
-            for line in selected_package.get("detail", "").split("\n"):
-                cleaned = line.strip()
-                if cleaned:
-                    info_text.append(f"- {cleaned}\n", style=theme["text_body"])
-
-            console.print(Panel(
-                info_text,
-                title=f"[{theme['text_title']}]📦 Detail Paket[/]",
-                border_style=theme["border_info"],
-                padding=(1, 2),
-                expand=True
-            ))
-            
-
-            # Ambil parameter pembayaran dari selected_package
-            payment_for = selected_package.get("payment_for", payment_for) or "BUY_PACKAGE"
-            ask_overwrite = selected_package.get("ask_overwrite", False)
-            overwrite_amount = selected_package.get("overwrite_amount", -1)
-            token_confirmation_idx = selected_package.get("token_confirmation_idx", 0)
-            amount_idx = selected_package.get("amount_idx", -1)
-
-            # Normalisasi overwrite & index untuk mencegah error
-            if ask_overwrite:
-                if overwrite_amount in (-1, None) or overwrite_amount <= 0:
-                    # fallback ke harga item terakhir
-                    try:
-                        overwrite_amount = int(payment_items[-1].item_price)
-                    except Exception:
-                        overwrite_amount = -1
-
-                if overwrite_amount in (-1, 0):
-                    print_panel("⚠️ Warning", "Nilai overwrite_amount belum ditetapkan. Masukkan nilai overwrite (Rp).")
-                    val = console.input(f"[{theme['text_sub']}]Overwrite (Rp):[/{theme['text_sub']}] ").strip()
-                    if val.isdigit() and int(val) > 0:
-                        overwrite_amount = int(val)
-                    else:
-                        print_panel("❌ Error", "Overwrite amount harus berupa angka > 0. Menonaktifkan overwrite.")
-                        ask_overwrite = False
-                        overwrite_amount = -1
-                        pause()
-
-            if token_confirmation_idx is None:
-                token_confirmation_idx = 0
-            if amount_idx is None:
-                amount_idx = -1
+            console.print(Panel(detail, title=f"[{theme['text_title']}]📜 Syarat & Ketentuan[/]",
+                                border_style=theme["border_warning"], expand=True))
 
             # Navigasi Pembelian
             nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -372,37 +284,23 @@ def show_hot_menu2():
             nav_table.add_row("3", "📱 QRIS")
             nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
 
-            console.print(Panel(
-                nav_table,
-                title=f"[{theme['text_title']}]🛒 Opsi Pembelian[/]",
-                border_style=theme["border_primary"],
-                expand=True
-            ))
+            console.print(Panel(nav_table, title=f"[{theme['text_title']}]🛒 Opsi Pembelian[/]",
+                                border_style=theme["border_primary"], expand=True))
 
             # Input pilihan
             choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
-
             if choice == "1":
-                # Jika tidak menggunakan overwrite, konfirmasi saldo < harga terakhir
-                if not ask_overwrite:
-                    last_price = payment_items[-1].item_price
-                    print_panel("⚠️ Warning", f"Pastikan sisa balance KURANG DARI Rp{get_rupiah(last_price)}!!!")
-                    balance_answer = console.input("Apakah anda yakin ingin melanjutkan pembelian? (y/n): ").strip().lower()
-                    if balance_answer != "y":
-                        print_panel("ℹ️ Info", "Pembelian dibatalkan oleh user.")
-                        pause()
-                        continue
+                last_price = payment_items[-1]["item_price"]
+                print_panel("⚠️ Warning", f"Pastikan sisa balance KURANG DARI Rp{get_rupiah(last_price)}!!!")
+                balance_answer = console.input("Apakah anda yakin ingin melanjutkan pembelian? (y/n): ").strip().lower()
+                if balance_answer != "y":
+                    print_panel("ℹ️ Info", "Pembelian dibatalkan oleh user.")
+                    pause()
+                    continue
 
-                settlement_balance(
-                    api_key,
-                    tokens,
-                    payment_items,
-                    payment_for,
-                    ask_overwrite=ask_overwrite,
-                    overwrite_amount=overwrite_amount,
-                    token_confirmation_idx=token_confirmation_idx,
-                    amount_idx=amount_idx,
-                )
+                settlement_balance(api_key, tokens, payment_items, payment_for,
+                                   ask_overwrite=False, overwrite_amount=last_price,
+                                   token_confirmation_idx=0, amount_idx=-1)
                 pause()
                 in_hot_menu = False
 
@@ -412,10 +310,10 @@ def show_hot_menu2():
                     tokens,
                     payment_items,
                     payment_for,
-                    ask_overwrite=ask_overwrite,
-                    overwrite_amount=overwrite_amount,
-                    token_confirmation_idx=token_confirmation_idx,
-                    amount_idx=amount_idx,
+                    ask_overwrite=False,
+                    overwrite_amount=payment_items[-1]["item_price"],
+                    token_confirmation_idx=0,
+                    amount_idx=-1,
                 )
                 pause()
                 in_hot_menu = False
@@ -426,15 +324,16 @@ def show_hot_menu2():
                     tokens,
                     payment_items,
                     payment_for,
-                    ask_overwrite=ask_overwrite,
-                    overwrite_amount=overwrite_amount,
-                    token_confirmation_idx=token_confirmation_idx,
-                    amount_idx=amount_idx,
+                    ask_overwrite=False,
+                    overwrite_amount=payment_items[-1]["item_price"],
+                    token_confirmation_idx=0,
+                    amount_idx=-1,
                 )
                 pause()
                 in_hot_menu = False
 
             elif choice == "00":
+                # kembali ke daftar paket
                 continue
 
             else:
