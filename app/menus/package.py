@@ -142,6 +142,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             benefit_table,
             title=f"[{theme['text_title']}]🎁 Benefit Paket[/]",
             border_style=theme["border_success"],
+            padding=(0, 0),
             expand=True
         ))
 
