@@ -2,7 +2,16 @@ import os
 import re
 import textwrap
 from html.parser import HTMLParser
-from app.config.imports import *
+
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
+from rich.align import Align
+from rich.padding import Padding
+from rich import box
+
+from app.config.theme import get_theme, get_theme_style
 
 console = Console()
 
