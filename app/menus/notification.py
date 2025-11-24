@@ -16,7 +16,7 @@ def show_notification_menu():
         clear_screen()
         console.print(Panel(
             Align.center("📩 Fetching notifications...", vertical="middle"),
-            border_style=theme["border_warning"],
+            border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
@@ -52,7 +52,7 @@ def show_notification_menu():
             notif_text = Text()
             notif_text.append(f"🔔 Notification {idx}\n", style="bold")
             notif_text.append("Status: ", style=theme["text_key"])
-            notif_text.append(f"{status}\n", style=theme["text_err"] if status == "UNREAD" else theme["text_success"])
+            notif_text.append(f"{status}\n", style=theme["text_err"] if status == "UNREAD" else theme["text_ok"])
             notif_text.append("Pesan Singkat: ", style=theme["text_key"])
             notif_text.append(f"{brief_message}\n", style=theme["text_body"])
             notif_text.append("Waktu: ", style=theme["text_key"])
