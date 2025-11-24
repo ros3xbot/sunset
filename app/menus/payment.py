@@ -3,8 +3,6 @@ from datetime import datetime, timedelta
 from app.client.engsel import get_transaction_history
 from app.config.imports import *
 
-console = Console()
-
 
 def show_transaction_history(api_key, tokens):
     theme = get_theme()
