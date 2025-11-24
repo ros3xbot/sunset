@@ -1,5 +1,5 @@
 # Rich
-from rich.console import Console
+from rich.console import Console, Group
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -34,6 +34,7 @@ console = Console()
 __all__ = [
     "get_theme",
     "console",
+    "Group",
     "Panel",
     "Table",
     "Text",
