@@ -14,8 +14,7 @@ from app.client.circle import (
 )
 from app.client.encrypt import decrypt_circle_msisdn
 
-# Asumsikan objek/tema Rich tersedia:
-# console, Panel, Table, Text, Align, MINIMAL_DOUBLE_HEAD, get_theme, print_panel, get_rupiah (optional)
+
 WIDTH = 55
 
 
@@ -35,14 +34,8 @@ def show_circle_creation(api_key: str, tokens: dict):
     member_msisdn = console.input(f"[{theme['text_sub']}]Enter initial member's MSISDN (e.g., 6281234567890):[/{theme['text_sub']}] ").strip()
     member_name = console.input(f"[{theme['text_sub']}]Enter initial member's name:[/{theme['text_sub']}] ").strip()
 
-    create_res = create_circle(
-        api_key,
-        tokens,
-        parent_name,
-        group_name,
-        member_msisdn,
-        member_name
-    )
+    with live_loading("🔄 Creating circle...", theme):
+        create_res = create_circle(api_key, tokens, parent_name, group_name, member_msisdn, member_name)
 
     res_text = Text()
     res_text.append("Server Response:\n", style="bold")
@@ -51,19 +44,13 @@ def show_circle_creation(api_key: str, tokens: dict):
     pause()
 
 
-def show_bonus_list(
-    api_key: str,
-    tokens: dict,
-    parent_subs_id: str,
-    family_id: str,
-):
+def show_bonus_list(api_key: str, tokens: dict, parent_subs_id: str, family_id: str):
     theme = get_theme()
     in_circle_bonus_menu = True
 
     while in_circle_bonus_menu:
         clear_screen()
 
-        # Tambahkan loading state
         with live_loading("🔶 Fetching bonus data...", theme):
             bonus_data = get_bonus_data(api_key, tokens, parent_subs_id, family_id)
 
@@ -78,7 +65,6 @@ def show_bonus_list(
             pause()
             return
 
-        # Header
         console.print(Panel(
             Align.center("🎁 Circle Bonus List", vertical="middle"),
             border_style=theme["border_info"],
@@ -86,24 +72,23 @@ def show_bonus_list(
             expand=True
         ))
 
-        # Tabel bonus
-        bonus_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-        bonus_table.add_column("No", justify="right", style=theme["text_key"], width=4)
-        bonus_table.add_column("Bonus", style=theme["text_body"])
-        bonus_table.add_column("Type", style=theme["text_sub"], width=10)
-        bonus_table.add_column("Action", style=theme["text_body"], width=10)
-        bonus_table.add_column("Param", style=theme["text_sub"])
-
+        # tampilkan bonus vertikal agar muat di layar kecil
         for idx, bonus in enumerate(bonus_list, start=1):
             bonus_name = bonus.get("name", "N/A")
             bonus_type = bonus.get("bonus_type", "N/A")
             action_type = bonus.get("action_type", "N/A")
             action_param = bonus.get("action_param", "N/A")
-            bonus_table.add_row(str(idx), bonus_name, bonus_type, action_type, action_param)
+            if isinstance(action_param, (int, float)):
+                action_param = get_rupiah(action_param)
 
-        console.print(Panel(bonus_table, border_style=theme["border_primary"], expand=True))
+            bonus_text = Text()
+            bonus_text.append(f"{idx}. {bonus_name}\n", style="bold")
+            bonus_text.append(f"Type: {bonus_type}\n", style=theme["text_body"])
+            bonus_text.append(f"Action: {action_type}\n", style=theme["text_body"])
+            bonus_text.append(f"Param: {action_param}\n", style=theme["text_sub"])
 
-        # Navigasi
+            console.print(Panel(bonus_text, border_style=theme["border_primary"], expand=True))
+
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
@@ -162,7 +147,6 @@ def show_circle_info(api_key: str, tokens: dict):
         group_data = group_res.get("data", {})
         group_id = group_data.get("group_id", "")
 
-        # Tidak ada circle
         if group_id == "":
             console.print(Panel(
                 Align.center("🚫 You are not part of any Circle.", vertical="middle"),
@@ -201,7 +185,6 @@ def show_circle_info(api_key: str, tokens: dict):
             pause()
             return "BACK"
 
-        # Ambil parent info
         parent_member_id = ""
         parent_subs_id = ""
         parrent_msisdn = ""
@@ -211,7 +194,6 @@ def show_circle_info(api_key: str, tokens: dict):
                 parent_subs_id = member.get("subscriber_number", "")
                 parrent_msisdn = decrypt_circle_msisdn(api_key, member.get("msisdn", ""))
 
-        # Paket Circle
         package = members_data.get("package", {})
         package_name = package.get("name", "N/A")
         benefit = package.get("benefit", {})
@@ -221,7 +203,6 @@ def show_circle_info(api_key: str, tokens: dict):
         formatted_allocation = format_quota_byte(allocation_byte)
         formatted_remaining = format_quota_byte(remaining_byte)
 
-        # Spending Tracker
         with live_loading("🔄 Fetching spending tracker...", theme):
             spending_res = spending_tracker(api_key, tokens, parent_subs_id, group_id)
 
@@ -234,28 +215,16 @@ def show_circle_info(api_key: str, tokens: dict):
         spend = spending_data.get("spend", 0)
         target = spending_data.get("target", 0)
 
-        clear_screen()
-
         # Header Circle
         header_text = Text()
         header_text.append(f"Circle: {group_name}\n", style="bold")
         header_text.append(f"Owner: {owner_name} {parrent_msisdn}\n", style=theme["text_body"])
         header_text.append(f"Package: {package_name} | {formatted_remaining} / {formatted_allocation}\n", style=theme["text_body"])
-        header_text.append(f"Spending: Rp{spend:,} / Rp{target:,}\n", style=theme["text_money"])
+        header_text.append(f"Spending: {get_rupiah(spend)} / {get_rupiah(target)}\n", style=theme["text_money"])
 
         console.print(Panel(header_text, border_style=theme["border_primary"], expand=True))
 
-        # Tabel Members
-        members_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-        members_table.add_column("No", justify="right", style=theme["text_key"], width=3)
-        members_table.add_column("MSISDN", style=theme["text_body"], width=16)
-        members_table.add_column("Name", style=theme["text_body"])
-        members_table.add_column("Role", style=theme["text_body"], width=8)
-        members_table.add_column("Joined", style=theme["text_sub"], width=12)
-        members_table.add_column("Slot", style=theme["text_sub"], width=8)
-        members_table.add_column("Status", style=theme["text_sub"], width=10)
-        members_table.add_column("Usage", style=theme["text_body"], width=18)
-
+        # Tabel Members (vertikal agar muat di layar kecil)
         for idx, m in enumerate(members, start=1):
             msisdn = decrypt_circle_msisdn(api_key, m.get("msisdn", "")) or "<No Number>"
             me_mark = " (You)" if str(msisdn) == str(my_msisdn) else ""
@@ -265,18 +234,16 @@ def show_circle_info(api_key: str, tokens: dict):
             used = format_quota_byte(max(m.get("allocation", 0) - m.get("remaining", 0), 0))
             usage_str = f"{used} / {alloc}"
 
-            members_table.add_row(
-                str(idx),
-                msisdn,
-                m.get("member_name", "N/A"),
-                f"{role}{me_mark}",
-                joined_str,
-                m.get("slot_type", "N/A"),
-                m.get("status", "N/A"),
-                usage_str
-            )
+            member_text = Text()
+            member_text.append(f"{idx}. {m.get('member_name','N/A')} {me_mark}\n", style="bold")
+            member_text.append(f"MSISDN: {msisdn}\n", style=theme["text_body"])
+            member_text.append(f"Role: {role}\n", style=theme["text_body"])
+            member_text.append(f"Joined: {joined_str}\n", style=theme["text_sub"])
+            member_text.append(f"Slot: {m.get('slot_type','N/A')}\n", style=theme["text_sub"])
+            member_text.append(f"Status: {m.get('status','N/A')}\n", style=theme["text_sub"])
+            member_text.append(f"Usage: {usage_str}\n", style=theme["text_body"])
 
-        console.print(Panel(members_table, border_style=theme["border_info"], expand=True))
+            console.print(Panel(member_text, border_style=theme["border_info"], expand=True))
 
         # Navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -290,7 +257,6 @@ def show_circle_info(api_key: str, tokens: dict):
 
         console.print(Panel(nav_table, border_style=theme["border_primary"], expand=True))
 
-        # Input opsi
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             return "BACK"
@@ -319,44 +285,27 @@ def show_circle_info(api_key: str, tokens: dict):
                     print_panel("❌ Error", "Invalid member number.")
                     pause()
                     continue
-
                 member_to_remove = members[member_number - 1]
-
-                # Prevent removing parent
                 if member_to_remove.get("member_role") == "PARENT":
                     print_panel("⚠️ Info", "Cannot remove the parent member.")
                     pause()
                     continue
-
-                # Prevent removing last member (parent + 1 member)
                 is_last_member = len(members) == 2
                 if is_last_member:
                     print_panel("⚠️ Info", "Cannot remove the last member from the Circle.")
                     pause()
                     continue
-
                 msisdn_to_remove = decrypt_circle_msisdn(api_key, member_to_remove.get("msisdn", ""))
-                confirm = console.input(
-                    f"[{theme['text_sub']}]Are you sure you want to remove {msisdn_to_remove}? (y/n):[/{theme['text_sub']}] "
-                ).strip().lower()
+                confirm = console.input(f"[{theme['text_sub']}]Remove {msisdn_to_remove}? (y/n):[/{theme['text_sub']}] ").strip().lower()
                 if confirm != "y":
                     print_panel("ℹ️ Info", "Removal cancelled.")
                     pause()
                     continue
-
                 with live_loading("🔄 Removing member...", theme):
-                    remove_res = remove_circle_member(
-                        api_key,
-                        tokens,
-                        member_to_remove.get("member_id", ""),
-                        group_id,
-                        parent_member_id,
-                        is_last_member
-                    )
-
+                    remove_res = remove_circle_member(api_key, tokens, member_to_remove.get("member_id", ""), group_id, parent_member_id, is_last_member)
                 if remove_res.get("status") == "SUCCESS":
                     res_text = Text()
-                    res_text.append(f"{msisdn_to_remove} has been removed from the Circle.\n", style="bold")
+                    res_text.append(f"{msisdn_to_remove} removed.\n", style="bold")
                     res_text.append(json.dumps(remove_res, indent=2), style=theme["text_body"])
                     console.print(Panel(res_text, border_style=theme["border_info"], expand=True))
                 else:
@@ -372,33 +321,22 @@ def show_circle_info(api_key: str, tokens: dict):
                     print_panel("❌ Error", "Invalid member number.")
                     pause()
                     continue
-
                 member_to_accept = members[member_number - 1]
                 if member_to_accept.get("status") != "INVITED":
                     print_panel("⚠️ Info", "This member is not in an invited state.")
                     pause()
                     continue
-
                 msisdn_to_accept = decrypt_circle_msisdn(api_key, member_to_accept.get("msisdn", ""))
-                confirm = console.input(
-                    f"[{theme['text_sub']}]Accept invitation for {msisdn_to_accept}? (y/n):[/{theme['text_sub']}] "
-                ).strip().lower()
+                confirm = console.input(f"[{theme['text_sub']}]Accept invitation for {msisdn_to_accept}? (y/n):[/{theme['text_sub']}] ").strip().lower()
                 if confirm != "y":
                     print_panel("ℹ️ Info", "Acceptance cancelled.")
                     pause()
                     continue
-
                 with live_loading("🔄 Accepting invitation...", theme):
-                    accept_res = accept_circle_invitation(
-                        api_key,
-                        tokens,
-                        group_id,
-                        member_to_accept.get("member_id", "")
-                    )
-
+                    accept_res = accept_circle_invitation(api_key, tokens, group_id, member_to_accept.get("member_id", ""))
                 if accept_res.get("status") == "SUCCESS":
                     res_text = Text()
-                    res_text.append(f"Invitation for {msisdn_to_accept} has been accepted.\n", style="bold")
+                    res_text.append(f"Invitation for {msisdn_to_accept} accepted.\n", style="bold")
                     res_text.append(json.dumps(accept_res, indent=2), style=theme["text_body"])
                     console.print(Panel(res_text, border_style=theme["border_info"], expand=True))
                 else:
