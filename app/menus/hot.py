@@ -111,6 +111,19 @@ def show_hot_menu():
 
 
 WIDTH = 55
+def validate_package_detail(detail):
+    return (
+        detail and
+        isinstance(detail, dict) and
+        "package_option" in detail and
+        "token_confirmation" in detail and
+        isinstance(detail["package_option"], dict) and
+        "package_option_code" in detail["package_option"] and
+        "price" in detail["package_option"] and
+        "name" in detail["package_option"]
+    )
+
+
 def show_hot_menu2():
     theme = get_theme()
     api_key = AuthInstance.api_key
