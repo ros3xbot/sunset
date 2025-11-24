@@ -94,7 +94,7 @@ def show_family_grup_menu(return_package_detail: bool = False):
             table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
             table.add_column("No", justify="right", style=theme["text_key"], width=3)
             table.add_column("Nama FC", style=theme["text_body"])
-            table.add_column("Family Code", style=theme["border_warning"])
+            table.add_column("Family Code", style=theme["border_info"])
 
             for i, item in enumerate(semua_kode, start=1):
                 table.add_row(str(i), item["name"], item["code"])
