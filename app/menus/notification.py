@@ -54,13 +54,13 @@ def show_notification_menu():
 
             notif_text = Text()
             notif_text.append(f"🔔 Notification {idx}\n", style="bold")
-            notif_text.append("Status: ", style=theme["text_key"])
+            notif_text.append("Status: ", style=theme["border_info"])
             notif_text.append(f"{status}\n", style=theme["text_err"] if status == "UNREAD" else theme["text_ok"])
-            notif_text.append("Pesan Singkat: ", style=theme["text_key"])
+            notif_text.append("Pesan Singkat: ", style=theme["border_info"])
             notif_text.append(f"{brief_message}\n", style=theme["text_body"])
-            notif_text.append("Waktu: ", style=theme["text_key"])
-            notif_text.append(f"{time}\n", style=theme["text_sub"])
-            notif_text.append("Pesan Lengkap:\n", style=theme["text_key"])
+            notif_text.append("Waktu: ", style=theme["border_info"])
+            notif_text.append(f"{time}\n", style=theme["border_warning"])
+            notif_text.append("Pesan Lengkap:\n", style=theme["border_info"])
             notif_text.append(f"{full_message}\n", style=theme["text_body"])
 
             console.print(Panel(
@@ -77,13 +77,13 @@ def show_notification_menu():
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("1", "📖 Read All Unread Notifications")
-        nav_table.add_row("2", "📌 Mark Single Notification as Read")
-        nav_table.add_row("00", f"[{theme['text_sub']}]↩️ Back to Main Menu[/]")
+        nav_table.add_row("1", "Read All Unread Notifications")
+        nav_table.add_row("2", "Mark Single Notification as Read")
+        nav_table.add_row("00", f"[{theme['text_sub']}]Back to Main Menu[/]")
 
         console.print(Panel(
             nav_table,
-            title=f"[{theme['text_title']}]🔧 Menu[/]",
+            #title=f"[{theme['text_title']}]🔧 Menu[/]",
             border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
