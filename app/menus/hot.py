@@ -197,6 +197,7 @@ def show_hot_menu2():
             variant = package.get("package_detail_variant", {})
 
             price = option.get("price", 0)
+            formatted_price = get_rupiah(price)
             validity = option.get("validity", "-")
             point = option.get("point", "-")
             plan_type = family.get("plan_type", "-")
@@ -225,7 +226,7 @@ def show_hot_menu2():
 
             clear_screen()
             console.print(Panel(
-                Align.center(f"📦{selected_package['name']} - Rp {selected_package['price']}", vertical="middle"),
+                Align.center(f"📦{selected_package['name']} - Rp {formatted_price}", vertical="middle"),
                 border_style=theme["border_info"],
                 padding=(1, 2),
                 expand=True
@@ -237,7 +238,7 @@ def show_hot_menu2():
             info_table.add_column(justify="left", style=theme["border_info"])
             info_table.add_column(justify="left")
             info_table.add_row("Nama", f": [bold {theme['text_body']}]{title}[/]")
-            info_table.add_row("Harga", f": Rp [{theme['text_money']}]{price}[/]")
+            info_table.add_row("Harga", f": Rp [{theme['text_money']}]{formatted_price}[/]")
             info_table.add_row("Masa Aktif", f": [{theme['text_date']}]{validity}[/]")
             info_table.add_row("Point", f": [{theme['text_body']}]{point}[/]")
             info_table.add_row("Plan Type", f": [{theme['text_body']}]{plan_type}[/]")
