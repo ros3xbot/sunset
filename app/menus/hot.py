@@ -110,7 +110,7 @@ def show_hot_menu():
             continue
 
 
-
+from typing import TypedDict
 class PaymentItem(TypedDict):
     item_code: str
     product_type: str
