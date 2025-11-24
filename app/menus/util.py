@@ -42,7 +42,7 @@ def simple_number():
 
     console.print(Panel(
         Align.center(text),
-        border_style=get_theme_style("text_primary"),
+        border_style=get_theme("text_primary"),
         padding=(0, 0),
         expand=True
     ))
