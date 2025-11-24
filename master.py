@@ -3,14 +3,14 @@ load_dotenv()
 
 import sys, json, random
 from datetime import datetime
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
-
-from app.service.git import check_for_updates, ensure_git
-from app.menus.util import (
+#from rich.console import Console
+#from rich.table import Table
+#from rich.panel import Panel
+#from rich.align import Align
+#from rich.box import MINIMAL_DOUBLE_HEAD
+from app.config.imports import *
+#from app.service.git import check_for_updates, ensure_git
+#from app.menus.util import (
     clear_screen,
     simple_number,
     pause,
@@ -52,7 +52,7 @@ from app.menus.family_grup import show_family_grup_menu
 from app.menus.sfy import show_special_for_you_menu
 from app.menus.bundle import show_bundle_menu
 from app.menus.theme import show_theme_menu
-from app.config.theme_config import get_theme, get_theme_style
+#from app.config.theme_config import get_theme, get_theme_style
 from app.config.cache import get_cache, set_cache, clear_cache
 
 console = Console()
