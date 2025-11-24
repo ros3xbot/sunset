@@ -1,10 +1,21 @@
-from app.config.imports import *
 try:
+    # Import aggregator (utama)
     from app.config.imports import *
 except ImportError:
-    from app.menus.util import clear_screen    #, pause, print_panel
-    #from app.config.theme_config import get_theme, get_theme_style
+    # Fallback kalau dijalankan langsung
+    from app.menus.util import clear_screen, pause, print_panel, simple_number
+    from app.config.theme_config import get_theme
+    from app.service.auth import AuthInstance
+    from app.service.bookmark import BookmarkInstance
+    from app.client.engsel import get_family, get_package_details
+    from app.menus.package import show_package_details
+    from app.service.git import ensure_git
     from rich.console import Console
+    from rich.panel import Panel
+    from rich.align import Align
+    from rich.table import Table
+    from rich.box import MINIMAL_DOUBLE_HEAD
+
     console = Console()
 
 
