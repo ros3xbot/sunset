@@ -384,7 +384,8 @@ def main():
             elif choice == "69":
                 show_theme_menu()
             elif choice == "99":
-                print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
+                #print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
+                print_panel("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
                 sys.exit(0)
 
             elif choice.lower() == "y":
