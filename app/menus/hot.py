@@ -57,6 +57,7 @@ def show_hot_menu():
             table,
             #title=f"[{theme['text_title']}]🔥 Daftar Paket Hot[/]",
             border_style=theme["border_info"],
+            padding=(0, 0),
             expand=True
         ))
 
@@ -146,6 +147,7 @@ def show_hot_menu2():
             table,
             #title=f"[{theme['text_title']}]🔥 Daftar Paket Hot 2[/]",
             border_style=theme["border_info"],
+            padding=(0, 0),
             expand=True
         ))
 
