@@ -381,7 +381,7 @@ def show_hot_menu2():
             continue
 
 
-            else:
-                print_panel("⚠️ Error", "Pilihan tidak valid. Silahkan coba lagi.")
-                pause()
-                continue
+    else:
+        print_panel("⚠️ Error", "Pilihan tidak valid. Silahkan coba lagi.")
+        pause()
+        continue
