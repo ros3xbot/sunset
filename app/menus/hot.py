@@ -148,11 +148,15 @@ def show_hot_menu2():
         pkg_table.add_column("Nama Paket", style=theme["text_body"])
         pkg_table.add_column("Harga", justify="right", style=theme["text_money"], width=16)
 
-        for idx, p in enumerate(hot_packages):
+        #for idx, p in enumerate(hot_packages):
             # Menjaga konsistensi: harga tampil sebagai rupiah string seperti versi Rich pertama
-            harga_str = get_rupiah(p["price"]) if isinstance(p.get("price"), (int, float)) else str(p["price"])
-            pkg_table.add_row(str(idx + 1), p["name"], harga_str)
+        #    harga_str = get_rupiah(p["price"]) if isinstance(p.get("price"), (int, float)) else str(p["price"])
+        #    pkg_table.add_row(str(idx + 1), p["name"], harga_str)
 
+        for idx, p in enumerate(hot_packages, start=1):
+            formatted_price = get_rupiah(p["price"])
+            pkg_table.add_row(str(idx), p["name"], f"{formatted_price}")     
+        
         console.print(Panel(pkg_table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
 
         # Navigasi kembali
