@@ -383,6 +383,7 @@ def show_hot_menu2():
                 pause()
                 in_payment_menu = False
                 in_bookmark_menu = False
+                continue
 
             elif input_method == "2":
                 show_multipayment(
