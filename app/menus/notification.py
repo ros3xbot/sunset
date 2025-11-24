@@ -6,6 +6,7 @@ from rich.panel import Panel
 from rich.text import Text
 from rich.table import Table
 from rich.align import Align
+from rich.box import MINIMAL_DOUBLE_HEAD
 
 console = Console()
 
@@ -71,7 +72,7 @@ def show_notification_menu():
 
         # Navigasi konsisten
         console.rule(f"[{theme['text_title']}]🔧 Menu[/]")
-        nav_table = Table(show_header=False, expand=True)
+        nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("1", "📖 Read All Unread Notifications")
