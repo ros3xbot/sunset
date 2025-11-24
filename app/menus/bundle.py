@@ -64,7 +64,7 @@ def show_bundle_menu():
             nav.add_row("5", f"[{theme['text_warn']}]💳 Lanjutkan ke Pembayaran[/]")
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
-        console.print(Panel(nav, border_style=theme["border_primary"], padding=(0, 1), expand=True))
+        console.print(Panel(nav, border_style=theme["border_primary"], padding=(0, 0), expand=True))
 
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
