@@ -38,7 +38,7 @@ def simple_number():
         text = f"[bold {theme['text_err']}]Tidak ada akun aktif saat ini.[/]"
     else:
         number = active_user.get("number", "-")
-        text = f"[bold {theme['text_body']}]Akun (nomor) aktif ✨ {number} ✨[/]"
+        text = f"[bold {theme['text_sub']}]Akun (nomor) aktif ✨ {number} ✨[/]"
 
     console.print(Panel(
         Align.center(text),
