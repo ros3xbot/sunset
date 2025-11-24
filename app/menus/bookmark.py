@@ -1,4 +1,11 @@
 from app.config.imports import *
+try:
+    from app.config.imports import *
+except ImportError:
+    from app.menus.util import clear_screen    #, pause, print_panel
+    #from app.config.theme_config import get_theme, get_theme_style
+    from rich.console import Console
+    console = Console()
 
 
 def show_bookmark_menu(return_package_detail: bool = False):
