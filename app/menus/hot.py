@@ -330,6 +330,39 @@ def show_hot_menu2():
                 expand=True
             ))
             
+
+            # Ambil parameter pembayaran dari selected_package
+            payment_for = selected_package.get("payment_for", payment_for) or "BUY_PACKAGE"
+            ask_overwrite = selected_package.get("ask_overwrite", False)
+            overwrite_amount = selected_package.get("overwrite_amount", -1)
+            token_confirmation_idx = selected_package.get("token_confirmation_idx", 0)
+            amount_idx = selected_package.get("amount_idx", -1)
+
+            # Normalisasi overwrite & index untuk mencegah error
+            if ask_overwrite:
+                if overwrite_amount in (-1, None) or overwrite_amount <= 0:
+                    # fallback ke harga item terakhir
+                    try:
+                        overwrite_amount = int(payment_items[-1].item_price)
+                    except Exception:
+                        overwrite_amount = -1
+
+                if overwrite_amount in (-1, 0):
+                    print_panel("⚠️ Warning", "Nilai overwrite_amount belum ditetapkan. Masukkan nilai overwrite (Rp).")
+                    val = console.input(f"[{theme['text_sub']}]Overwrite (Rp):[/{theme['text_sub']}] ").strip()
+                    if val.isdigit() and int(val) > 0:
+                        overwrite_amount = int(val)
+                    else:
+                        print_panel("❌ Error", "Overwrite amount harus berupa angka > 0. Menonaktifkan overwrite.")
+                        ask_overwrite = False
+                        overwrite_amount = -1
+                        pause()
+
+            if token_confirmation_idx is None:
+                token_confirmation_idx = 0
+            if amount_idx is None:
+                amount_idx = -1
+
             # Navigasi Pembelian
             nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
             nav_table.add_column(justify="right", style=theme["text_key"], width=6)
@@ -348,16 +381,27 @@ def show_hot_menu2():
 
             # Input pilihan
             choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
+
             if choice == "1":
+                # Jika tidak menggunakan overwrite, konfirmasi saldo < harga terakhir
+                if not ask_overwrite:
+                    last_price = payment_items[-1].item_price
+                    print_panel("⚠️ Warning", f"Pastikan sisa balance KURANG DARI Rp{get_rupiah(last_price)}!!!")
+                    balance_answer = console.input("Apakah anda yakin ingin melanjutkan pembelian? (y/n): ").strip().lower()
+                    if balance_answer != "y":
+                        print_panel("ℹ️ Info", "Pembelian dibatalkan oleh user.")
+                        pause()
+                        continue
+
                 settlement_balance(
                     api_key,
                     tokens,
                     payment_items,
                     payment_for,
-                    ask_overwrite=False,
-                    overwrite_amount=-1,
-                    token_confirmation_idx=0,
-                    amount_idx=-1
+                    ask_overwrite=ask_overwrite,
+                    overwrite_amount=overwrite_amount,
+                    token_confirmation_idx=token_confirmation_idx,
+                    amount_idx=amount_idx,
                 )
                 pause()
                 in_hot_menu = False
@@ -368,10 +412,10 @@ def show_hot_menu2():
                     tokens,
                     payment_items,
                     payment_for,
-                    ask_overwrite=False,
-                    overwrite_amount=-1,
-                    token_confirmation_idx=0,
-                    amount_idx=-1
+                    ask_overwrite=ask_overwrite,
+                    overwrite_amount=overwrite_amount,
+                    token_confirmation_idx=token_confirmation_idx,
+                    amount_idx=amount_idx,
                 )
                 pause()
                 in_hot_menu = False
@@ -382,10 +426,10 @@ def show_hot_menu2():
                     tokens,
                     payment_items,
                     payment_for,
-                    ask_overwrite=False,
-                    overwrite_amount=-1,
-                    token_confirmation_idx=0,
-                    amount_idx=-1
+                    ask_overwrite=ask_overwrite,
+                    overwrite_amount=overwrite_amount,
+                    token_confirmation_idx=token_confirmation_idx,
+                    amount_idx=amount_idx,
                 )
                 pause()
                 in_hot_menu = False
@@ -397,4 +441,3 @@ def show_hot_menu2():
                 print_panel("⚠️ Error", "Pilihan tidak valid. Silahkan coba lagi.")
                 pause()
                 continue
-
