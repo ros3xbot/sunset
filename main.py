@@ -9,6 +9,7 @@ from app.config.imports import *
 def is_rebase_in_progress():
     return os.path.exists(".git/rebase-apply") or os.path.exists(".git/rebase-merge")
 
+
 def git_pull_rebase():
     theme = get_theme()
     result = {"status": None, "error": None, "output": ""}
@@ -132,6 +133,7 @@ def git_pull_rebase():
         ))
         pause()
         sys.exit(1)
+
 
 def run_main():
     try:
