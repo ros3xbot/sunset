@@ -16,6 +16,8 @@ from app.menus.util import (
     format_quota_byte
 )
 
+console = Console()
+
 
 def purchase_loop(
     family_code: str,
