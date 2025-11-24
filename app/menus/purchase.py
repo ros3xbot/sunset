@@ -5,6 +5,7 @@ from app.service.auth import AuthInstance
 from app.service.decoy import DecoyInstance
 from app.type_dict import PaymentItem
 from app.client.purchase.balance import settlement_balance
+from app.config.theme_config import get_theme
 from app.menus.util import (
     clear_screen,
     pause,
