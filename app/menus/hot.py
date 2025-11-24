@@ -126,6 +126,7 @@ def show_hot_menu2():
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         # Load data paket
         hot_packages = []
@@ -148,23 +149,18 @@ def show_hot_menu2():
         pkg_table.add_column("Nama Paket", style=theme["text_body"])
         pkg_table.add_column("Harga", justify="right", style=theme["text_money"], width=16)
 
-        #for idx, p in enumerate(hot_packages):
-            # Menjaga konsistensi: harga tampil sebagai rupiah string seperti versi Rich pertama
-        #    harga_str = get_rupiah(p["price"]) if isinstance(p.get("price"), (int, float)) else str(p["price"])
-        #    pkg_table.add_row(str(idx + 1), p["name"], harga_str)
-
         for idx, p in enumerate(hot_packages, start=1):
             formatted_price = get_rupiah(p["price"])
             pkg_table.add_row(str(idx), p["name"], f"{formatted_price}")     
         
-        console.print(Panel(pkg_table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
+        console.print(Panel(pkg_table, border_style=theme["border_info"], padding=(0, 0), expand=True))
 
         # Navigasi kembali
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
-        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
+        console.print(Panel(nav_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
         # Input pilihan paket
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
