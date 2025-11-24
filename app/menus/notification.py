@@ -1,5 +1,6 @@
-from app.menus.util import clear_screen, pause, print_panel, get_theme
+from app.menus.util import clear_screen, pause, print_panel, simple_number()
 from app.client.engsel import get_notification_detail, dashboard_segments
+from app.config.theme_config import get_theme
 from app.service.auth import AuthInstance
 from rich.console import Console
 from rich.panel import Panel
@@ -21,6 +22,7 @@ def show_notification_menu():
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
@@ -71,16 +73,17 @@ def show_notification_menu():
         console.print(f"[{theme['text_title']}]Total: {len(notifications)} | Unread: {unread_count}[/]")
 
         # Navigasi konsisten
-        console.rule(f"[{theme['text_title']}]🔧 Menu[/]")
+        #console.rule(f"[{theme['text_title']}]🔧 Menu[/]")
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("1", "📖 Read All Unread Notifications")
-        nav_table.add_row("2", "📌 Mark Single Notification as Read (masukkan nomor)")
+        nav_table.add_row("2", "📌 Mark Single Notification as Read")
         nav_table.add_row("00", f"[{theme['text_sub']}]↩️ Back to Main Menu[/]")
 
         console.print(Panel(
             nav_table,
+            title=f"[{theme['text_title']}]🔧 Menu[/]",
             border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
