@@ -1,4 +1,4 @@
-from app.menus.util import clear_screen, pause, print_panel, simple_number()
+from app.menus.util import clear_screen, pause, print_panel, simple_number
 from app.client.engsel import get_notification_detail, dashboard_segments
 from app.config.theme_config import get_theme
 from app.service.auth import AuthInstance
