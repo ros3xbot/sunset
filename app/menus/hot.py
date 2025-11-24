@@ -2,7 +2,7 @@ import json
 from app.client.engsel import get_package_details, get_family
 from app.menus.package import show_package_details
 from app.service.auth import AuthInstance
-from app.menus.util import clear_screen, pause, print_panel, format_quota_byte, display_html, simple_number
+from app.menus.util import clear_screen, pause, print_panel, format_quota_byte, display_html, simple_number, get_rupiah
 from app.client.purchase.ewallet import show_multipayment
 from app.client.purchase.qris import show_qris_payment
 from app.client.purchase.balance import settlement_balance
@@ -141,11 +141,11 @@ def show_hot_menu2():
         table.add_column("Harga", style=theme["text_money"], justify="right")
 
         for idx, p in enumerate(hot_packages, start=1):
-            table.add_row(str(idx), p["name"], f"Rp {p['price']}")
+            formatted_price = get_rupiah(p["price"])
+            table.add_row(str(idx), p["name"], f"Rp {formatted_price}")
 
         console.print(Panel(
             table,
-            #title=f"[{theme['text_title']}]🔥 Daftar Paket Hot 2[/]",
             border_style=theme["border_info"],
             padding=(0, 0),
             expand=True
