@@ -110,6 +110,15 @@ def show_hot_menu():
             continue
 
 
+
+class PaymentItem(TypedDict):
+    item_code: str
+    product_type: str
+    item_price: int
+    item_name: str
+    tax: int
+    token_confirmation: str
+
 def show_hot_menu2():
     theme = get_theme()
     api_key = AuthInstance.api_key
@@ -126,7 +135,6 @@ def show_hot_menu2():
         ))
         simple_number()
 
-        # Load JSON
         try:
             with open("hot_data/hot2.json", "r", encoding="utf-8") as f:
                 hot_packages = json.load(f)
@@ -171,8 +179,7 @@ def show_hot_menu2():
             pause()
             continue
 
-        # Ambil detail paket utama
-        package = get_package_details(
+        package_detail = get_package_details(
             api_key,
             tokens,
             packages[0]["family_code"],
@@ -181,33 +188,19 @@ def show_hot_menu2():
             packages[0]["is_enterprise"],
             packages[0]["migration_type"],
         )
-        if not package:
+        if not package_detail:
             print_panel("⚠️ Error", "Gagal memuat detail paket.")
             pause()
             continue
 
-        option = package.get("package_option", {})
-        family = package.get("package_family", {})
-        variant = package.get("package_detail_variant", {})
+        option = package_detail.get("package_option", {})
+        family = package_detail.get("package_family", {})
+        variant = package_detail.get("package_detail_variant", {})
 
         # Harga fallback
         price_api = option.get("price", 0)
         price = price_api if (price_api and price_api > 0) else selected_package.get("price", 0)
         formatted_price = get_rupiah(price)
-
-        validity = option.get("validity", "-")
-        point = option.get("point", "-")
-        plan_type = family.get("plan_type", "-")
-        payment_for = family.get("payment_for", "") or "BUY_PACKAGE"
-        detail_html = display_html(option.get("tnc", ""))
-
-        option_name = option.get("name", "")
-        family_name = family.get("name", "")
-        variant_name = variant.get("name", "")
-        title = f"{family_name} - {variant_name} - {option_name}".strip()
-
-        family_code = family.get("package_family_code", "")
-        parent_code = package.get("package_addon", {}).get("parent_code", "") or "N/A"
 
         # PaymentItem dict-style
         payment_items: list[PaymentItem] = [
@@ -215,9 +208,9 @@ def show_hot_menu2():
                 "item_code": option.get("package_option_code", ""),
                 "product_type": "",
                 "item_price": price,
-                "item_name": f"{variant_name} {option_name}".strip(),
+                "item_name": f"{variant.get('name','')} {option.get('name','')}".strip(),
                 "tax": 0,
-                "token_confirmation": package.get("token_confirmation", ""),
+                "token_confirmation": package_detail.get("token_confirmation", ""),
             }
         ]
 
@@ -225,52 +218,12 @@ def show_hot_menu2():
         info_table = Table.grid(padding=(0, 1))
         info_table.add_column(justify="left", style=theme["border_info"])
         info_table.add_column(justify="left")
-        info_table.add_row("Nama", f": [bold {theme['text_body']}]{title}[/]")
+        info_table.add_row("Nama", f": [bold {theme['text_body']}]{selected_package['name']}[/]")
         info_table.add_row("Harga", f": Rp [{theme['text_money']}]{formatted_price}[/]")
-        info_table.add_row("Masa Aktif", f": [{theme['text_date']}]{validity}[/]")
-        info_table.add_row("Point", f": [{theme['text_body']}]{point}[/]")
-        info_table.add_row("Plan Type", f": [{theme['text_body']}]{plan_type}[/]")
-        info_table.add_row("Payment For", f": [{theme['text_body']}]{payment_for}[/]")
-        info_table.add_row("Family Code", f": [{theme['border_warning']}]{family_code}[/]")
-        info_table.add_row("Parent Code", f": [{theme['text_sub']}]{parent_code}[/]")
+        info_table.add_row("Payment For", f": [{theme['text_body']}]{family.get('payment_for','BUY_PACKAGE')}[/]")
 
         console.print(Panel(info_table, title=f"[{theme['text_title']}]📦 Detail Paket[/]",
                             border_style=theme["border_info"], expand=True))
-
-        # Benefit Paket
-        benefits = option.get("benefits", [])
-        if benefits:
-            benefit_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-            benefit_table.add_column("Nama", style=theme["text_body"])
-            benefit_table.add_column("Jenis", style=theme["text_body"])
-            benefit_table.add_column("Unli", style=theme["border_info"], justify="center")
-            benefit_table.add_column("Total", style=theme["text_body"], justify="right")
-
-            for b in benefits:
-                dt = b.get("data_type", "")
-                total = b.get("total", 0)
-                is_unli = b.get("is_unlimited", False)
-
-                if is_unli:
-                    total_str = {"VOICE": "menit", "TEXT": "SMS", "DATA": "kuota"}.get(dt, dt)
-                else:
-                    if dt == "VOICE":
-                        total_str = f"{total / 60:.0f} menit"
-                    elif dt == "TEXT":
-                        total_str = f"{total} SMS"
-                    elif dt == "DATA":
-                        total_str = format_quota_byte(total)
-                    else:
-                        total_str = f"{total} ({dt})"
-
-                benefit_table.add_row(b.get("name", "-"), dt, "YES" if is_unli else "-", total_str)
-
-            console.print(Panel(benefit_table, title=f"[{theme['text_title']}]🎁 Benefit Paket[/]",
-                                border_style=theme["border_success"], expand=True))
-
-        # Syarat & Ketentuan
-        console.print(Panel(detail_html, title=f"[{theme['text_title']}]📜 Syarat & Ketentuan[/]",
-                            border_style=theme["border_warning"], expand=True))
 
         # Navigasi Pembelian
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -288,13 +241,12 @@ def show_hot_menu2():
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         last_price = payment_items[-1]["item_price"]
 
-        if choice in ("1", "2", "3") and (last_price is None or last_price <= 0):
-            print_panel("⚠️ Error", "Harga paket tidak valid (0).")
-            pause()
-            continue
+        # Fallback overwrite_amount
+        overwrite_amount = selected_package.get("overwrite_amount", -1)
+        if overwrite_amount == -1 or overwrite_amount <= 0:
+            overwrite_amount = last_price
 
         if choice == "1":
-            # Konfirmasi saldo jika tanpa overwrite
             print_panel("⚠️ Warning", f"Pastikan sisa balance KURANG DARI Rp{get_rupiah(last_price)}!!!")
             balance_answer = console.input("Apakah anda yakin ingin melanjutkan pembelian? (y/n): ").strip().lower()
             if balance_answer != "y":
@@ -306,9 +258,9 @@ def show_hot_menu2():
                 api_key,
                 tokens,
                 payment_items,
-                payment_for,
+                family.get("payment_for","BUY_PACKAGE"),
                 ask_overwrite=False,
-                overwrite_amount=last_price,
+                overwrite_amount=overwrite_amount,
                 token_confirmation_idx=0,
                 amount_idx=-1
             )
@@ -320,9 +272,9 @@ def show_hot_menu2():
                 api_key,
                 tokens,
                 payment_items,
-                payment_for,
+                family.get("payment_for","BUY_PACKAGE"),
                 ask_overwrite=False,
-                overwrite_amount=last_price,
+                overwrite_amount=overwrite_amount,
                 token_confirmation_idx=0,
                 amount_idx=-1
             )
@@ -334,9 +286,9 @@ def show_hot_menu2():
                 api_key,
                 tokens,
                 payment_items,
-                payment_for,
+                family.get("payment_for","BUY_PACKAGE"),
                 ask_overwrite=False,
-                overwrite_amount=last_price,
+                overwrite_amount=overwrite_amount,
                 token_confirmation_idx=0,
                 amount_idx=-1
             )
