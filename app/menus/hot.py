@@ -142,7 +142,7 @@ def show_hot_menu2():
 
         for idx, p in enumerate(hot_packages, start=1):
             formatted_price = get_rupiah(p["price"])
-            table.add_row(str(idx), p["name"], f"Rp {formatted_price}")
+            table.add_row(str(idx), p["name"], f"{formatted_price}")
 
         console.print(Panel(
             table,
@@ -159,7 +159,6 @@ def show_hot_menu2():
 
         console.print(Panel(
             nav_table,
-            #title=f"[{theme['text_title']}]🔧 Menu[/]",
             border_style=theme["border_primary"],
             expand=True
         ))
@@ -226,7 +225,6 @@ def show_hot_menu2():
 
             clear_screen()
             console.print(Panel(
-                #Align.center(f"📦 {family_name}", vertical="middle"),
                 Align.center(f"📦{selected_package['name']} - Rp {selected_package['price']}", vertical="middle"),
                 border_style=theme["border_info"],
                 padding=(1, 2),
@@ -366,7 +364,6 @@ def show_hot_menu2():
                 in_hot_menu = False
 
             elif choice == "00":
-                # kembali ke daftar paket
                 continue
 
             else:
