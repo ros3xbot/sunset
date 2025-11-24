@@ -1,17 +1,5 @@
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
-
+from app.config.imports import *
 from app.client.ciam import get_otp, submit_otp
-from app.menus.util import clear_screen, simple_number, pause, print_panel, nav_range
-from app.service.auth import AuthInstance
-from app.config.theme_config import get_theme
-from app.service.service import load_status, save_status
-from app.service.git import ensure_git
-
-console = Console()
 
 
 def normalize_number(raw_input: str) -> str:
