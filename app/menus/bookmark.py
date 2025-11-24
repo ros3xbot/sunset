@@ -1,4 +1,5 @@
 from app.config.imports import *
+from app.menus.util import clear_screen
 
 
 def show_bookmark_menu(return_package_detail: bool = False):
