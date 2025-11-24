@@ -226,12 +226,29 @@ def show_hot_menu2():
 
             clear_screen()
             console.print(Panel(
-                Align.center(f"📦{selected_package['name']} - Rp {formatted_price}", vertical="middle"),
+                Align.center(f"📦 {selected_package['name']} - Rp {formatted_price}", vertical="middle"),
                 border_style=theme["border_info"],
                 padding=(1, 2),
                 expand=True
             ))
             simple_number()
+
+            info_text = Text()
+            info_text.append(f"{selected_package['name']}\n", style="bold")
+            info_text.append(f"Harga: Rp {get_rupiah(selected_package['price'])}\n", style=theme["text_money"])
+            info_text.append("Detail:\n", style=theme["text_body"])
+            for line in selected_package.get("detail", "").split("\n"):
+                cleaned = line.strip()
+                if cleaned:
+                    info_text.append(f"- {cleaned}\n", style=theme["text_body"])
+
+            console.print(Panel(
+                info_text,
+                title=f"[{theme['text_title']}]📦 Detail Paket[/]",
+                border_style=theme["border_info"],
+                padding=(1, 2),
+                expand=True
+            ))
 
             # Panel Info Paket
             info_table = Table.grid(padding=(0, 1))
