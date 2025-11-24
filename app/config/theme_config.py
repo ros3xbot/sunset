@@ -24,6 +24,70 @@ THEMES = {
         "gradient_start": "#34D399",
         "gradient_end": "#A7F3D0"
     },
+
+    "solarized_dark": {
+        "border_primary": "#268BD2",
+        "border_info": "#2AA198",
+        "border_success": "#859900",
+        "border_warning": "#B58900",
+        "border_error": "#DC322F",
+        "text_title": "bold #EEE8D5",
+        "text_sub": "bold #2AA198",
+        "text_ok": "bold #859900",
+        "text_warn": "bold #B58900",
+        "text_err": "bold #DC322F",
+        "text_body": "#93A1A1",
+        "text_key": "#268BD2",
+        "text_value": "bold #FDF6E3",
+        "text_money": "bold #859900",
+        "text_date": "bold #B58900",
+        "text_number": "#6C71C4",
+        "gradient_start": "#2AA198",
+        "gradient_end": "#268BD2"
+    },
+
+    "matrix_green": {
+        "border_primary": "#00FF00",
+        "border_info": "#00CC66",
+        "border_success": "#33FF99",
+        "border_warning": "#99FF33",
+        "border_error": "#FF3333",
+        "text_title": "bold #CCFFCC",
+        "text_sub": "bold #66FF66",
+        "text_ok": "bold #33FF99",
+        "text_warn": "bold #99FF33",
+        "text_err": "bold #FF6666",
+        "text_body": "#99CC99",
+        "text_key": "#00FF99",
+        "text_value": "bold #E6FFE6",
+        "text_money": "bold #33FF99",
+        "text_date": "bold #99FF33",
+        "text_number": "#00FF66",
+        "gradient_start": "#00FF99",
+        "gradient_end": "#00CC66"
+    },
+
+    "pastel_light": {
+        "border_primary": "#A78BFA",
+        "border_info": "#60A5FA",
+        "border_success": "#34D399",
+        "border_warning": "#FBBF24",
+        "border_error": "#F87171",
+        "text_title": "bold #374151",
+        "text_sub": "bold #60A5FA",
+        "text_ok": "bold #34D399",
+        "text_warn": "bold #FBBF24",
+        "text_err": "bold #F87171",
+        "text_body": "#6B7280",
+        "text_key": "#A78BFA",
+        "text_value": "bold #111827",
+        "text_money": "bold #34D399",
+        "text_date": "bold #FBBF24",
+        "text_number": "#C084FC",
+        "gradient_start": "#60A5FA",
+        "gradient_end": "#A78BFA"
+    },
+
     "sunset_blaze": {
         "border_primary": "#F97316",
         "border_info": "#FDBA74",
@@ -44,6 +108,7 @@ THEMES = {
         "gradient_start": "#FB923C",
         "gradient_end": "#FDE68A"
     },
+
     "ocean_wave": {
         "border_primary": "#0EA5E9",
         "border_info": "#38BDF8",
@@ -64,6 +129,7 @@ THEMES = {
         "gradient_start": "#38BDF8",
         "gradient_end": "#A5F3FC"
     },
+
     "midnight_shadow": {
         "border_primary": "#4B5563",
         "border_info": "#6B7280",
@@ -84,6 +150,7 @@ THEMES = {
         "gradient_start": "#6B7280",
         "gradient_end": "#9CA3AF"
     },
+
     "lavender_dream": {
         "border_primary": "#A78BFA",
         "border_info": "#C4B5FD",
@@ -104,6 +171,7 @@ THEMES = {
         "gradient_start": "#C4B5FD",
         "gradient_end": "#E9D5FF"
     },
+
     "dark_neon": {
         "border_primary": "#7C3AED",
         "border_info": "#06B6D4",
@@ -124,6 +192,7 @@ THEMES = {
         "gradient_start": "#22D3EE",
         "gradient_end": "#A78BFA"
     },
+
     "solar_flare": {
         "border_primary": "#FF6B00",
         "border_info": "#FFA500",
@@ -144,6 +213,7 @@ THEMES = {
         "gradient_start": "#FF8C00",
         "gradient_end": "#FFD700"
     },
+
     "arctic_frost": {
         "border_primary": "#5DADE2",
         "border_info": "#85C1E9",
@@ -164,6 +234,7 @@ THEMES = {
         "gradient_start": "#85C1E9",
         "gradient_end": "#D6EAF8"
     },
+
     "sakura_bloom": {
         "border_primary": "#E91E63",
         "border_info": "#F48FB1",
@@ -184,6 +255,7 @@ THEMES = {
         "gradient_start": "#F48FB1",
         "gradient_end": "#FFF0F5"
     },
+
     "cyber_noir": {
         "border_primary": "#00FFFF",
         "border_info": "#00CED1",
@@ -204,6 +276,7 @@ THEMES = {
         "gradient_start": "#00CED1",
         "gradient_end": "#7CFC00"
     },
+
     "bright_cyan_wave": {
         "border_primary": "#00FFFF",
         "border_info": "#00CED1",
@@ -223,8 +296,30 @@ THEMES = {
         "text_number": "#00CED1",
         "gradient_start": "#00FFFF",
         "gradient_end": "#AFEEEE"
+    },
+
+    "mono_minimal": {
+        "border_primary": "#6B7280",
+        "border_info": "#9CA3AF",
+        "border_success": "#374151",
+        "border_warning": "#D1D5DB",
+        "border_error": "#EF4444",
+        "text_title": "bold #F9FAFB",
+        "text_sub": "bold #9CA3AF",
+        "text_ok": "bold #6EE7B7",
+        "text_warn": "bold #FBBF24",
+        "text_err": "bold #F87171",
+        "text_body": "#E5E7EB",
+        "text_key": "#6B7280",
+        "text_value": "bold #FFFFFF",
+        "text_money": "bold #10B981",
+        "text_date": "bold #9CA3AF",
+        "text_number": "#4B5563",
+        "gradient_start": "#111827",
+        "gradient_end": "#6B7280"
     }
 }
+
 
 def _load_config():
     if os.path.exists(CONFIG_PATH):
