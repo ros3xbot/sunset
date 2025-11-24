@@ -96,7 +96,14 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                 elif dt == "TEXT":
                     total_str = f"{total} SMS"
                 elif dt == "DATA":
-                    total_str = format_quota_byte(total)
+                    if total >= 1_000_000_000:
+                        total_str = f"{total / (1024 ** 3):.2f} GB"
+                    elif total >= 1_000_000:
+                        total_str = f"{total / (1024 ** 2):.2f} MB"
+                    elif total >= 1_000:
+                        total_str = f"{total / 1024:.2f} KB"
+                    else:
+                        total_str = f"{total} B"
                 else:
                     total_str = f"{total} ({dt})"
 
