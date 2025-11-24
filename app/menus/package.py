@@ -79,7 +79,13 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     info_table.add_row("Family Code", f": [{theme['border_warning']}]{family_code}[/]")
     info_table.add_row("Parent Code", f": [{theme['text_sub']}]{parent_code}[/]")
 
-    console.print(Panel(info_table, title="📦 Detail Paket", border_style=theme["border_info"], expand=True))
+    #console.print(Panel(info_table, title="📦 Detail Paket", border_style=theme["border_info"], expand=True))
+    console.print(Panel(
+        detail,
+        title=f"[{theme['text_title']}]📦 Detail Paket[/]",
+        border_style=theme["border_info"],
+        expand=True
+    ))
 
     # Benefit Paket
     benefits = option.get("benefits", [])
@@ -137,7 +143,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     console.print(Panel(
         detail,
         title=f"[{theme['text_title']}]📜 Syarat & Ketentuan[/]",
-        border_style=theme["border_info"],
+        border_style=theme["border_warning"],
         expand=True
     ))
 
