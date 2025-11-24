@@ -81,7 +81,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
     #console.print(Panel(info_table, title="📦 Detail Paket", border_style=theme["border_info"], expand=True))
     console.print(Panel(
-        detail,
+        info_table,
         title=f"[{theme['text_title']}]📦 Detail Paket[/]",
         border_style=theme["border_info"],
         expand=True
