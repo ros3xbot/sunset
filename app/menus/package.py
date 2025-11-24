@@ -140,10 +140,10 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
 
     # Navigasi Pembelian
-    console.print(Panel(nav_table, title="🛒 Opsi Pembelian", border_style=theme["border_primary"], expand=True))
+    console.print(Panel(nav_table, title=f"[{get_theme_style('text_title')}]🛒 Opsi Pembelian[/]", border_style=theme["border_primary"], expand=True))
 
     # Input pilihan
-    choice = console.input(f"[{theme['text_title']}]Pilihan:[/{theme['text_title']}] ").strip()
+    choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
     if choice == "00":
         return False
