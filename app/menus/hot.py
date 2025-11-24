@@ -208,6 +208,14 @@ def show_hot_menu2():
 
             # Panel ringkas detail paket terpilih (name/price/detail)
             clear_screen()
+            console.print(Panel(
+                Align.center(f"📦 {selected_package['name']}", vertical="middle"),
+                border_style=theme["border_info"],
+                padding=(1, 2),
+                expand=True
+            ))
+            simple_number()
+
             info_text = Text()
             info_text.append(f"{selected_package['name']}\n", style="bold")
 
@@ -247,67 +255,7 @@ def show_hot_menu2():
 
             payment_for_from_detail = main_package_detail["package_family"]["payment_for"]
 
-            # Build text untuk panel main details
-            main_text = Text()
-            main_text.append("Main Package Details\n", style="bold")
-            main_text.append(f"Nama: {title}\n", style=theme["text_body"])
-
-            harga_main_str = get_rupiah(price) if isinstance(price, (int, float)) else str(price)
-            main_text.append(f"Harga: Rp {harga_main_str}\n", style=theme["text_money"])
-
-            main_text.append(f"Payment For: {payment_for_from_detail}\n", style=theme["text_body"])
-            main_text.append(f"Masa Aktif: {validity}\n", style=theme["text_body"])
-            main_text.append(f"Point: {main_package_detail['package_option']['point']}\n", style=theme["text_body"])
-            main_text.append(f"Plan Type: {main_package_detail['package_family']['plan_type']}\n", style=theme["text_body"])
-            main_text.append("-" * 32 + "\n", style=theme["text_sub"])
-            main_text.append(f"Family Code: {family_code}\n", style=theme["text_body"])
-            main_text.append(f"Parent Code (for addon/dummy): {parent_code}\n", style=theme["text_body"])
-
-            # Benefits (format dan konversi meniru file ke-2)
-            benefits = main_package_detail["package_option"].get("benefits", [])
-            if benefits and isinstance(benefits, list):
-                main_text.append("\nBenefits:\n", style="bold")
-                for benefit in benefits:
-                    main_text.append("-" * 32 + "\n", style=theme["text_sub"])
-                    main_text.append(f" Name: {benefit['name']}\n", style=theme["text_body"])
-                    main_text.append(f"  Item id: {benefit['item_id']}\n", style=theme["text_body"])
-
-                    data_type = benefit["data_type"]
-                    total = benefit.get("total", 0)
-
-                    if data_type == "VOICE" and total > 0:
-                        # Menjaga perilaku: total/60 menit
-                        main_text.append(f"  Total: {total/60} menit\n", style=theme["text_body"])
-                    elif data_type == "TEXT" and total > 0:
-                        main_text.append(f"  Total: {total} SMS\n", style=theme["text_body"])
-                    elif data_type == "DATA" and total > 0:
-                        quota = int(total)
-                        quota_formatted = format_quota_byte(quota)
-                        main_text.append(f"  Total: {quota_formatted} ({data_type})\n", style=theme["text_body"])
-                    elif data_type not in ["DATA", "VOICE", "TEXT"]:
-                        main_text.append(f"  Total: {total} ({data_type})\n", style=theme["text_body"])
-
-                    if benefit.get("is_unlimited"):
-                        main_text.append("  Unlimited: Yes\n", style=theme["text_body"])
-
-            console.print(Panel(
-                main_text,
-                border_style=theme["border_primary"],
-                padding=(1, 2),
-                expand=True
-            ))
-
-            # SnK MyXL (detail_tnc)
-            tnc_text = Text()
-            tnc_text.append("SnK MyXL:\n", style="bold")
-            tnc_text.append(f"{detail_tnc}\n", style=theme["text_body"])
-            console.print(Panel(
-                tnc_text,
-                border_style=theme["border_info"],
-                padding=(1, 2),
-                expand=True
-            ))
-
+            
             # Ambil parameter pembayaran dari selected_package (dipertahankan)
             payment_for = selected_package.get("payment_for", "BUY_PACKAGE")
             ask_overwrite = selected_package.get("ask_overwrite", False)
