@@ -193,7 +193,7 @@ def purchase_by_family(
             return False
         
         balance_threshold = decoy_package_detail["package_option"]["price"]
-        console.print(f"[{theme['text_warning']}]Pastikan sisa balance KURANG DARI Rp{balance_threshold}![/]")
+        console.print(f"[{theme['text_warn']}]Pastikan sisa balance KURANG DARI Rp{balance_threshold}![/]")
         balance_answer = console.input("Apakah anda yakin ingin melanjutkan pembelian? (y/n): ").strip().lower()
         if balance_answer != "y":
             print_panel("ℹ️ Info", "Pembelian dibatalkan oleh user.")
@@ -379,7 +379,7 @@ def purchase_n_times(
             return False
         
         balance_threshold = decoy_package_detail["package_option"]["price"]
-        console.print(f"[{theme['text_warning']}]Pastikan sisa balance KURANG DARI Rp{balance_threshold}![/]")
+        console.print(f"[{theme['text_warn']}]Pastikan sisa balance KURANG DARI Rp{balance_threshold}![/]")
         balance_answer = console.input("Apakah anda yakin ingin melanjutkan pembelian? (y/n): ").strip().lower()
         if balance_answer != "y":
             print_panel("ℹ️ Info", "Pembelian dibatalkan oleh user.")
@@ -555,7 +555,7 @@ def purchase_n_times_by_option_code(
             return False
         
         balance_threshold = decoy_package_detail["package_option"]["price"]
-        console.print(f"[{theme['text_warning']}]Pastikan sisa balance KURANG DARI Rp{balance_threshold}![/]")
+        console.print(f"[{theme['text_warn']}]Pastikan sisa balance KURANG DARI Rp{balance_threshold}![/]")
         balance_answer = console.input("Apakah anda yakin ingin melanjutkan pembelian? (y/n): ").strip().lower()
         if balance_answer != "y":
             print_panel("ℹ️ Info", "Pembelian dibatalkan oleh user.")
