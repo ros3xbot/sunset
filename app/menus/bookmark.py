@@ -45,7 +45,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
             label = f"{bm['family_name']} - {bm['variant_name']} - {bm['option_name']}"
             table.add_row(str(idx + 1), label)
 
-        console.print(Panel(table, border_style=theme["border_info"], expand=True))
+        console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
 
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
