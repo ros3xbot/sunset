@@ -39,8 +39,6 @@ def show_notification_menu():
             pause()
             return
 
-        #console.rule(f"[{theme['text_title']}]📢 Notifications[/]")
-
         unread_count = 0
         for idx, notification in enumerate(notifications, start=1):
             is_read = notification.get("is_read", False)
@@ -70,10 +68,13 @@ def show_notification_menu():
                 expand=True
             ))
 
-        console.print(f"[{theme['text_title']}]Total: {len(notifications)} | Unread: {unread_count}[/]")
+        # Total & Unread
+        console.print(
+            f"[{theme['text_title']}]Total: {len(notifications)}[/] | "
+            f"[{theme['text_err']}]Unread: {unread_count}[/]"
+        )
 
         # Navigasi konsisten
-        #console.rule(f"[{theme['text_title']}]🔧 Menu[/]")
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
@@ -83,7 +84,6 @@ def show_notification_menu():
 
         console.print(Panel(
             nav_table,
-            #title=f"[{theme['text_title']}]🔧 Menu[/]",
             border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
