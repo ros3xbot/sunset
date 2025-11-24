@@ -45,7 +45,6 @@ from app.menus.theme import show_theme_menu
 #from app.config.theme_config import get_theme, get_theme_style
 from app.config.cache import get_cache, set_cache, clear_cache
 
-console = Console()
 
 
 def show_main_menu(profile: dict, display_quota: str, segments: dict):
