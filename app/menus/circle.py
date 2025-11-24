@@ -15,15 +15,12 @@ from app.client.circle import (
 from app.client.encrypt import decrypt_circle_msisdn
 
 
-WIDTH = 55
-
-
 def show_circle_creation(api_key: str, tokens: dict):
     clear_screen()
     theme = get_theme()
 
     console.print(Panel(
-        Align.center("Create a new Circle", vertical="middle"),
+        Align.center(" Create a new Circle", vertical="middle"),
         border_style=theme["border_info"],
         padding=(1, 2),
         expand=True
@@ -215,7 +212,6 @@ def show_circle_info(api_key: str, tokens: dict):
         spend = spending_data.get("spend", 0)
         target = spending_data.get("target", 0)
 
-        # Header Circle
         header_text = Text()
         header_text.append(f"Circle: {group_name}\n", style="bold")
         header_text.append(f"Owner: {owner_name} {parrent_msisdn}\n", style=theme["text_body"])
@@ -224,7 +220,7 @@ def show_circle_info(api_key: str, tokens: dict):
 
         console.print(Panel(header_text, border_style=theme["border_primary"], expand=True))
 
-        # Tabel Members (vertikal agar muat di layar kecil)
+        # Tampilkan member secara vertikal agar muat di layar kecil
         for idx, m in enumerate(members, start=1):
             msisdn = decrypt_circle_msisdn(api_key, m.get("msisdn", "")) or "<No Number>"
             me_mark = " (You)" if str(msisdn) == str(my_msisdn) else ""
@@ -236,10 +232,10 @@ def show_circle_info(api_key: str, tokens: dict):
 
             member_text = Text()
             member_text.append(f"{idx}. {m.get('member_name','N/A')} {me_mark}\n", style="bold")
-            member_text.append(f"MSISDN: {msisdn}\n", style=theme["border_warning"])
+            member_text.append(f"MSISDN: {msisdn}\n", style=theme["text_body"])
             member_text.append(f"Role: {role}\n", style=theme["text_body"])
-            member_text.append(f"Joined: {joined_str}\n", style=theme["border_info"])
-            member_text.append(f"Slot: {m.get('slot_type','N/A')}\n", style=theme["text_body"])
+            member_text.append(f"Joined: {joined_str}\n", style=theme["text_sub"])
+            member_text.append(f"Slot: {m.get('slot_type','N/A')}\n", style=theme["text_sub"])
             member_text.append(f"Status: {m.get('status','N/A')}\n", style=theme["text_sub"])
             member_text.append(f"Usage: {usage_str}\n", style=theme["text_body"])
 
@@ -347,4 +343,3 @@ def show_circle_info(api_key: str, tokens: dict):
 
         elif choice == "2":
             show_bonus_list(api_key, tokens, parent_subs_id, group_id)
-
