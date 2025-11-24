@@ -46,7 +46,7 @@ def show_transaction_history(api_key, tokens):
                 t.add_row("Status Transaksi", transaction.get("status", "-"))
                 t.add_row("Status Pembayaran", transaction.get("payment_status", "-"))
 
-                console.print(Panel(t, title=f"🧾 Transaksi #{idx}", border_style=theme["border_success"], expand=True))
+                console.print(Panel(t, title=f"🧾 Transaksi #{idx}", border_style=theme["border_info"], expand=True))
 
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
@@ -54,7 +54,7 @@ def show_transaction_history(api_key, tokens):
         nav_table.add_row("0", "Refresh")
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke Menu Utama[/]")
 
-        console.print(Panel(nav_table, border_style=theme["border_info"], expand=True))
+        console.print(Panel(nav_table, border_style=theme["border_primary"], expand=True))
 
         choice = console.input(f"[{theme['text_sub']}]Pilih opsi:[/{theme['text_sub']}] ").strip()
         if choice == "0":
