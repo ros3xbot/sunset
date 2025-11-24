@@ -17,7 +17,7 @@ def show_notification_menu():
     while in_notification_menu:
         clear_screen()
         console.print(Panel(
-            Align.center("📩 Fetching notifications...", vertical="middle"),
+            Align.center("📢 Notifications", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -39,7 +39,7 @@ def show_notification_menu():
             pause()
             return
 
-        console.rule(f"[{theme['text_title']}]📢 Notifications[/]")
+        #console.rule(f"[{theme['text_title']}]📢 Notifications[/]")
 
         unread_count = 0
         for idx, notification in enumerate(notifications, start=1):
