@@ -116,210 +116,83 @@ def show_hot_menu2():
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
 
-    in_hot_menu = True
-    while in_hot_menu:
+    while True:
         clear_screen()
         console.print(Panel(
-            Align.center("🔥 Paket Hot 2 🔥", vertical="middle"),
+            Align.center("🔥 Paket Hot Promo-2 🔥", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
-        simple_number()
 
         try:
-            with open("hot_data/hot2.json", "r", encoding="utf-8") as f:
-                hot_packages = json.load(f)
-        except Exception as e:
-            print_panel("❌ Error", f"Gagal memuat hot2.json: {e}")
+            response = requests.get("https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/pg-hot2.json", timeout=30)
+            hot_packages = response.json()
+        except Exception:
+            print_panel("⚠️ Error", "Gagal mengambil data HOT-2 Package.")
             pause()
             return
 
-        # Tabel daftar paket hot2
+        if not hot_packages:
+            print_panel("⚠️ Error", "Tidak ada data paket tersedia.")
+            pause()
+            return
+
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-        table.add_column("No", style=theme["text_key"], width=4, justify="right")
+        table.add_column("No", justify="right", style=theme["text_key"], width=6)
         table.add_column("Nama Paket", style=theme["text_body"])
-        table.add_column("Harga", style=theme["text_money"], justify="right")
+        table.add_column("Harga", justify="right", style=theme["text_money"], width=10)
 
-        for idx, p in enumerate(hot_packages, start=1):
-            formatted_price = get_rupiah(p["price"])
-            table.add_row(str(idx), p["name"], f"{formatted_price}")
+        for idx, p in enumerate(hot_packages):
+            table.add_row(str(idx + 1), p["name"], get_rupiah(p["price"]))
 
-        console.print(Panel(
-            table,
-            border_style=theme["border_info"],
-            padding=(0, 0),
-            expand=True
-        ))
+        console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
 
-        # Navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-        nav_table.add_column(justify="right", style=theme["text_key"], width=6)
+        nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
-        console.print(Panel(
-            nav_table,
-            border_style=theme["border_primary"],
-            expand=True
-        ))
+        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
 
-        choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
-            in_hot_menu = False
-            return None
+            return
 
         if choice.isdigit() and 1 <= int(choice) <= len(hot_packages):
             selected_package = hot_packages[int(choice) - 1]
             packages = selected_package.get("packages", [])
             if not packages:
-                print_panel("ℹ️ Info", "Paket tidak tersedia.")
+                print_panel("⚠️ Error", "Paket tidak tersedia.")
                 pause()
                 continue
 
-            # Ambil detail paket utama
-            package = get_package_details(
-                api_key,
-                tokens,
-                packages[0]["family_code"],
-                packages[0]["variant_code"],
-                packages[0]["order"],
-                packages[0]["is_enterprise"],
-                packages[0]["migration_type"],
-            )
-            if not package:
-                print_panel("⚠️ Error", "Gagal memuat detail paket.")
-                pause()
-                continue
-
-            # Ekstrak field utama
-            option = package.get("package_option", {})
-            family = package.get("package_family", {})
-            variant = package.get("package_detail_variant", {})
-
-            price = option.get("price", 0)
-            formatted_price = get_rupiah(price)
-            validity = option.get("validity", "-")
-            point = option.get("point", "-")
-            plan_type = family.get("plan_type", "-")
-            payment_for = family.get("payment_for", "") or "BUY_PACKAGE"
-            detail = display_html(option.get("tnc", ""))
-
-            option_name = option.get("name", "")
-            family_name = family.get("name", "")
-            variant_name = variant.get("name", "")
-            title = f"{family_name} - {variant_name} - {option_name}".strip()
-
-            family_code = family.get("package_family_code", "")
-            parent_code = package.get("package_addon", {}).get("parent_code", "") or "N/A"
-
-            # Base payment item
-            payment_items = [
-                PaymentItem(
-                    item_code=option.get("package_option_code", ""),
-                    product_type="",
-                    item_price=price,
-                    item_name=f"{variant_name} {option_name}".strip(),
-                    tax=0,
-                    token_confirmation=package.get("token_confirmation", ""),
+            payment_items = []
+            for package in packages:
+                detail = get_package_details(
+                    api_key,
+                    tokens,
+                    package["family_code"],
+                    package["variant_code"],
+                    package["order"],
+                    package["is_enterprise"],
                 )
-            ]
+                if validate_package_detail(detail):
+                    payment_items.append(PaymentItem(
+                        item_code=detail["package_option"]["package_option_code"],
+                        product_type="",
+                        item_price=detail["package_option"]["price"],
+                        item_name=detail["package_option"]["name"],
+                        tax=0,
+                        token_confirmation=detail["token_confirmation"],
+                    ))
+
+            if not payment_items:
+                print_panel("⚠️ Error", "Gagal memuat data pembayaran. Silakan coba lagi nanti.")
+                pause()
+                continue
 
             clear_screen()
-            console.print(Panel(
-                Align.center(f"📦 {selected_package['name']}", vertical="middle"),
-                border_style=theme["border_info"],
-                padding=(1, 2),
-                expand=True
-            ))
-            simple_number()
-
-            # Panel Info Paket
-            info_table = Table.grid(padding=(0, 1))
-            info_table.add_column(justify="left", style=theme["border_info"])
-            info_table.add_column(justify="left")
-            info_table.add_row("Nama", f": [bold {theme['text_body']}]{title}[/]")
-            info_table.add_row("Harga", f": Rp [{theme['text_money']}]{formatted_price}[/]")
-            info_table.add_row("Masa Aktif", f": [{theme['text_date']}]{validity}[/]")
-            info_table.add_row("Point", f": [{theme['text_body']}]{point}[/]")
-            info_table.add_row("Plan Type", f": [{theme['text_body']}]{plan_type}[/]")
-            info_table.add_row("Payment For", f": [{theme['text_body']}]{payment_for}[/]")
-            info_table.add_row("Family Code", f": [{theme['border_warning']}]{family_code}[/]")
-            info_table.add_row("Parent Code", f": [{theme['text_sub']}]{parent_code}[/]")
-
-            console.print(Panel(
-                info_table,
-                title=f"[{theme['text_title']}]📦 Detail Paket[/]",
-                border_style=theme["border_info"],
-                expand=True
-            ))
-
-            # Benefit Paket
-            benefits = option.get("benefits", [])
-            if benefits:
-                benefit_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-                benefit_table.add_column("Nama", style=theme["text_body"])
-                benefit_table.add_column("Jenis", style=theme["text_body"])
-                benefit_table.add_column("Unli", style=theme["border_info"], justify="center")
-                benefit_table.add_column("Total", style=theme["text_body"], justify="right")
-
-                for b in benefits:
-                    dt = b["data_type"]
-                    total = b["total"]
-                    is_unli = b["is_unlimited"]
-        
-                    if is_unli:
-                        total_str = {"VOICE": "menit", "TEXT": "SMS", "DATA": "kuota"}.get(dt, dt)
-                    else:
-                        if dt == "VOICE":
-                            total_str = f"{total / 60:.0f} menit"
-                        elif dt == "TEXT":
-                            total_str = f"{total} SMS"
-                        elif dt == "DATA":
-                            if total >= 1_000_000_000:
-                                total_str = f"{total / (1024 ** 3):.2f} GB"
-                            elif total >= 1_000_000:
-                                total_str = f"{total / (1024 ** 2):.2f} MB"
-                            elif total >= 1_000:
-                                total_str = f"{total / 1024:.2f} KB"
-                            else:
-                                total_str = f"{total} B"
-                        else:
-                            total_str = f"{total} ({dt})"
-        
-                    benefit_table.add_row(b["name"], dt, "YES" if is_unli else "-", total_str)
-
-                console.print(Panel(
-                    benefit_table,
-                    title=f"[{theme['text_title']}]🎁 Benefit Paket[/]",
-                    border_style=theme["border_success"],
-                    padding=(0, 0),
-                    expand=True
-                ))
-
-            # Syarat & Ketentuan
-            console.print(Panel(
-                detail,
-                title=f"[{theme['text_title']}]📜 Syarat & Ketentuan[/]",
-                border_style=theme["border_warning"],
-                expand=True
-            ))
-
-            payment_for = selected_package.get("payment_for", "BUY_PACKAGE")
-            ask_overwrite = selected_package.get("ask_overwrite", False)
-            overwrite_amount = selected_package.get("overwrite_amount", -1)
-            token_confirmation_idx = selected_package.get("token_confirmation_idx", 0)
-            amount_idx = selected_package.get("amount_idx", -1)
-
-            # Panel Info Paket utama
-            console.print(Panel(
-                Align.center(f"📦 {selected_package['name']}", vertical="middle"),
-                border_style=theme["border_info"],
-                padding=(1, 2),
-                expand=True
-            ))
-            simple_number()
-
             info_text = Text()
             info_text.append(f"{selected_package['name']}\n", style="bold")
             info_text.append(f"Harga: Rp {get_rupiah(selected_package['price'])}\n", style=theme["text_money"])
@@ -336,90 +209,47 @@ def show_hot_menu2():
                 padding=(1, 2),
                 expand=True
             ))
-            
 
-            # Navigasi Pembelian
-            nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-            nav_table.add_column(justify="right", style=theme["text_key"], width=6)
-            nav_table.add_column(style=theme["text_body"])
-            nav_table.add_row("1", "💰 Beli dengan Pulsa")
-            nav_table.add_row("2", "💳 E-Wallet")
-            nav_table.add_row("3", "📱 QRIS")
-            nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
+            while True:
+                method_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+                method_table.add_column(justify="right", style=theme["text_key"], width=6)
+                method_table.add_column(style=theme["text_body"])
+                method_table.add_row("1", "Balance")
+                method_table.add_row("2", "E-Wallet")
+                method_table.add_row("3", "QRIS")
+                method_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
 
-            console.print(Panel(
-                nav_table,
-                title=f"[{theme['text_title']}]🛒 Opsi Pembelian[/]",
-                border_style=theme["border_primary"],
-                expand=True
-            ))
+                console.print(Panel(
+                    method_table,
+                    title=f"[{theme['text_title']}]💳 Pilih Metode Pembayaran[/]",
+                    border_style=theme["border_primary"],
+                    padding=(0, 1),
+                    expand=True
+                ))
 
-            # Input pilihan
-            input_method = console.input(
-                f"[{theme['text_sub']}]Pilih metode (nomor):[/{theme['text_sub']}] "
-            ).strip()
-
-            if input_method == "1":
-                if overwrite_amount == -1:
-                    print_panel("⚠️ Warning",
-                                f"Pastikan sisa balance KURANG DARI Rp{payment_items[-1].item_price}!!!")
-                    balance_answer = console.input("Apakah anda yakin ingin melanjutkan pembelian? (y/n): ").strip().lower()
-                    if balance_answer != "y":
-                        print_panel("ℹ️ Info", "Pembelian dibatalkan oleh user.")
+                method = console.input(f"[{theme['text_sub']}]Pilih metode:[/{theme['text_sub']}] ").strip()
+                if method == "1":
+                    confirm = console.input(f"[{theme['text_sub']}]Pastikan balance cukup. Lanjutkan pembelian? (y/n):[/{theme['text_sub']}] ").strip().lower()
+                    if confirm != "y":
+                        print_panel("ℹ️ Info", "Pembelian dibatalkan oleh pengguna.")
                         pause()
-                        in_payment_menu = False
-                        continue
-
-                settlement_balance(
-                    api_key,
-                    tokens,
-                    payment_items,
-                    payment_for,
-                    ask_overwrite,
-                    overwrite_amount=overwrite_amount,
-                    token_confirmation_idx=token_confirmation_idx,
-                    amount_idx=amount_idx,
-                )
-                pause()
-                in_payment_menu = False
-                in_bookmark_menu = False
-                continue
-
-            elif input_method == "2":
-                show_multipayment(
-                    api_key,
-                    tokens,
-                    payment_items,
-                    payment_for,
-                    ask_overwrite,
-                    overwrite_amount,
-                    token_confirmation_idx,
-                    amount_idx,
-                )
-                pause()
-                in_payment_menu = False
-                in_bookmark_menu = False
-
-            elif input_method == "3":
-                show_qris_payment(
-                    api_key,
-                    tokens,
-                    payment_items,
-                    payment_for,
-                    ask_overwrite,
-                    overwrite_amount,
-                    token_confirmation_idx,
-                    amount_idx,
-                )
-                pause()
-                in_payment_menu = False
-                in_bookmark_menu = False
-
-            elif input_method == "00":
-                in_payment_menu = False
-                continue
-
-            else:
-                print_panel("❌ Error", "Metode tidak valid. Silahkan coba lagi.")
-                pause()
-                continue
+                        break
+                    settlement_balance(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+                    return
+                elif method == "2":
+                    show_multipayment(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+                    return
+                elif method == "3":
+                    show_qris_payment(api_key, tokens, payment_items, "BUY_PACKAGE", True)
+                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+                    return
+                elif method == "00":
+                    break
+                else:
+                    print_panel("⚠️ Error", "Metode tidak valid. Silahkan coba lagi.")
+                    pause()
+        else:
+            print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
+            pause()
