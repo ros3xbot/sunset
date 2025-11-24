@@ -304,7 +304,15 @@ def show_hot_menu2():
                 expand=True
             ))
 
+            # Panel Info Paket utama
+            console.print(Panel(
+                Align.center(f"📦 {selected_package['name']}", vertical="middle"),
+                border_style=theme["border_info"],
+                padding=(1, 2),
+                expand=True
+            ))
             simple_number()
+
             info_text = Text()
             info_text.append(f"{selected_package['name']}\n", style="bold")
             info_text.append(f"Harga: Rp {get_rupiah(selected_package['price'])}\n", style=theme["text_money"])
