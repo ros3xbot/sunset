@@ -185,8 +185,8 @@ def show_main_menu2(active_user: dict, profile: dict):
         menu_table.add_row("N", "🔔 Notifikasi")
         menu_table.add_row("R", "📝 Register")
         menu_table.add_row("V", "✅ Validate MSISDN")
-        menu_table.add_row("", "")
-        menu_table.add_row("00", f"[{theme['text_title']}]Kembali ke menu utama[/]")
+        #menu_table.add_row("", "")
+        menu_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             menu_table,
