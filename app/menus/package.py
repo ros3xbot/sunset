@@ -121,10 +121,10 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
   #  # Addons
   #  addons = get_addons(api_key, tokens, package_option_code)
   #  if addons:
-  #      console.print(Panel(json.dumps(addons, indent=2), title="🧩 Addons", border_style=theme["border_info"], expand=True))
+  #      console.print(Panel(json.dumps(addons, indent=2), title="🧩 Addons", border_style=theme["border_warning"], expand=True))
 
     # Syarat & Ketentuan
-    console.print(Panel(detail, title="📜 Syarat & Ketentuan", border_style=theme["border_warning"], expand=True))
+    console.print(Panel(detail, title="📜 Syarat & Ketentuan", border_style=theme["border_info"], expand=True))
 
     # Navigasi Pembelian
     nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
