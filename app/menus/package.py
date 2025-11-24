@@ -59,7 +59,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     parent_code = package.get("package_addon", {}).get("parent_code", "") or "N/A"
 
     console.print(Panel(
-        Align.center(f"📦 {data['package_family']['name']}", vertical="middle"),
+        Align.center(f"📦 {family_name}", vertical="middle"),
         border_style=theme["border_info"],
         padding=(1, 2),
         expand=True
