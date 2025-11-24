@@ -218,12 +218,9 @@ def show_hot_menu2():
 
             info_text = Text()
             info_text.append(f"{selected_package['name']}\n", style="bold")
-
-            harga_selected_str = get_rupiah(selected_package["price"]) if isinstance(selected_package.get("price"), (int, float)) else str(selected_package["price"])
-            info_text.append(f"Harga: Rp {harga_selected_str}\n", style=theme["text_money"])
-
+            info_text.append(f"Harga: Rp {get_rupiah(selected_package['price'])}\n", style=theme["text_money"])
             info_text.append("Detail:\n", style=theme["text_body"])
-            for line in str(selected_package.get("detail", "")).split("\n"):
+            for line in selected_package.get("detail", "").split("\n"):
                 cleaned = line.strip()
                 if cleaned:
                     info_text.append(f"- {cleaned}\n", style=theme["text_body"])
@@ -235,21 +232,6 @@ def show_hot_menu2():
                 padding=(1, 2),
                 expand=True
             ))
-
-            # Panel Main Package Details
-            price = main_package_detail["package_option"]["price"]
-            validity = main_package_detail["package_option"]["validity"]
-            detail_tnc = display_html(main_package_detail["package_option"]["tnc"])
-
-            option_name = main_package_detail.get("package_option", {}).get("name", "")
-            family_name = main_package_detail.get("package_family", {}).get("name", "")
-            variant_name = (main_package_detail.get("package_detail_variant") or {}).get("name", "")
-
-            title = f"{family_name} - {variant_name} - {option_name}".strip()
-
-            family_code = main_package_detail.get("package_family", {}).get("package_family_code", "")
-            parent_code = main_package_detail.get("package_addon", {}).get("parent_code", "") or "N/A"
-            payment_for_from_detail = main_package_detail["package_family"]["payment_for"]
 
             # Ambil parameter pembayaran dari selected_package
             payment_for = selected_package.get("payment_for", "BUY_PACKAGE")
