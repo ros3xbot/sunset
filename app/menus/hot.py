@@ -53,7 +53,12 @@ def show_hot_menu():
         for idx, p in enumerate(hot_packages, start=1):
             table.add_row(str(idx), p["family_name"], p["variant_name"], p["option_name"])
 
-        console.print(table)
+        console.print(Panel(
+            table,
+            #title=f"[{theme['text_title']}]🔥 Daftar Paket Hot[/]",
+            border_style=theme["border_info"],
+            expand=True
+        ))
 
         # Navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -139,7 +144,7 @@ def show_hot_menu2():
 
         console.print(Panel(
             table,
-            title=f"[{theme['text_title']}]🔥 Daftar Paket Hot 2[/]",
+            #title=f"[{theme['text_title']}]🔥 Daftar Paket Hot 2[/]",
             border_style=theme["border_info"],
             expand=True
         ))
@@ -152,7 +157,7 @@ def show_hot_menu2():
 
         console.print(Panel(
             nav_table,
-            title=f"[{theme['text_title']}]🔧 Menu[/]",
+            #title=f"[{theme['text_title']}]🔧 Menu[/]",
             border_style=theme["border_primary"],
             expand=True
         ))
@@ -219,7 +224,8 @@ def show_hot_menu2():
 
             clear_screen()
             console.print(Panel(
-                Align.center(f"📦 {family_name}", vertical="middle"),
+                #Align.center(f"📦 {family_name}", vertical="middle"),
+                Align.center(f"📦{selected_package['name']} - Rp {selected_package['price']}", vertical="middle"),
                 border_style=theme["border_info"],
                 padding=(1, 2),
                 expand=True
