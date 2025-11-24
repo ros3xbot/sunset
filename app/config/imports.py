@@ -7,6 +7,7 @@ from rich.align import Align
 from rich.box import MINIMAL_DOUBLE_HEAD
 
 # Utilitas internal
+from app.config.theme_config import get_theme
 from app.menus.util import (
     clear_screen,
     pause,
@@ -30,6 +31,7 @@ console = Console()
 
 # __all__ untuk kontrol import *
 __all__ = [
+    "get_theme",
     "console",
     "Panel",
     "Table",
