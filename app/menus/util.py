@@ -11,7 +11,7 @@ from rich.align import Align
 from rich.padding import Padding
 from rich import box
 
-from app.config.theme import get_theme, get_theme_style
+from app.config.theme_config import get_theme, get_theme_style
 
 console = Console()
 
