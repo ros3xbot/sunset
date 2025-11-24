@@ -126,10 +126,10 @@ def show_hot_menu2():
         ))
 
         try:
-            response = requests.get("https://raw.githubusercontent.com/dratx1/engsel/refs/heads/main/family/pg-hot2.json", timeout=30)
-            hot_packages = response.json()
-        except Exception:
-            print_panel("⚠️ Error", "Gagal mengambil data HOT-2 Package.")
+            with open("hot_data/hot2.json", "r", encoding="utf-8") as f:
+                hot_packages = json.load(f)
+        except Exception as e:
+            print_panel("❌ Error", f"Gagal memuat hot2.json: {e}")
             pause()
             return
 
