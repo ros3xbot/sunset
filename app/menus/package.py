@@ -30,7 +30,6 @@ console = Console()
 def show_package_details(api_key, tokens, package_option_code, is_enterprise, option_order=-1):
     theme = get_theme()
     clear_screen()
-    simple_number()
 
     package = get_package(api_key, tokens, package_option_code)
     if not package:
@@ -58,6 +57,14 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
     family_code = family.get("package_family_code", "")
     parent_code = package.get("package_addon", {}).get("parent_code", "") or "N/A"
+
+    console.print(Panel(
+        Align.center(f"📦 {data['package_family']['name']}", vertical="middle"),
+        border_style=theme["border_info"],
+        padding=(1, 2),
+        expand=True
+    ))
+    simple_number()
 
     # Panel Info Paket
     info_table = Table.grid(padding=(0, 1))
@@ -140,7 +147,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke daftar paket[/]")
 
     # Navigasi Pembelian
-    console.print(Panel(nav_table, title=f"[{get_theme_style('text_title')}]🛒 Opsi Pembelian[/]", border_style=theme["border_primary"], expand=True))
+    console.print(Panel(nav_table, title=f"[{get_theme('text_title')}]🛒 Opsi Pembelian[/]", border_style=theme["border_primary"], expand=True))
 
     # Input pilihan
     choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
