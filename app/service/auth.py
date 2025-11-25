@@ -4,8 +4,6 @@ import time
 from app.client.ciam import get_new_token
 from app.client.engsel import get_profile
 from app.util import ensure_api_key
-from app.menus.util import print_error, print_success, print_warning, print_panel
-from app.config.theme_config import get_theme
 
 
 class Auth:
@@ -46,8 +44,6 @@ class Auth:
             for rt in refresh_tokens:
                 if "number" in rt and "refresh_token" in rt:
                     self.refresh_tokens.append(rt)
-                else:
-                    print_warning("⚠️", f"Invalid token entry: {rt}")
 
     def add_refresh_token(self, number: int, refresh_token: str):
         existing = next((rt for rt in self.refresh_tokens if rt["number"] == number), None)
@@ -56,7 +52,6 @@ class Auth:
         else:
             tokens = get_new_token(self.api_key, refresh_token, "")
             if not tokens:
-                print_error("❌", f"Failed to fetch new token for number {number}")
                 return
             profile_data = get_profile(self.api_key, tokens["access_token"], tokens["id_token"])
             sub_id = profile_data["profile"]["subscriber_id"]
@@ -83,18 +78,15 @@ class Auth:
                 if tokens:
                     self.set_active_user(first_rt["number"])
             else:
-                print_warning("⚠️", "No users left after removal.")
                 self.active_user = None
 
     def set_active_user(self, number: int):
         rt_entry = next((rt for rt in self.refresh_tokens if rt["number"] == number), None)
         if not rt_entry:
-            print_error("❌", f"No refresh token found for number: {number}")
             return False
 
         tokens = get_new_token(self.api_key, rt_entry["refresh_token"], rt_entry.get("subscriber_id", ""))
         if not tokens:
-            print_error("❌", f"Failed to get tokens for number: {number}. Refresh token might be invalid or expired.")
             return False
 
         profile_data = get_profile(self.api_key, tokens["access_token"], tokens["id_token"])
@@ -124,12 +116,7 @@ class Auth:
                 self.active_user["tokens"] = tokens
                 self.last_refresh_time = int(time.time())
                 self.add_refresh_token(self.active_user["number"], self.active_user["tokens"]["refresh_token"])
-                print_success("✅", "Active user token renewed successfully.")
                 return True
-            else:
-                print_error("❌", "Failed to renew active user token.")
-        else:
-            print_error("❌", "No active user set or missing refresh token.")
         return False
 
     def get_active_user(self):
@@ -177,7 +164,6 @@ class Auth:
                 user["name"] = new_name
                 break
         self.write_tokens_to_file()
-        print_success("✅", f"Account name for {number} updated to {new_name}")
 
 
 AuthInstance = Auth()
