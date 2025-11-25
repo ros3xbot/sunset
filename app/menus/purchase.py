@@ -141,8 +141,8 @@ def purchase_loop(
                 choice = console.input("Lanjut Dor? (y/n): ").strip().lower()
                 if choice == 'n':
                     return False
-        else:
-            print_panel("❌ Error", "Purchase tidak berhasil. Cek pesan di atas.")
+        #else:
+            #print_panel("❌ Error", "Purchase tidak berhasil. Cek pesan di atas.")
 
     except Exception as e:
         print_panel("❌ Error", f"Exception saat membuat order: {e}")
