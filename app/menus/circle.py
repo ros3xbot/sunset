@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 from app.config.imports import *
 from app.menus.package import get_packages_by_family, show_package_details
-from app.menus.util import pause, clear_screen, format_quota_byte, live_loading, get_quota ,print_panel
+from app.menus.util import pause, clear_screen, format_quota_byte, live_loading, get_rupiah ,print_panel
 from app.client.circle import (
     get_group_data,
     get_group_members,
