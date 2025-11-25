@@ -1,12 +1,5 @@
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
-
-from app.config.theme_config import get_theme, get_all_presets, set_theme
+from app.config.imports import *
 from app.menus.util import clear_screen, pause, print_panel, simple_number
-from app.service.git import ensure_git
 
 console = Console()
 
