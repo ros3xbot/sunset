@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from app.client.engsel import BASE_API_URL, UA, intercept_page, send_api_request
 from app.client.encrypt import API_KEY, decrypt_xdata, encryptsign_xdata, java_like_timestamp, get_x_signature_payment
 from app.type_dict import PaymentItem
-from app.menus.util import live_loading
+from app.menus.util import live_loading, print_panel
 from app.config.theme_config import get_theme
 
 
@@ -19,7 +19,7 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
                     token_confirmation_idx: int = 0,
                     amount_idx: int = -1,
                     topup_number: str = "",
-                    stage_token: str = "") -> str | None:
+                    stage_token: str = "") -> dict | None:
     if overwrite_amount == -1 and not ask_overwrite:
         return None
 
@@ -57,7 +57,11 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
         payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
 
     if payment_res.get("status") != "SUCCESS":
-        return None
+        return {
+            "status": payment_res.get("status"),
+            "message": payment_res.get("message", ""),
+            "data": payment_res,
+        }
 
     token_payment = payment_res["data"]["token_payment"]
     ts_to_sign = payment_res["data"]["timestamp"]
@@ -137,12 +141,33 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
 
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        if decrypted_body.get("status") != "SUCCESS":
-            return None
+        status = decrypted_body.get("status", "UNKNOWN")
+        message = decrypted_body.get("message", "")
+
+        # ✅ tampilkan status pembayaran
+        print_panel("🧾 Payment Status", f"Status: {status}\nMessage: {message}")
+
+        if status != "SUCCESS":
+            return {
+                "status": status,
+                "message": message,
+                "data": decrypted_body,
+            }
+
         transaction_id = decrypted_body["data"]["transaction_code"]
-        return transaction_id
-    except Exception:
-        return None
+        return {
+            "status": status,
+            "message": message,
+            "transaction_id": transaction_id,
+            "data": decrypted_body,
+        }
+    except Exception as e:
+        print_panel("🧾 Payment Status", f"Status: ERROR\nMessage: Decrypt error: {e}")
+        return {
+            "status": "ERROR",
+            "message": f"Decrypt error: {e}",
+            "data": None,
+        }
 
 
 def get_qris_code(api_key: str, tokens: dict, transaction_id: str) -> str | None:
@@ -165,14 +190,15 @@ def show_qris_payment(api_key: str, tokens: dict, items: list[PaymentItem],
                       amount_idx: int = -1,
                       topup_number: str = "",
                       stage_token: str = "") -> str | None:
-    transaction_id = settlement_qris(api_key, tokens, items, payment_for,
-                                     ask_overwrite, overwrite_amount,
-                                     token_confirmation_idx, amount_idx,
-                                     topup_number, stage_token)
+    settlement_result = settlement_qris(api_key, tokens, items, payment_for,
+                                        ask_overwrite, overwrite_amount,
+                                        token_confirmation_idx, amount_idx,
+                                        topup_number, stage_token)
 
-    if not transaction_id:
+    if not settlement_result or settlement_result.get("status") != "SUCCESS":
         return None
 
+    transaction_id = settlement_result["transaction_id"]
     qris_code = get_qris_code(api_key, tokens, transaction_id)
     if not qris_code:
         return None
