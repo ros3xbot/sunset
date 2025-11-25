@@ -160,5 +160,5 @@ if __name__ == "__main__":
 
     if need_update:
         git_pull_rebase()
-    clear_cache()
+    #clear_cache()
     run_main()
