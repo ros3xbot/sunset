@@ -3,6 +3,7 @@ import sys
 import requests
 
 from app.config.imports import *
+from app.type_dict import PaymentItem
 from app.menus.util import live_loading, clear_screen, pause, display_html, print_panel, get_rupiah, format_quota_byte, nav_range, simple_number
 from app.client.engsel import get_addons, send_api_request, unsubscribe
 from app.client.ciam import get_auth_code
