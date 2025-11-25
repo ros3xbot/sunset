@@ -13,7 +13,7 @@ from app.menus.util import clear_screen    #, pause, print_panel, simple_number
 #from rich.table import Table
 #from rich.box import MINIMAL_DOUBLE_HEAD
 
-#console = Console()
+console = Console()
 
 
 def show_bookmark_menu(return_package_detail: bool = False):
