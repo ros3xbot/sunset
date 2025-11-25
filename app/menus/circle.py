@@ -237,10 +237,10 @@ def show_circle_info(api_key: str, tokens: dict):
 
             member_text = Text()
             member_text.append(f"{idx}. {m.get('member_name','N/A')} {me_mark}\n", style="bold")
-            member_text.append(f"MSISDN: {msisdn}\n", style=theme["text_body"])
+            member_text.append(f"MSISDN: {msisdn}\n", style=theme["border_warning"])
             member_text.append(f"Role: {role}\n", style=theme["text_body"])
-            member_text.append(f"Joined: {joined_str}\n", style=theme["text_sub"])
-            member_text.append(f"Slot: {m.get('slot_type','N/A')}\n", style=theme["text_sub"])
+            member_text.append(f"Joined: {joined_str}\n", style=theme["border_info"])
+            member_text.append(f"Slot: {m.get('slot_type','N/A')}\n", style=theme["text_body"])
             member_text.append(f"Status: {m.get('status','N/A')}\n", style=theme["text_sub"])
             member_text.append(f"Usage: {usage_str}\n", style=theme["text_body"])
 
