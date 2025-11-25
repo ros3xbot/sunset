@@ -1,7 +1,7 @@
 import json
 import os
 from app.client.engsel import send_api_request
-from app.menus.util import live_loading, print_error, print_success, print_panel
+from app.menus.util import live_loading
 from app.config.theme_config import get_theme
 
 BASE_API_URL = os.getenv("BASE_API_URL")
@@ -26,9 +26,6 @@ def get_payment_methods(api_key: str, tokens: dict,
         payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
 
     if not payment_res or payment_res.get("status") != "SUCCESS":
-        print_error("❌", "Failed to fetch payment methods.")
-        print_panel("📑 Response", json.dumps(payment_res, indent=2))
         return None
 
-    print_success("✅", "Payment methods fetched successfully")
     return payment_res.get("data")
