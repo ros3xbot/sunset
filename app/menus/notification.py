@@ -1,21 +1,16 @@
+from app.config.imports import *
 from app.menus.util import clear_screen, pause, print_panel, simple_number, live_loading
 from app.client.engsel import get_notification_detail, dashboard_segments
-from app.config.theme_config import get_theme
-from app.service.auth import AuthInstance
-from rich.console import Console
-from rich.panel import Panel
-from rich.text import Text
-from rich.table import Table
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
 
 console = Console()
+
 
 def show_notification_menu():
     theme = get_theme()
     in_notification_menu = True
     while in_notification_menu:
         clear_screen()
+        ensure_git()
         console.print(Panel(
             Align.center("📢 Notifications", vertical="middle"),
             border_style=theme["border_info"],
@@ -27,7 +22,6 @@ def show_notification_menu():
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
 
-        # Pakai live_loading saat memuat notifikasi
         with live_loading("🔄 Mengambil notifikasi...", theme):
             notifications_res = dashboard_segments(api_key, tokens)
 
@@ -71,13 +65,11 @@ def show_notification_menu():
                 expand=True
             ))
 
-        # Total & Unread dengan warna
         console.print(
             f"[{theme['text_title']}]Total: {len(notifications)}[/] | "
             f"[{theme['text_err']}]Unread: {unread_count}[/]"
         )
 
-        # Navigasi konsisten
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
