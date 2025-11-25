@@ -2,6 +2,9 @@ from datetime import datetime, timedelta
 
 from app.client.engsel import get_transaction_history
 from app.config.imports import *
+from app.menus.util import clear_screen, pause, print_panel
+
+console = Console()
 
 
 def show_transaction_history(api_key, tokens):
