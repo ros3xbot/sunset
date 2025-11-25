@@ -6,7 +6,7 @@ import requests
 from urllib.parse import urlparse
 from datetime import datetime, timezone, timedelta
 
-from app.menus.util import live_loading
+from app.menus.util import live_loading, print_panel
 from app.config.theme_config import get_theme
 from app.client.encrypt import (
     java_like_timestamp,
@@ -251,6 +251,16 @@ def get_auth_code(tokens: dict, pin: str, msisdn: str) -> str | None:
         return None
 
     status = data.get("status", "")
+    message = data.get("message", "")
+
+    # ✅ tampilkan status dengan warna
+    if status == "Success":
+        colored_status = f"\033[92m{status}\033[0m"  # hijau
+    else:
+        colored_status = f"\033[91m{status}\033[0m"  # merah
+
+    print_panel("🔐 Auth Code Status", f"Status: {colored_status}\nMessage: {message}")
+
     if status != "Success":
         return None
 
