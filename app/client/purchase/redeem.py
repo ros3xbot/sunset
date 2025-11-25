@@ -15,7 +15,7 @@ from app.client.encrypt import (
     get_x_signature_bounty,
     get_x_signature_bounty_allotment,
 )
-from app.menus.util import live_loading
+from app.menus.util import live_loading, print_panel
 from app.config.theme_config import get_theme
 
 BASE_API_URL = os.getenv("BASE_API_URL")
@@ -74,11 +74,22 @@ def settlement_bounty(api_key: str, tokens: dict,
 
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        if decrypted_body.get("status") != "SUCCESS":
-            return None
-        return decrypted_body
-    except Exception:
-        return None
+        status = decrypted_body.get("status", "UNKNOWN")
+        message = decrypted_body.get("message", "")
+
+        print_panel("🧾 Bounty Status", f"Status: {status}\nMessage: {message}")
+        return {
+            "status": status,
+            "message": message,
+            "data": decrypted_body
+        }
+    except Exception as e:
+        print_panel("🧾 Bounty Status", f"Status: ERROR\nMessage: Decrypt error: {e}")
+        return {
+            "status": "ERROR",
+            "message": f"Decrypt error: {e}",
+            "data": None
+        }
 
 
 def settlement_loyalty(api_key: str, tokens: dict,
@@ -121,11 +132,22 @@ def settlement_loyalty(api_key: str, tokens: dict,
 
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        if decrypted_body.get("status") != "SUCCESS":
-            return None
-        return decrypted_body
-    except Exception:
-        return None
+        status = decrypted_body.get("status", "UNKNOWN")
+        message = decrypted_body.get("message", "")
+
+        print_panel("🏆 Loyalty Status", f"Status: {status}\nMessage: {message}")
+        return {
+            "status": status,
+            "message": message,
+            "data": decrypted_body
+        }
+    except Exception as e:
+        print_panel("🏆 Loyalty Status", f"Status: ERROR\nMessage: Decrypt error: {e}")
+        return {
+            "status": "ERROR",
+            "message": f"Decrypt error: {e}",
+            "data": None
+        }
 
 
 def bounty_allotment(api_key: str, tokens: dict,
@@ -171,8 +193,19 @@ def bounty_allotment(api_key: str, tokens: dict,
 
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        if decrypted_body.get("status") != "SUCCESS":
-            return None
-        return decrypted_body
-    except Exception:
-        return None
+        status = decrypted_body.get("status", "UNKNOWN")
+        message = decrypted_body.get("message", "")
+
+        print_panel("🎁 Bounty Allotment Status", f"Status: {status}\nMessage: {message}")
+        return {
+            "status": status,
+            "message": message,
+            "data": decrypted_body
+        }
+    except Exception as e:
+        print_panel("🎁 Bounty Allotment Status", f"Status: ERROR\nMessage: Decrypt error: {e}")
+        return {
+            "status": "ERROR",
+            "message": f"Decrypt error: {e}",
+            "data": None
+        }
