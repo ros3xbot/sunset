@@ -1,11 +1,8 @@
 import requests, time
 from random import randint
-from app.client.engsel import get_family, get_package_details, get_package
-from app.service.auth import AuthInstance
-from app.service.decoy import DecoyInstance
-from app.type_dict import PaymentItem
+
+from app.config.imports import *
 from app.client.purchase.balance import settlement_balance
-from app.config.theme_config import get_theme
 from app.menus.util import (
     clear_screen,
     pause,
@@ -15,12 +12,6 @@ from app.menus.util import (
     simple_number,
     format_quota_byte
 )
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
 
 console = Console()
 
@@ -33,10 +24,10 @@ def purchase_loop(
     pause_on_success: bool = False,
 ):
     theme = get_theme()
+    ensure_git()
     api_key = AuthInstance.api_key
     tokens: dict = AuthInstance.get_active_tokens() or {}
 
-    # 1. Cari variant & option sesuai order
     family_data = get_family(api_key, tokens, family_code)
     if not family_data:
         print_panel("❌ Error", f"Gagal mengambil data family untuk kode: {family_code}.")
@@ -66,7 +57,6 @@ def purchase_loop(
     console.print("-"*55)
     console.print(f"[{theme['text_title']}]Mencoba beli: {target_variant['name']} - {order}. {option_name} - Rp{option_price}[/]")
 
-    # 2. Decoy logic
     decoy_package_detail = None
     if use_decoy:
         decoy = DecoyInstance.get_decoy("balance")
@@ -76,7 +66,6 @@ def purchase_loop(
             pause()
             return False
 
-    # 3. Ambil detail package target
     try:
         target_package_detail = get_package_details(
             api_key,
@@ -92,7 +81,6 @@ def purchase_loop(
         time.sleep(delay)
         return True  # lanjut loop
 
-    # 4. Susun payment items
     payment_items = [
         PaymentItem(
             item_code=target_package_detail["package_option"]["package_option_code"],
@@ -116,7 +104,6 @@ def purchase_loop(
             )
         )
 
-    # 5. Settlement
     overwrite_amount = target_package_detail["package_option"]["price"]
     if use_decoy and decoy_package_detail:
         overwrite_amount += decoy_package_detail["package_option"]["price"]
@@ -159,7 +146,6 @@ def purchase_loop(
     except Exception as e:
         print_panel("❌ Error", f"Exception saat membuat order: {e}")
 
-    # 6. Delay loop
     if delay > 0:
         for i in range(delay, 0, -1):
             console.print(f"[{theme['text_sub']}]Menunggu {i} detik...[/]", end="\r")
@@ -177,13 +163,13 @@ def purchase_by_family(
     start_from_option: int = 1,
 ):
     theme = get_theme()
+    ensure_git()
     active_user = AuthInstance.get_active_user()
     subscription_type = active_user.get("subscription_type", "")
     
     api_key = AuthInstance.api_key
     tokens: dict = AuthInstance.get_active_tokens() or {}
-    
-    # Jika pakai decoy
+
     if use_decoy:
         decoy = DecoyInstance.get_decoy("balance")
         decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
@@ -199,8 +185,7 @@ def purchase_by_family(
             print_panel("ℹ️ Info", "Pembelian dibatalkan oleh user.")
             pause()
             return None
-    
-    # Ambil data family
+
     family_data = get_family(api_key, tokens, family_code)
     if not family_data:
         print_panel("❌ Error", f"Gagal mengambil data family untuk kode: {family_code}.")
@@ -259,8 +244,7 @@ def purchase_by_family(
                 print_panel("❌ Error", f"Exception saat mengambil detail paket: {e}")
                 console.print(f"Gagal ambil detail untuk {variant_name} - {option_name}. Melewati.")
                 continue
-            
-            # Tambahkan item utama
+
             payment_items.append(
                 PaymentItem(
                     item_code=target_package_detail["package_option"]["package_option_code"],
@@ -271,8 +255,7 @@ def purchase_by_family(
                     token_confirmation=target_package_detail["token_confirmation"],
                 )
             )
-            
-            # Tambahkan decoy jika perlu
+
             if use_decoy:
                 payment_items.append(
                     PaymentItem(
@@ -339,8 +322,7 @@ def purchase_by_family(
             if delay_seconds > 0 and should_delay:
                 console.print(f"[{theme['text_sub']}]Menunggu {delay_seconds} detik sebelum pembelian berikutnya...[/]")
                 time.sleep(delay_seconds)
-                
-    # Ringkasan hasil
+
     console.print(f"[{theme['text_title']}]Family: {family_name}[/]")
     console.print(f"Successful: {len(successful_purchases)}")
     if successful_purchases:
@@ -363,13 +345,13 @@ def purchase_n_times(
     token_confirmation_idx: int = 0,
 ):
     theme = get_theme()
+    ensure_git()
     active_user = AuthInstance.get_active_user()
     subscription_type = active_user.get("subscription_type", "")
     
     api_key = AuthInstance.api_key
     tokens: dict = AuthInstance.get_active_tokens() or {}
-    
-    # Jika pakai decoy
+
     if use_decoy:
         decoy = DecoyInstance.get_decoy("balance")
         decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
@@ -385,8 +367,7 @@ def purchase_n_times(
             print_panel("ℹ️ Info", "Pembelian dibatalkan oleh user.")
             pause()
             return None
-    
-    # Ambil data family
+
     family_data = get_family(api_key, tokens, family_code)
     if not family_data:
         print_panel("❌ Error", f"Gagal mengambil data family untuk kode: {family_code}.")
@@ -442,8 +423,7 @@ def purchase_n_times(
             print_panel("❌ Error", f"Exception saat mengambil detail paket: {e}")
             console.print(f"Gagal ambil detail untuk {target_variant['name']} - {option_name}. Melewati.")
             continue
-        
-        # Tambahkan item utama
+
         payment_items.append(
             PaymentItem(
                 item_code=target_package_detail["package_option"]["package_option_code"],
@@ -454,8 +434,7 @@ def purchase_n_times(
                 token_confirmation=target_package_detail["token_confirmation"],
             )
         )
-        
-        # Tambahkan decoy jika perlu
+
         if use_decoy:
             payment_items.append(
                 PaymentItem(
@@ -517,7 +496,6 @@ def purchase_n_times(
             console.print(f"[{theme['text_sub']}]Menunggu {delay_seconds} detik sebelum pembelian berikutnya...[/]")
             time.sleep(delay_seconds)
 
-    # Ringkasan hasil
     console.print(f"[{theme['text_title']}]Total pembelian sukses {len(successful_purchases)}/{n}[/]")
     console.print(f"Family: {family_name}\nVariant: {target_variant['name']}\nOption: {option_order}. {option_name} - Rp{option_price}")
     if successful_purchases:
@@ -539,13 +517,13 @@ def purchase_n_times_by_option_code(
     token_confirmation_idx: int = 0,
 ):
     theme = get_theme()
+    ensure_git()
     active_user = AuthInstance.get_active_user()
     subscription_type = active_user.get("subscription_type", "")
     
     api_key = AuthInstance.api_key
     tokens: dict = AuthInstance.get_active_tokens() or {}
-    
-    # Jika pakai decoy, cek dulu
+
     if use_decoy:
         decoy = DecoyInstance.get_decoy("balance")
         decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
@@ -585,8 +563,7 @@ def purchase_n_times_by_option_code(
         except Exception as e:
             print_panel("❌ Error", f"Exception saat mengambil detail paket: {e}")
             continue
-        
-        # Tambahkan item utama
+
         payment_items.append(
             PaymentItem(
                 item_code=target_package_detail["package_option"]["package_option_code"],
@@ -597,8 +574,7 @@ def purchase_n_times_by_option_code(
                 token_confirmation=target_package_detail["token_confirmation"],
             )
         )
-        
-        # Tambahkan decoy jika perlu
+
         if use_decoy:
             payment_items.append(
                 PaymentItem(
@@ -660,7 +636,6 @@ def purchase_n_times_by_option_code(
             console.print(f"[{theme['text_sub']}]Menunggu {delay_seconds} detik sebelum pembelian berikutnya...[/]")
             time.sleep(delay_seconds)
 
-    # Ringkasan hasil
     console.print(f"[{theme['text_title']}]Total pembelian sukses {len(successful_purchases)}/{n}[/]")
     if successful_purchases:
         console.print("-"*55)
