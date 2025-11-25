@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from app.client.engsel import BASE_API_URL, UA, intercept_page, send_api_request
 from app.client.encrypt import API_KEY, decrypt_xdata, encryptsign_xdata, java_like_timestamp, get_x_signature_payment
 from app.type_dict import PaymentItem
-from app.menus.util import live_loading
+from app.menus.util import live_loading, print_panel
 from app.config.theme_config import get_theme
 
 
@@ -60,7 +60,11 @@ def settlement_multipayment(
         payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
 
     if payment_res.get("status") != "SUCCESS":
-        return None
+        return {
+            "status": payment_res.get("status"),
+            "message": payment_res.get("message", ""),
+            "data": payment_res,
+        }
 
     token_payment = payment_res["data"]["token_payment"]
     ts_to_sign = payment_res["data"]["timestamp"]
@@ -133,9 +137,24 @@ def settlement_multipayment(
 
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        return decrypted_body
-    except Exception:
-        return None
+        status = decrypted_body.get("status", "UNKNOWN")
+        message = decrypted_body.get("message", "")
+
+        # ✅ tampilkan status pembayaran
+        print_panel("🧾 Payment Status", f"Status: {status}\nMessage: {message}")
+
+        return {
+            "status": status,
+            "message": message,
+            "data": decrypted_body,
+        }
+    except Exception as e:
+        print_panel("🧾 Payment Status", f"Status: ERROR\nMessage: Decrypt error: {e}")
+        return {
+            "status": "ERROR",
+            "message": f"Decrypt error: {e}",
+            "data": None,
+        }
 
 
 def show_multipayment(api_key: str, tokens: dict, items: list[PaymentItem],
