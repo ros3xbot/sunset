@@ -1,6 +1,7 @@
 import json
 
 from app.config.imports import *
+from app.type_dict import PaymentItem
 from app.client.engsel import get_package_details, get_family
 from app.menus.package import show_package_details
 from app.menus.util import clear_screen, pause, print_panel, format_quota_byte, display_html, simple_number, get_rupiah
