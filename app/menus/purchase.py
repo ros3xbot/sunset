@@ -3,6 +3,7 @@ from random import randint
 
 from app.config.imports import *
 from app.client.purchase.balance import settlement_balance
+from app.type_dict import PaymentItem
 from app.menus.util import (
     clear_screen,
     pause,
