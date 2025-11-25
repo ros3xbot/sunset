@@ -1,8 +1,6 @@
 import os
 import json
 from typing import List, Dict
-from app.menus.util import print_error, print_success, print_warning, print_panel
-from app.config.theme_config import get_theme
 
 
 class Bookmark:
@@ -70,7 +68,6 @@ class Bookmark:
             (p["family_code"], p["variant_name"], p["order"]) == key
             for p in self.packages
         ):
-            print_warning("⚠️", "Bookmark already exists.")
             return False
 
         self.packages.append(
@@ -84,7 +81,6 @@ class Bookmark:
             }
         )
         self.save_bookmark()
-        print_success("✅", f"Bookmark for {family_name} added.")
         return True
 
     def remove_bookmark(
@@ -104,9 +100,7 @@ class Bookmark:
             ):
                 del self.packages[i]
                 self.save_bookmark()
-                print_success("✅", f"Bookmark {family_code}-{variant_name} removed.")
                 return True
-        print_error("❌", "Bookmark not found.")
         return False
 
     def get_bookmarks(self) -> List[Dict]:
