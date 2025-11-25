@@ -21,6 +21,7 @@ console = Console()
 
 def show_circle_creation(api_key: str, tokens: dict):
     clear_screen()
+    ensure_git()
     theme = get_theme()
 
     console.print(Panel(
@@ -51,6 +52,7 @@ def show_bonus_list(api_key: str, tokens: dict, parent_subs_id: str, family_id: 
 
     while in_circle_bonus_menu:
         clear_screen()
+        ensure_git()
 
         with live_loading("🔶 Fetching bonus data...", theme):
             bonus_data = get_bonus_data(api_key, tokens, parent_subs_id, family_id)
@@ -73,7 +75,6 @@ def show_bonus_list(api_key: str, tokens: dict, parent_subs_id: str, family_id: 
             expand=True
         ))
 
-        # tampilkan bonus vertikal agar muat di layar kecil
         for idx, bonus in enumerate(bonus_list, start=1):
             bonus_name = bonus.get("name", "N/A")
             bonus_type = bonus.get("bonus_type", "N/A")
@@ -225,7 +226,6 @@ def show_circle_info(api_key: str, tokens: dict):
 
         console.print(Panel(header_text, border_style=theme["border_primary"], expand=True))
 
-        # Tampilkan member secara vertikal agar muat di layar kecil
         for idx, m in enumerate(members, start=1):
             msisdn = decrypt_circle_msisdn(api_key, m.get("msisdn", "")) or "<No Number>"
             me_mark = " (You)" if str(msisdn) == str(my_msisdn) else ""
@@ -246,7 +246,6 @@ def show_circle_info(api_key: str, tokens: dict):
 
             console.print(Panel(member_text, border_style=theme["border_info"], expand=True))
 
-        # Navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
