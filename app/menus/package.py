@@ -1,28 +1,16 @@
 import json
 import sys
-
 import requests
-from rich.console import Console, Group
-from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
-from app.config.theme_config import get_theme
+
+from app.config.imports import *
 from app.menus.util import live_loading, clear_screen, pause, display_html, print_panel, get_rupiah, format_quota_byte, nav_range, simple_number
-from app.service.auth import AuthInstance
-from app.service.git import ensure_git
-from app.client.engsel import get_family, get_package, get_addons, get_package_details, send_api_request, unsubscribe
+from app.client.engsel import get_addons, send_api_request, unsubscribe
 from app.client.ciam import get_auth_code
-from app.service.bookmark import BookmarkInstance
 from app.client.purchase.redeem import settlement_bounty, settlement_loyalty, bounty_allotment
 from app.client.purchase.qris import show_qris_payment
 from app.client.purchase.ewallet import show_multipayment
 from app.client.purchase.balance import settlement_balance
-from app.type_dict import PaymentItem
 from app.menus.purchase import purchase_n_times, purchase_n_times_by_option_code
-from app.menus.util import format_quota_byte
-from app.service.decoy import DecoyInstance
 
 console = Console()
 
