@@ -1,6 +1,7 @@
 import os
 import json
 
+from app.config.imports import *
 from app.menus.package import get_packages_by_family
 from app.menus.util import clear_screen, pause, print_panel, live_loading, simple_number
 
