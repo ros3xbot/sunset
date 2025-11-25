@@ -5,6 +5,7 @@ import requests
 from datetime import datetime, timezone
 
 from app.config.theme_config import get_theme
+from app.menus.util import live_loading
 from app.client.encrypt import (
     encryptsign_xdata,
     java_like_timestamp,
