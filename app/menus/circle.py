@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 from app.config.imports import *
 from app.menus.package import get_packages_by_family, show_package_details
-from app.menus.util import pause, clear_screen, format_quota_byte
+from app.menus.util import pause, clear_screen, format_quota_byte, live_loading
 from app.client.circle import (
     get_group_data,
     get_group_members,
@@ -135,6 +135,7 @@ def show_circle_info(api_key: str, tokens: dict):
 
     while in_circle_menu:
         clear_screen()
+        ensure_git()
         with live_loading("🔄 Fetching circle data...", theme):
             group_res = get_group_data(api_key, tokens)
 
