@@ -1,5 +1,6 @@
 from app.config.imports import *
 from app.client.ciam import get_otp, submit_otp
+from app.service.service import load_status, save_status
 from app.menus.util import clear_screen, simple_number, pause, print_panel, nav_range
 
 console = Console()
