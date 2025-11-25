@@ -16,6 +16,8 @@ from app.client.circle import (
 )
 from app.client.encrypt import decrypt_circle_msisdn
 
+console = Console()
+
 
 def show_circle_creation(api_key: str, tokens: dict):
     clear_screen()
