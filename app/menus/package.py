@@ -18,15 +18,14 @@ console = Console()
 def show_package_details(api_key, tokens, package_option_code, is_enterprise, option_order=-1):
     theme = get_theme()
     clear_screen()
+    ensure_git()
 
-    # Ambil data paket
     package = get_package(api_key, tokens, package_option_code)
     if not package:
         print_panel("⚠️ Error", "Gagal memuat detail paket.")
         pause()
         return "BACK"
 
-    # Ekstrak field utama
     option = package.get("package_option", {})
     family = package.get("package_family", {})
     variant = package.get("package_detail_variant", {})
@@ -50,7 +49,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     family_code = family.get("package_family_code", "")
     parent_code = package.get("package_addon", {}).get("parent_code", "") or "N/A"
 
-    # Base payment item
     payment_items = [
         PaymentItem(
             item_code=package_option_code,
@@ -62,7 +60,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         )
     ]
 
-    # Panel judul
     console.print(Panel(
         Align.center(f"📦 {family_name}", vertical="middle"),
         border_style=theme["border_info"],
@@ -71,7 +68,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     ))
     simple_number()
 
-    # Panel Info Paket
     info_table = Table.grid(padding=(0, 1))
     info_table.add_column(justify="left", style=theme["border_info"])
     info_table.add_column(justify="left")
@@ -91,7 +87,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
 
-    # Benefit Paket
     benefits = option.get("benefits", [])
     if benefits:
         benefit_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -134,7 +129,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             expand=True
         ))
 
-    # Syarat & Ketentuan
     console.print(Panel(
         detail,
         title=f"[{theme['text_title']}]📜 Syarat & Ketentuan[/]",
@@ -142,7 +136,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
 
-    # Navigasi Pembelian
     nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
     nav_table.add_column(justify="right", style=theme["text_key"], width=6)
     nav_table.add_column(style=theme["text_body"])
@@ -169,14 +162,11 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
 
-    # Input pilihan
     choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
-    # Kembali
     if choice == "00":
         return "BACK"
 
-    # Bookmark
     elif choice == "0" and option_order != -1:
         success = BookmarkInstance.add_bookmark(
             family_code=package.get("package_family", {}).get("package_family_code",""),
@@ -193,25 +183,21 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    # Pulsa langsung
     elif choice == "1":
         settlement_balance(api_key, tokens, payment_items, payment_for, True)
         pause()
         return True
 
-    # E-Wallet
     elif choice == "2":
         show_multipayment(api_key, tokens, payment_items, payment_for, True)
         pause()
         return True
 
-    # QRIS
     elif choice == "3":
         show_qris_payment(api_key, tokens, payment_items, payment_for, True)
         pause()
         return True
 
-    # Pulsa + Decoy
     elif choice == "4":
         decoy = DecoyInstance.get_decoy("balance")
         decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
@@ -248,7 +234,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    # Pulsa + Decoy V2 (token idx)
     elif choice == "5":
         decoy = DecoyInstance.get_decoy("balance")
         decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
@@ -291,7 +276,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    # QRIS + Decoy (+1K)
     elif choice == "6":
         decoy = DecoyInstance.get_decoy("qris")
         decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
@@ -321,7 +305,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    # QRIS + Decoy V2 (Rp0)
     elif choice == "7":
         decoy = DecoyInstance.get_decoy("qris0")
         decoy_package_detail = get_package(api_key, tokens, decoy["option_code"])
@@ -351,7 +334,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    # Pulsa N kali
     elif choice == "8":
         use_decoy_for_n_times = console.input("Use decoy package? (y/n): ").strip().lower() == 'y'
         n_times_str = console.input("Enter number of times to purchase (e.g., 3): ").strip()
@@ -379,7 +361,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    # Bonus (ambil)
     elif choice.lower() == "b":
         settlement_bounty(
             api_key=api_key,
@@ -393,7 +374,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    # Bonus (kirim)
     elif choice.lower() == "ba":
         destination_msisdn = console.input("Masukkan nomor tujuan bonus (mulai dengan 62): ").strip()
         bounty_allotment(
@@ -408,7 +388,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    # Loyalti (poin)
     elif choice.lower() == "l":
         settlement_loyalty(
             api_key=api_key,
@@ -421,7 +400,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         pause()
         return True
 
-    # Cancel
     else:
         print_panel("ℹ️ Info", "Purchase cancelled.")
         pause()
