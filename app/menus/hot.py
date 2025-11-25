@@ -1,19 +1,13 @@
 import json
+
+from app.config.imports import *
 from app.client.engsel import get_package_details, get_family
 from app.menus.package import show_package_details
-from app.service.auth import AuthInstance
 from app.menus.util import clear_screen, pause, print_panel, format_quota_byte, display_html, simple_number, get_rupiah
 from app.client.purchase.ewallet import show_multipayment
 from app.client.purchase.qris import show_qris_payment
 from app.client.purchase.balance import settlement_balance
-from app.type_dict import PaymentItem
-from app.config.theme_config import get_theme
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
+
 
 console = Console()
 
@@ -26,6 +20,8 @@ def show_hot_menu():
     in_hot_menu = True
     while in_hot_menu:
         clear_screen()
+        ensure_git()
+        
         console.print(Panel(
             Align.center("🔥 Paket Hot 🔥", vertical="middle"),
             border_style=theme["border_info"],
@@ -34,7 +30,6 @@ def show_hot_menu():
         ))
         simple_number()
 
-        # Load hot packages
         try:
             with open("hot_data/hot.json", "r", encoding="utf-8") as f:
                 hot_packages = json.load(f)
@@ -43,7 +38,6 @@ def show_hot_menu():
             pause()
             return
 
-        # Tabel daftar paket hot
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", style=theme["text_key"], width=4, justify="right")
         table.add_column("Family", style=theme["text_body"])
@@ -61,7 +55,6 @@ def show_hot_menu():
             expand=True
         ))
 
-        # Navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
@@ -109,6 +102,7 @@ def show_hot_menu():
             pause()
             continue
 
+
 def show_hot_menu2():
     theme = get_theme()
     api_key = AuthInstance.api_key
@@ -117,9 +111,9 @@ def show_hot_menu2():
     in_bookmark_menu = True
     while in_bookmark_menu:
         clear_screen()
+        ensure_git()
         main_package_detail = {}
 
-        # Header
         console.print(Panel(
             Align.center("🔥 Paket Hot 2 🔥", vertical="middle"),
             border_style=theme["border_info"],
@@ -128,7 +122,6 @@ def show_hot_menu2():
         ))
         simple_number()
 
-        # Load data paket
         hot_packages = []
         try:
             with open("hot_data/hot2.json", "r", encoding="utf-8") as f:
@@ -143,7 +136,6 @@ def show_hot_menu2():
             pause()
             return None
 
-        # Tabel daftar paket
         pkg_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         pkg_table.add_column("No", justify="right", style=theme["text_key"], width=6)
         pkg_table.add_column("Nama Paket", style=theme["text_body"])
@@ -155,14 +147,12 @@ def show_hot_menu2():
         
         console.print(Panel(pkg_table, border_style=theme["border_info"], padding=(0, 0), expand=True))
 
-        # Navigasi kembali
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         console.print(Panel(nav_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
-        # Input pilihan paket
         choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             in_bookmark_menu = False
@@ -176,7 +166,6 @@ def show_hot_menu2():
                 pause()
                 continue
 
-            # Ambil detail paket untuk semua sub-package, simpan main_package_detail dari paket pertama
             payment_items = []
             for pkg_idx, package in enumerate(packages):
                 detail = get_package_details(
@@ -192,7 +181,6 @@ def show_hot_menu2():
                 if pkg_idx == 0:
                     main_package_detail = detail
 
-                # Force failed when one of the package detail is None
                 if not detail:
                     print_panel("❌ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
                     return None
@@ -206,8 +194,8 @@ def show_hot_menu2():
                     token_confirmation=detail["token_confirmation"],
                 ))
 
-            # Panel ringkas detail paket terpilih (name/price/detail)
             clear_screen()
+            ensure_git()
             console.print(Panel(
                 Align.center(f"📦 {selected_package['name']}", vertical="middle"),
                 border_style=theme["border_info"],
@@ -233,14 +221,12 @@ def show_hot_menu2():
                 expand=True
             ))
 
-            # Ambil parameter pembayaran dari selected_package
             payment_for = selected_package.get("payment_for", "BUY_PACKAGE")
             ask_overwrite = selected_package.get("ask_overwrite", False)
             overwrite_amount = selected_package.get("overwrite_amount", -1)
             token_confirmation_idx = selected_package.get("token_confirmation_idx", 0)
             amount_idx = selected_package.get("amount_idx", -1)
 
-            # Menu pembayaran
             in_payment_menu = True
             while in_payment_menu:
                 method_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
