@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from app.client.engsel import BASE_API_URL, UA, intercept_page, send_api_request
 from app.client.encrypt import API_KEY, decrypt_xdata, encryptsign_xdata, java_like_timestamp, get_x_signature_payment
 from app.type_dict import PaymentItem
-from app.menus.util import live_loading, print_error, print_success, print_warning, print_panel
+from app.menus.util import live_loading
 from app.config.theme_config import get_theme
 
 
@@ -21,7 +21,6 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
                     topup_number: str = "",
                     stage_token: str = "") -> str | None:
     if overwrite_amount == -1 and not ask_overwrite:
-        print_error("❌", "Either ask_overwrite must be True or overwrite_amount must be set.")
         return None
 
     token_confirmation = items[token_confirmation_idx]["token_confirmation"]
@@ -34,13 +33,12 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
         amount_int = items[amount_idx]["item_price"]
 
     if ask_overwrite:
-        print_panel("💰 Amount", f"Total amount is {amount_int}. Enter new amount if you need to overwrite.")
-        amount_str = input("Press enter to ignore & use default amount: ")
+        amount_str = input(f"Total amount is {amount_int}. Enter new amount if you need to overwrite: ")
         if amount_str:
             try:
                 amount_int = int(amount_str)
             except ValueError:
-                print_warning("⚠️", "Invalid overwrite input, using original price.")
+                pass  # fallback ke original price
 
     intercept_page(api_key, tokens, items[0]["item_code"], False)
 
@@ -59,8 +57,6 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
         payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
 
     if payment_res.get("status") != "SUCCESS":
-        print_error("❌", "Failed to fetch payment methods.")
-        print_panel("📑 Response", json.dumps(payment_res, indent=2))
         return None
 
     token_payment = payment_res["data"]["token_payment"]
@@ -132,7 +128,7 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
         "x-signature": x_sig,
         "x-request-id": str(uuid.uuid4()),
         "x-request-at": java_like_timestamp(x_requested_at),
-        "x-version-app": "8.9.0",
+        "x-version-app": "8.9.1",
     }
 
     url = f"{BASE_API_URL}/{path}"
@@ -142,15 +138,10 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            print_error("❌", "Failed to initiate settlement.")
-            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
         transaction_id = decrypted_body["data"]["transaction_code"]
-        print_success("✅", "QRIS transaction created successfully")
         return transaction_id
-    except Exception as e:
-        print_error("❌", f"Decrypt error: {e}")
-        print_panel("📑 Raw Response", resp.text)
+    except Exception:
         return None
 
 
@@ -162,11 +153,8 @@ def get_qris_code(api_key: str, tokens: dict, transaction_id: str) -> str | None
         res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
 
     if res.get("status") != "SUCCESS":
-        print_error("❌", "Failed to fetch QRIS code.")
-        print_panel("📑 Response", json.dumps(res, indent=2))
         return None
 
-    print_success("✅", "QRIS code fetched successfully")
     return res["data"]["qr_code"]
 
 
@@ -183,15 +171,11 @@ def show_qris_payment(api_key: str, tokens: dict, items: list[PaymentItem],
                                      topup_number, stage_token)
 
     if not transaction_id:
-        print_error("❌", "Failed to create QRIS transaction.")
         return None
 
     qris_code = get_qris_code(api_key, tokens, transaction_id)
     if not qris_code:
-        print_error("❌", "Failed to get QRIS code.")
         return None
-
-    print_panel("📲 QRIS Data", qris_code)
 
     qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,
                        box_size=1, border=1)
@@ -202,5 +186,4 @@ def show_qris_payment(api_key: str, tokens: dict, items: list[PaymentItem],
     qris_b64 = base64.urlsafe_b64encode(qris_code.encode()).decode()
     qris_url = f"https://ki-ar-kod.netlify.app/?data={qris_b64}"
 
-    print_panel("🔗 QRIS Link", f"Atau buka link berikut untuk melihat QRIS:\n{qris_url}")
     return qris_b64
