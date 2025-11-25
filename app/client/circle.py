@@ -1,7 +1,7 @@
 import json
 from app.client.engsel import send_api_request
 from app.client.encrypt import encrypt_circle_msisdn
-from app.menus.util import live_loading
+from app.menus.util import live_loading, print_panel
 from app.config.theme_config import get_theme
 
 
@@ -46,7 +46,17 @@ def invite_circle_member(api_key: str, tokens: dict, msisdn: str, name: str,
     }
     with live_loading(f"📩 Inviting {msisdn} to Circle...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    return res
+
+    if not res:
+        return None
+
+    status = res.get("status", "UNKNOWN")
+    message = res.get("message", "")
+
+    colored_status = f"\033[92m{status}\033[0m" if status == "SUCCESS" else f"\033[91m{status}\033[0m"
+    print_panel("📩 Invite Status", f"Status: {colored_status}\nMessage: {message}")
+
+    return {"status": status, "message": message, "data": res}
 
 
 def remove_circle_member(api_key: str, tokens: dict, member_id: str,
@@ -63,7 +73,17 @@ def remove_circle_member(api_key: str, tokens: dict, member_id: str,
     }
     with live_loading(f"🗑️ Removing member {member_id}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    return res
+
+    if not res:
+        return None
+
+    status = res.get("status", "UNKNOWN")
+    message = res.get("message", "")
+
+    colored_status = f"\033[92m{status}\033[0m" if status == "SUCCESS" else f"\033[91m{status}\033[0m"
+    print_panel("🗑️ Remove Status", f"Status: {colored_status}\nMessage: {message}")
+
+    return {"status": status, "message": message, "data": res}
 
 
 def accept_circle_invitation(api_key: str, tokens: dict, group_id: str, member_id: str) -> dict | None:
@@ -77,7 +97,17 @@ def accept_circle_invitation(api_key: str, tokens: dict, group_id: str, member_i
     }
     with live_loading(f"✅ Accepting invitation to Circle {group_id}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    return res
+
+    if not res:
+        return None
+
+    status = res.get("status", "UNKNOWN")
+    message = res.get("message", "")
+
+    colored_status = f"\033[92m{status}\033[0m" if status == "SUCCESS" else f"\033[91m{status}\033[0m"
+    print_panel("✅ Accept Invitation Status", f"Status: {colored_status}\nMessage: {message}")
+
+    return {"status": status, "message": message, "data": res}
 
 
 def create_circle(api_key: str, tokens: dict, parent_name: str,
@@ -93,7 +123,17 @@ def create_circle(api_key: str, tokens: dict, parent_name: str,
     }
     with live_loading(f"➕ Creating Circle with member {member_msisdn}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    return res
+
+    if not res:
+        return None
+
+    status = res.get("status", "UNKNOWN")
+    message = res.get("message", "")
+
+    colored_status = f"\033[92m{status}\033[0m" if status == "SUCCESS" else f"\033[91m{status}\033[0m"
+    print_panel("➕ Create Circle Status", f"Status: {colored_status}\nMessage: {message}")
+
+    return {"status": status, "message": message, "data": res}
 
 
 def spending_tracker(api_key: str, tokens: dict, parent_subs_id: str, family_id: str) -> dict | None:
