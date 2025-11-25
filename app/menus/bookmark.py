@@ -1,6 +1,6 @@
 from app.config.imports import *
 
-from app.menus.util import clear_screen, simple_number    #, pause, print_panel
+from app.menus.util import clear_screen, simple_number, pause, print_panel
 #from app.config.theme_config import get_theme
 #from app.service.auth import AuthInstance
 #from app.service.bookmark import BookmarkInstance
