@@ -60,7 +60,7 @@ from app.menus.store.redemables import show_redeemables_menu
 from app.menus.store.search import show_family_list_menu, show_store_packages_menu
 from app.menus.store.segments import show_store_segments_menu
 from app.menus.theme import show_theme_menu
-from app.menus.util import (
+from app.config.util import (
     clear_screen,
     display_html,
     format_quota_byte,
