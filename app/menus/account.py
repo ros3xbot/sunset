@@ -1,5 +1,8 @@
 from app.config.imports import *
 from app.client.ciam import get_otp, submit_otp
+from app.menus.util import clear_screen, simple_number, pause, print_panel, nav_range
+
+console = Console()
 
 
 def normalize_number(raw_input: str) -> str:
