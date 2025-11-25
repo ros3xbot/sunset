@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from app.client.engsel import get_transaction_history
 from app.config.imports import *
-from app.menus.util import clear_screen, pause, print_panel
+from app.menus.util import clear_screen, pause, print_panel, simple_number
 
 console = Console()
 
