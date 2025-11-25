@@ -6,7 +6,7 @@ import requests
 from urllib.parse import urlparse
 from datetime import datetime, timezone, timedelta
 
-from app.menus.util import live_loading, print_error, print_success, print_warning, print_panel
+from app.menus.util import live_loading
 from app.config.theme_config import get_theme
 from app.client.encrypt import (
     java_like_timestamp,
@@ -27,10 +27,7 @@ UA = os.getenv("UA")
 
 
 def validate_contact(contact: str) -> bool:
-    if not contact.startswith("628") or len(contact) > 14:
-        print_error("❌", "Invalid number format")
-        return False
-    return True
+    return contact.startswith("628") and len(contact) <= 14
 
 
 def get_otp(contact: str) -> str | None:
@@ -62,12 +59,9 @@ def get_otp(contact: str) -> str | None:
             response = requests.get(url, headers=headers, params=querystring, timeout=30)
             json_body = response.json()
             if "subscriber_id" not in json_body:
-                print_error("❌", json_body.get("error", "Subscriber ID not found"))
                 return None
-            print_success("✅", "OTP requested successfully")
             return json_body["subscriber_id"]
-        except Exception as e:
-            print_error("❌", f"Error requesting OTP: {e}")
+        except Exception:
             return None
 
 
@@ -97,21 +91,18 @@ def extend_session(subscriber_id: str) -> str | None:
         try:
             response = requests.get(url, headers=headers, params=querystring, timeout=30)
             if response.status_code != 200:
-                print_error("❌", f"Failed: {response.status_code} - {response.text}")
                 return None
             data = response.json()
             return data.get("data", {}).get("exchange_code")
-        except Exception as e:
-            print_error("❌", f"Error extending session: {e}")
+        except Exception:
             return None
 
 
-def submit_otp(api_key: str, contact_type: str, contact: str, code: str):
+def submit_otp(api_key: str, contact_type: str, contact: str, code: str) -> dict | None:
     if contact_type == "SMS":
         if not validate_contact(contact):
             return None
         if not code or len(code) != 6:
-            print_error("❌", "Invalid OTP code format")
             return None
         final_contact = contact
         final_code = code
@@ -119,7 +110,6 @@ def submit_otp(api_key: str, contact_type: str, contact: str, code: str):
         final_contact = base64.b64encode(contact.encode()).decode()
         final_code = code
     else:
-        print_error("❌", "Unsupported contact type")
         return None
 
     url = BASE_CIAM_URL + "/realms/xl-ciam/protocol/openid-connect/token"
@@ -148,12 +138,9 @@ def submit_otp(api_key: str, contact_type: str, contact: str, code: str):
             response = requests.post(url, data=payload, headers=headers, timeout=30)
             json_body = response.json()
             if "error" in json_body:
-                print_error("❌", f"Error: {json_body}")
                 return None
-            print_success("✅", "Login successful")
             return json_body
-        except requests.RequestException as e:
-            print_error("❌", f"Request error: {e}")
+        except requests.RequestException:
             return None
 
 
@@ -179,27 +166,38 @@ def get_new_token(api_key: str, refresh_token: str, subscriber_id: str) -> dict 
     data = {"grant_type": "refresh_token", "refresh_token": refresh_token}
 
     with live_loading("🔄 Refreshing token...", get_theme()):
-        resp = requests.post(url, headers=headers, data=data, timeout=30)
+        try:
+            resp = requests.post(url, headers=headers, data=data, timeout=30)
+        except requests.RequestException:
+            return None
+
     if resp.status_code == 400:
-        if resp.json().get("error_description") != "Session not active":
-            print_error("❌", f"Failed: {resp.status_code} - {resp.text}")
+        try:
+            err_json = resp.json()
+        except ValueError:
+            return None
+        if err_json.get("error_description") != "Session not active":
             return None
         if not subscriber_id:
-            print_error("❌", "Subscriber ID is missing")
             return None
         exchange_code = extend_session(subscriber_id)
         if not exchange_code:
-            print_error("❌", "Failed to get exchange code")
             return None
-        extend_result = submit_otp(api_key, "DEVICEID", subscriber_id, exchange_code)
-        return extend_result
-    resp.raise_for_status()
-    body = resp.json()
+        return submit_otp(api_key, "DEVICEID", subscriber_id, exchange_code)
+
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError:
+        return None
+
+    try:
+        body = resp.json()
+    except ValueError:
+        return None
+
     if "id_token" not in body:
-        print_error("❌", "ID token not found in response")
         return None
     if "error" in body:
-        print_error("❌", f"Error: {body['error']} - {body.get('error_description', '')}")
         return None
     return body
 
@@ -238,33 +236,26 @@ def get_auth_code(tokens: dict, pin: str, msisdn: str) -> str | None:
     with live_loading("🔐 Requesting authorization code...", get_theme()):
         try:
             resp = requests.post(url, headers=headers, json=body, timeout=30)
-        except requests.RequestException as e:
-            print_error("❌", f"Request error: {e}")
+        except requests.RequestException:
             return None
 
     if resp.status_code != 200:
-        print_error("❌", f"Failed: {resp.status_code} - {resp.text}")
         return None
 
     try:
         data = resp.json()
     except ValueError:
-        print_error("❌", f"Invalid JSON response: {resp.text}")
         return None
 
     if not isinstance(data, dict):
-        print_error("❌", f"Unexpected response format: {data!r}")
         return None
 
     status = data.get("status", "")
     if status != "Success":
-        print_error("❌", f"Error getting authorization code: {status}")
         return None
 
     authorization_code = data.get("data", {}).get("authorization_code")
     if not authorization_code:
-        print_error("❌", f"Authorization code not found in response: {data}")
         return None
 
-    print_success("✅", "Authorization code retrieved successfully")
     return authorization_code
