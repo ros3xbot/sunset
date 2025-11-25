@@ -15,7 +15,7 @@ from app.client.encrypt import (
     get_x_signature_bounty,
     get_x_signature_bounty_allotment,
 )
-from app.menus.util import live_loading, print_error, print_success, print_panel
+from app.menus.util import live_loading
 from app.config.theme_config import get_theme
 
 BASE_API_URL = os.getenv("BASE_API_URL")
@@ -65,7 +65,7 @@ def settlement_bounty(api_key: str, tokens: dict,
         "x-signature": x_sig,
         "x-request-id": str(uuid.uuid4()),
         "x-request-at": java_like_timestamp(x_requested_at),
-        "x-version-app": "8.9.0",
+        "x-version-app": "8.9.1",
     }
 
     url = f"{BASE_API_URL}/{path}"
@@ -75,15 +75,9 @@ def settlement_bounty(api_key: str, tokens: dict,
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            print_error("❌", "Failed to claim bounty.")
-            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
-        print_success("✅", "Bounty claimed successfully")
-        print_panel("🎁 Bounty Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
-    except Exception as e:
-        print_error("❌", f"Decrypt error: {e}")
-        print_panel("📑 Raw Response", resp.text)
+    except Exception:
         return None
 
 
@@ -118,7 +112,7 @@ def settlement_loyalty(api_key: str, tokens: dict,
         "x-signature": x_sig,
         "x-request-id": str(uuid.uuid4()),
         "x-request-at": java_like_timestamp(x_requested_at),
-        "x-version-app": "8.9.0",
+        "x-version-app": "8.9.1",
     }
 
     url = f"{BASE_API_URL}/{path}"
@@ -128,15 +122,9 @@ def settlement_loyalty(api_key: str, tokens: dict,
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            print_error("❌", "Failed purchase.")
-            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
-        print_success("✅", "Loyalty exchange successful")
-        print_panel("🏆 Loyalty Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
-    except Exception as e:
-        print_error("❌", f"Decrypt error: {e}")
-        print_panel("📑 Raw Response", resp.text)
+    except Exception:
         return None
 
 
@@ -174,7 +162,7 @@ def bounty_allotment(api_key: str, tokens: dict,
         "x-signature": x_sig,
         "x-request-id": str(uuid.uuid4()),
         "x-request-at": java_like_timestamp(x_requested_at),
-        "x-version-app": "8.9.0",
+        "x-version-app": "8.9.1",
     }
 
     url = f"{BASE_API_URL}/{path}"
@@ -184,13 +172,7 @@ def bounty_allotment(api_key: str, tokens: dict,
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            print_error("❌", "Failed to claim bounty.")
-            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
-        print_success("✅", "Bounty allotment successful")
-        print_panel("🎁 Bounty Allotment Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
-    except Exception as e:
-        print_error("❌", f"Decrypt error: {e}")
-        print_panel("📑 Raw Response", resp.text)
+    except Exception:
         return None
