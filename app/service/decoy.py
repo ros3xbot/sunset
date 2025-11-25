@@ -3,8 +3,6 @@ import json
 
 from app.client.engsel import get_package_details
 from app.service.auth import AuthInstance
-from app.menus.util import print_error, print_success, print_warning, print_panel
-from app.config.theme_config import get_theme
 
 
 class DecoyPackage:
@@ -48,7 +46,6 @@ class DecoyPackage:
         current_subscriber_id = active_user.get("subscriber_id", "")
         current_subscription_type = active_user.get("subscription_type", "")
         if self.subscriber_id != current_subscriber_id:
-            print_warning("⚠️", f"Subscriber ID changed from {self.subscriber_id} to {current_subscriber_id}. Resetting decoy data.")
             self.reset_decoys()
             self.subscriber_id = current_subscriber_id
             self.subscription_type = current_subscription_type
@@ -61,7 +58,6 @@ class DecoyPackage:
     def fetch_decoy_data(self, decoy_name: str):
         active_user = AuthInstance.get_active_user()
         if active_user is None:
-            print_error("❌", "No active user. Cannot fetch decoy package.")
             return None
 
         api_key = AuthInstance.api_key
@@ -69,7 +65,6 @@ class DecoyPackage:
         path = self.decoy_base_path + decoy_name + ".json"
 
         try:
-            print_panel("🔄 Refreshing Decoy", f"Refreshing decoy data for: {decoy_name}")
             with open(path, "r", encoding="utf-8") as f:
                 decoy_data = json.load(f)
 
@@ -88,16 +83,13 @@ class DecoyPackage:
                 "last_fetched_at": int(time.time()),
                 "price": decoy_data["price"],
             }
-
-            print_success("✅", f"Decoy data for {decoy_name} refreshed successfully.")
-        except Exception as e:
-            print_error("❌", f"Error fetching decoy data: {e}")
+        except Exception:
+            return None
 
     def get_decoy(self, payment_type: str):
         self.check_subscriber_change()
 
         if payment_type not in self.supported_payment_types:
-            print_error("❌", f"Unsupported payment type: {payment_type}")
             return None
 
         decoy_name = self.prefix + payment_type
@@ -113,7 +105,6 @@ class DecoyPackage:
 
     def reset_decoys(self):
         self.decoys = self.initial_decoys.copy()
-        print_panel("🔄 Decoy Reset", "All decoys reset to initial state.")
 
 
 DecoyInstance = DecoyPackage()
