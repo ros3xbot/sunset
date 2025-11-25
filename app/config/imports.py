@@ -16,7 +16,7 @@ from rich.text import Text
 
 # Internal app - config
 from app.config.cache import clear_cache, get_cache, set_cache
-from app.config.theme_config import get_theme, get_theme_style
+from app.config.theme_config import get_theme, get_theme_style, get_all_presets, set_theme
 
 # Internal app - client
 from app.client.engsel import (
@@ -101,6 +101,8 @@ __all__ = [
     "get_cache",
     "set_cache",
     "clear_cache",
+    "get_all_presets",
+    "set_theme",
 
     # Client
     "dash_segments",
