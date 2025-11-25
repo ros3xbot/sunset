@@ -1,10 +1,10 @@
 import json
 from app.client.engsel import send_api_request
-from app.menus.util import live_loading, print_error, print_success, print_panel
+from app.menus.util import live_loading
 from app.config.theme_config import get_theme
 
 
-def validate_puk(api_key: str, msisdn: str, puk: str) -> dict:
+def validate_puk(api_key: str, msisdn: str, puk: str) -> dict | None:
     path = "api/v8/infos/validate-puk"
     raw_payload = {
         "is_enterprise": False,
@@ -18,14 +18,11 @@ def validate_puk(api_key: str, msisdn: str, puk: str) -> dict:
         res = send_api_request(api_key, path, raw_payload, "", "POST")
 
     if not res or res.get("status") != "SUCCESS":
-        print_error("❌", f"Failed to validate PUK for {msisdn}")
-        print_panel("📑 Response", json.dumps(res, indent=2))
-    else:
-        print_success("✅", f"PUK validated successfully for {msisdn}")
+        return None
     return res
 
 
-def dukcapil(api_key: str, msisdn: str, kk: str, nik: str) -> dict:
+def dukcapil(api_key: str, msisdn: str, kk: str, nik: str) -> dict | None:
     path = "api/v8/auth/regist/dukcapil"
     raw_payload = {
         "msisdn": msisdn,
@@ -38,8 +35,5 @@ def dukcapil(api_key: str, msisdn: str, kk: str, nik: str) -> dict:
         res = send_api_request(api_key, path, raw_payload, "", "POST")
 
     if not res or res.get("status") != "SUCCESS":
-        print_error("❌", f"Failed to validate Dukcapil for {msisdn}")
-        print_panel("📑 Response", json.dumps(res, indent=2))
-    else:
-        print_success("✅", f"Dukcapil validated successfully for {msisdn}")
+        return None
     return res
