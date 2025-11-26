@@ -65,6 +65,10 @@ def _with_loading(message: str, func, use_loading: bool, theme, *args, **kwargs)
     return func(*args, **kwargs)
 
 
+# ============================
+# API Wrapper Functions
+# ============================
+
 def get_profile(api_key: str, access_token: str, id_token: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/profile"
     payload = {
@@ -160,6 +164,28 @@ def get_package(api_key: str, tokens: dict,
     res = _with_loading("📦 Mengambil detail paket...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     return res.get("data")
+
+
+def get_package_details(api_key: str, tokens: dict,
+                        family_code: str, variant_code: str, option_order: int,
+                        is_enterprise: bool | None = None,
+                        migration_type: str | None = None,
+                        use_loading: bool = True) -> dict | None:
+    family_data = get_family(api_key, tokens, family_code, is_enterprise, migration_type, use_loading)
+    if not family_data:
+        return None
+
+    option_code = None
+    for variant in family_data.get("package_variants", []):
+        if variant.get("package_variant_code") == variant_code:
+            for option in variant.get("package_options", []):
+                if option.get("order") == option_order:
+                    option_code = option.get("package_option_code")
+                    break
+    if not option_code:
+        return None
+
+    return get_package(api_key, tokens, option_code, use_loading=use_loading)
 
 
 def get_addons(api_key: str, tokens: dict, package_option_code: str, use_loading: bool = True) -> dict | None:
