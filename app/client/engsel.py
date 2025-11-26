@@ -4,8 +4,8 @@ import uuid
 import requests
 from datetime import datetime, timezone
 
-from app.config.theme_config import get_theme
 from app.menus.util import live_loading
+from app.config.theme_config import get_theme
 from app.client.encrypt import (
     encryptsign_xdata,
     java_like_timestamp,
@@ -55,7 +55,7 @@ def send_api_request(api_key: str, path: str, payload_dict: dict, id_token: str,
     try:
         return decrypt_xdata(api_key, json.loads(resp.text))
     except Exception as e:
-        return {"error": str(e), "raw": resp.text}
+        return {"error": f"Gagal decrypt response: {e}", "raw": resp.text}
 
 
 def get_profile(api_key: str, access_token: str, id_token: str) -> dict | None:
@@ -66,7 +66,7 @@ def get_profile(api_key: str, access_token: str, id_token: str) -> dict | None:
         "is_enterprise": False,
         "lang": "en",
     }
-    with live_loading("📡 Memuat profile.. ", get_theme()):
+    with live_loading("📡 Mengambil profil...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, id_token, "POST")
     return res.get("data")
 
@@ -74,9 +74,9 @@ def get_profile(api_key: str, access_token: str, id_token: str) -> dict | None:
 def get_balance(api_key: str, id_token: str) -> dict | None:
     path = "api/v8/packages/balance-and-credit"
     raw_payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("💰 Memuat balance.. ", get_theme()):
+    with live_loading("💰 Mengambil saldo...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, id_token, "POST")
-    if "data" in res and "balance" in res["data"]:
+    if isinstance(res, dict) and "data" in res and "balance" in res["data"]:
         return res["data"]["balance"]
     return None
 
@@ -90,7 +90,7 @@ def get_family(api_key: str, tokens: dict, family_code: str,
     path = "api/v8/xl-stores/options/list"
     id_token = tokens.get("id_token")
     family_data = None
-    with live_loading(f"📦 Memuat family.. ", theme):
+    with live_loading(f"📦 Mengambil family paket {family_code}...", theme):
         for mt in migration_type_list:
             for ie in is_enterprise_list:
                 payload_dict = {
@@ -108,8 +108,10 @@ def get_family(api_key: str, tokens: dict, family_code: str,
                 }
                 res = send_api_request(api_key, path, payload_dict, id_token, "POST")
                 if res.get("status") == "SUCCESS":
-                    family_data = res["data"]
-                    break
+                    family_name = res["data"]["package_family"].get("name", "")
+                    if family_name:
+                        family_data = res["data"]
+                        break
             if family_data:
                 break
     return family_data
@@ -126,7 +128,7 @@ def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict
         "is_migration": False,
         "lang": "en",
     }
-    with live_loading(f"📂 Memuat families.. ", get_theme()):
+    with live_loading(f"📂 Mengambil families untuk kategori {package_category_code}...", get_theme()):
         res = send_api_request(api_key, path, payload_dict, tokens["id_token"], "POST")
     if res.get("status") != "SUCCESS":
         return None
@@ -152,29 +154,25 @@ def get_package(api_key: str, tokens: dict,
         "is_upsell_pdp": False,
         "package_variant_code": package_variant_code,
     }
-    with live_loading(f"📦 Memuat data.. ", get_theme()):
+    with live_loading("📦 Mengambil detail paket...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    if "data" not in res:
-        return None
-    return res["data"]
+    return res.get("data")
 
 
 def get_addons(api_key: str, tokens: dict, package_option_code: str) -> dict | None:
     path = "api/v8/xl-stores/options/addons-pinky-box"
     raw_payload = {"is_enterprise": False, "lang": "en", "package_option_code": package_option_code}
-    with live_loading(f"🧩 Memuat addons.. ", get_theme()):
+    with live_loading(f"🧩 Mengambil addons untuk {package_option_code}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    if "data" not in res:
-        return None
-    return res["data"]
+    return res.get("data")
 
 
 def intercept_page(api_key: str, tokens: dict, option_code: str, is_enterprise: bool = False) -> dict | None:
     path = "misc/api/v8/utility/intercept-page"
     raw_payload = {"is_enterprise": is_enterprise, "lang": "en", "package_option_code": option_code}
-    with live_loading(f"🛡️ Memuat intercept.. ", get_theme()):
+    with live_loading(f"🛡️ Mengambil intercept page untuk {option_code}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    return res
+    return res if isinstance(res, dict) else None
 
 
 def login_info(api_key: str, tokens: dict, is_enterprise: bool = False) -> dict | None:
@@ -184,7 +182,7 @@ def login_info(api_key: str, tokens: dict, is_enterprise: bool = False) -> dict 
         "is_enterprise": is_enterprise,
         "lang": "en",
     }
-    with live_loading("🔑 Memuat info login.. ", get_theme()):
+    with live_loading("🔑 Mengambil info login...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     return res.get("data")
 
@@ -198,10 +196,10 @@ def get_package_details(api_key: str, tokens: dict,
         return None
     option_code = None
     for variant in family_data.get("package_variants", []):
-        if variant["package_variant_code"] == variant_code:
+        if variant.get("package_variant_code") == variant_code:
             for option in variant.get("package_options", []):
-                if option["order"] == option_order:
-                    option_code = option["package_option_code"]
+                if option.get("order") == option_order:
+                    option_code = option.get("package_option_code")
                     break
     if not option_code:
         return None
@@ -211,7 +209,7 @@ def get_package_details(api_key: str, tokens: dict,
 def get_notifications(api_key: str, tokens: dict) -> dict | None:
     path = "api/v8/notification-non-grouping"
     raw_payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("🔔 Memuat notifications.. ", get_theme()):
+    with live_loading("🔔 Mengambil notifikasi...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if isinstance(res, dict) and res.get("status") != "SUCCESS":
         return None
@@ -221,7 +219,7 @@ def get_notifications(api_key: str, tokens: dict) -> dict | None:
 def get_notification_detail(api_key: str, tokens: dict, notification_id: str) -> dict | None:
     path = "api/v8/notification/detail"
     raw_payload = {"is_enterprise": False, "lang": "en", "notification_id": notification_id}
-    with live_loading(f"🔔 Memuat notification {notification_id} ", get_theme()):
+    with live_loading(f"🔔 Mengambil notifikasi {notification_id}...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if isinstance(res, dict) and res.get("status") != "SUCCESS":
         return None
@@ -231,7 +229,7 @@ def get_notification_detail(api_key: str, tokens: dict, notification_id: str) ->
 def get_pending_transaction(api_key: str, tokens: dict) -> dict | None:
     path = "api/v8/profile"
     raw_payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("⏳ Memuat pending transactions.. ", get_theme()):
+    with live_loading("⏳ Mengambil transaksi pending...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if res.get("status") != "SUCCESS":
         return None
@@ -244,7 +242,7 @@ def get_pending_transaction(api_key: str, tokens: dict) -> dict | None:
 def get_transaction_history(api_key: str, tokens: dict) -> dict | None:
     path = "payments/api/v8/transaction-history"
     raw_payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("📜 Memuat transaction history.. ", get_theme()):
+    with live_loading("📜 Mengambil riwayat transaksi...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if res.get("status") != "SUCCESS":
         return None
@@ -257,7 +255,7 @@ def get_transaction_history(api_key: str, tokens: dict) -> dict | None:
 def get_tiering_info(api_key: str, tokens: dict) -> dict:
     path = "gamification/api/v8/loyalties/tiering/info"
     raw_payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("🏆 Memuat tiering.. ", get_theme()):
+    with live_loading("🏆 Mengambil info tiering...", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if not res or res.get("status") != "SUCCESS":
         return {}
@@ -276,19 +274,17 @@ def unsubscribe(api_key: str, tokens: dict,
         "lang": "en",
         "family_member_id": "",
     }
-    with live_loading(f"🚫 Unsubscribing quota {quota_code} ", get_theme()):
-        try:
-            res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-            return bool(res and res.get("code") == "000")
-        except Exception:
-            return False
+    with live_loading(f"🚫 Unsubscribe kuota {quota_code}...", get_theme()):
+        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+    return bool(res and res.get("code") == "000")
 
 
-def dashboard_segments(api_key: str, tokens: dict) -> dict | None:
+def dashboard_segments(api_key: str, tokens: dict) -> dict:
     path = "dashboard/api/v8/segments"
     raw_payload = {
         "access_token": tokens["access_token"],
     }
+    # Live loading opsional; fungsi ini cenderung dipanggil internal
     return send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
 
 
@@ -305,26 +301,19 @@ def dash_segments(api_key: str, id_token: str, access_token: str, balance: int =
         "model_name": "SM-N935F",
     }
 
-    theme = get_theme()
-    with live_loading("📊 Mengambil data segmen.. ", theme):
-        try:
-            res = send_api_request(api_key, path, payload, id_token, "POST")
-        except Exception:
-            return None
+    with live_loading("📊 Mengambil data segmen pengguna...", get_theme()):
+        res = send_api_request(api_key, path, payload, id_token, "POST")
 
     if not (isinstance(res, dict) and "data" in res):
         return None
 
     data = res["data"]
-
     loyalty_data = data.get("loyalty", {}).get("data", {})
     loyalty_info = {
         "current_point": loyalty_data.get("current_point", 0),
         "tier_name": loyalty_data.get("detail_tier", {}).get("name", ""),
     }
-
     notifications = data.get("notification", {}).get("data", [])
-
     sfy_data = data.get("special_for_you", {}).get("data", {})
     sfy_banners = sfy_data.get("banners", [])
     special_packages = []
@@ -339,20 +328,18 @@ def dash_segments(api_key: str, id_token: str, access_token: str, balance: int =
                 if benefit.get("data_type") == "DATA"
             )
             kuota_gb = kuota_total / (1024 ** 3)
-
             original_price = int(pkg.get("original_price", 0))
             discounted_price = int(pkg.get("discounted_price", original_price))
             diskon_percent = int(round((original_price - discounted_price) / original_price * 100)) if original_price else 0
 
-            formatted_pkg = {
+            special_packages.append({
                 "name": f"{pkg.get('family_name', '')} ({pkg.get('title', '')}) {pkg.get('validity', '')}",
                 "kode_paket": pkg.get("action_param", ""),
                 "original_price": original_price,
                 "diskon_price": discounted_price,
                 "diskon_percent": diskon_percent,
                 "kuota_gb": kuota_gb,
-            }
-            special_packages.append(formatted_pkg)
+            })
         except Exception:
             continue
 
@@ -366,11 +353,8 @@ def dash_segments(api_key: str, id_token: str, access_token: str, balance: int =
 def get_quota(api_key: str, id_token: str) -> dict | None:
     path = "api/v8/packages/quota-summary"
     payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("📶 Memuat quota summary.. ", get_theme()):
-        try:
-            res = send_api_request(api_key, path, payload, id_token, "POST")
-        except Exception:
-            return None
+    with live_loading("📶 Mengambil ringkasan kuota...", get_theme()):
+        res = send_api_request(api_key, path, payload, id_token, "POST")
     if isinstance(res, dict):
         quota = res.get("data", {}).get("quota", {}).get("data")
         if quota:
