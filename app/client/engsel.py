@@ -152,7 +152,7 @@ def get_package(api_key: str, tokens: dict,
         "is_upsell_pdp": False,
         "package_variant_code": package_variant_code,
     }
-    with live_loading(f"📦 Memuat... ", get_theme()):
+    with live_loading(f"📦 Memuat data.. ", get_theme()):
         res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
     if "data" not in res:
         return None
