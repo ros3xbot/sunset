@@ -125,7 +125,7 @@ def purchase_loop(
             if "Bizz-err.Amount.Total" in error_msg:
                 error_msg_arr = error_msg.split("=")
                 valid_amount = int(error_msg_arr[1].strip())
-                print_panel("ℹ️ Info", f"Adjusted total amount to: {valid_amount}")
+                print_panel("Info", f"Adjusted total amount to: {valid_amount}")
                 res = settlement_balance(
                     api_key,
                     tokens,
@@ -291,7 +291,7 @@ def purchase_by_family(
                     if "Bizz-err.Amount.Total" in error_msg:
                         error_msg_arr = error_msg.split("=")
                         valid_amount = int(error_msg_arr[1].strip())
-                        print_panel("ℹ️ Info", f"Adjusted total amount to: {valid_amount}")
+                        print_panel("Info", f"Adjusted total amount to: {valid_amount}")
                         res = settlement_balance(
                             api_key,
                             tokens,
@@ -468,7 +468,7 @@ def purchase_n_times(
                 if "Bizz-err.Amount.Total" in error_msg:
                     error_msg_arr = error_msg.split("=")
                     valid_amount = int(error_msg_arr[1].strip())
-                    print_panel("ℹ️ Info", f"Adjusted total amount to: {valid_amount}")
+                    print_panel("Info", f"Adjusted total amount to: {valid_amount}")
                     res = settlement_balance(
                         api_key,
                         tokens,
@@ -608,7 +608,7 @@ def purchase_n_times_by_option_code(
                 if "Bizz-err.Amount.Total" in error_msg:
                     error_msg_arr = error_msg.split("=")
                     valid_amount = int(error_msg_arr[1].strip())
-                    print_panel("ℹ️ Info", f"Adjusted total amount to: {valid_amount}")
+                    print_panel("Info", f"Adjusted total amount to: {valid_amount}")
                     res = settlement_balance(
                         api_key,
                         tokens,
