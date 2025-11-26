@@ -121,7 +121,7 @@ def purchase_loop(
 
         if res and res.get("status", "") != "SUCCESS":
             error_msg = res.get("message", "Unknown error")
-            print_panel("❌ Error", f"Purchase failed: {error_msg}")
+            #print_panel("❌ Error", f"Purchase failed: {error_msg}")
             if "Bizz-err.Amount.Total" in error_msg:
                 error_msg_arr = error_msg.split("=")
                 valid_amount = int(error_msg_arr[1].strip())
