@@ -30,7 +30,6 @@ def settlement_multipayment(
     token_confirmation = items[token_confirmation_idx]["token_confirmation"]
     payment_targets = ";".join([item["item_code"] for item in items])
 
-    # Determine amount
     if overwrite_amount != -1:
         amount_int = overwrite_amount
     elif amount_idx == -1:
