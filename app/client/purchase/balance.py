@@ -14,7 +14,7 @@ from app.client.encrypt import (
 )
 from app.client.engsel import BASE_API_URL, UA, intercept_page, send_api_request
 from app.type_dict import PaymentItem
-from app.menus.util import live_loading, print_panel
+from app.menus.util import live_loading, print_error, print_success, print_panel
 from app.config.theme_config import get_theme
 
 
@@ -29,9 +29,10 @@ def settlement_balance(
     amount_idx: int = -1,
     topup_number: str = "",
     stage_token: str = "",
-) -> dict | None:
+):
     # Sanity check
     if overwrite_amount == -1 and not ask_overwrite:
+        print_error("❌", "Either ask_overwrite must be True or overwrite_amount must be set.")
         return None
 
     token_confirmation = items[token_confirmation_idx]["token_confirmation"]
@@ -45,12 +46,13 @@ def settlement_balance(
 
     # If Overwrite
     if ask_overwrite:
-        amount_str = input(f"Total amount is {amount_int}. Enter new amount if you need to overwrite: ")
+        print_panel("💰 Amount", f"Total amount is {amount_int}. Enter new amount if you need to overwrite.")
+        amount_str = input("Press enter to ignore & use default amount: ")
         if amount_str != "":
             try:
                 amount_int = int(amount_str)
             except ValueError:
-                pass  # fallback ke original price
+                print_warning("⚠️", "Invalid overwrite input, using original price.")
 
     intercept_page(api_key, tokens, items[0]["item_code"], False)
 
@@ -69,11 +71,9 @@ def settlement_balance(
         payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
 
     if payment_res.get("status") != "SUCCESS":
-        return {
-            "status": payment_res.get("status"),
-            "message": payment_res.get("message", ""),
-            "data": payment_res,
-        }
+        print_error("❌", "Failed to fetch payment methods.")
+        print_panel("📑 Response", json.dumps(payment_res, indent=2))
+        return payment_res
 
     token_payment = payment_res["data"]["token_payment"]
     ts_to_sign = payment_res["data"]["timestamp"]
@@ -185,21 +185,15 @@ def settlement_balance(
 
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
-        status = decrypted_body.get("status", "UNKNOWN")
-        message = decrypted_body.get("message", "")
+        if decrypted_body.get("status") != "SUCCESS":
+            #print_error("❌", "Failed to initiate settlement.")
+            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
+            return decrypted_body
 
-        # ✅ tampilkan status pembayaran
-        print_panel("🧾 Payment Status", f"Status: {status}\nMessage: {message}")
-
-        return {
-            "status": status,
-            "message": message,
-            "data": decrypted_body,
-        }
+        print_success("✅", "Purchase completed successfully")
+        print_panel("🧾 Purchase Result", json.dumps(decrypted_body, indent=2))
+        return decrypted_body
     except Exception as e:
-        print_panel("🧾 Payment Status", f"Status: ERROR\nMessage: Decrypt error: {e}")
-        return {
-            "status": "ERROR",
-            "message": f"Decrypt error: {e}",
-            "data": None,
-        }
+        print_error("❌", f"Decrypt error: {e}")
+        print_panel("📑 Raw Response", resp.text)
+        return resp.text
