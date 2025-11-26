@@ -54,26 +54,26 @@ def simple_number():
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
-                                  CCCJwJ
-                               CwCJCCJwJ
-                            CwCJwwCJJJwC
-                           CCwwJJJJJJJwC
-                           CfJJJJJJJJJwC
-    <<<<<<<<<<<<<<<        CwJJJJJJJJJwC
-    <<<<<<<<<<<<<<<<<      CJJJJJJJJJJwC
-    v<<<<<<<<<<<<<<<<<<  \< JwJJJJJJJJwC
-      v<<<<<<<<<<<<<<<<<<<</fCJJJJJJJJwC
-        |<<<<<<<<<<<<<<<<<<< JwJJJJJJJCJJJJJJJJJJJJJJJJJJJC
-          \<<<<<<<<<<<<<<<<<\mCwJJJJJJJCwwwwwwwwwwwwwwwwfwJ
-            <<<<<<<<<<<<<<<<<)FCwJJJJJJJJJJJJJJJJJJJJJJCCJ
-              )<<<<<<<<<<<<<<<)uwwJJJJJJJJJJJJJJJJJJJJwCC
-              <<<<<<<<<<<<<<<<<\sfwJJJJJJJJJJJJJJJJJCwCJ
-            <<<<<<<<<<<<<<<<<<<<\>LwwJJJCwCJJJJJJJJJCwL
-          <<<<<<<<<<<<<<<<<<<<<<<<)luwCCJJCJJJJJCJwJJ
-        ><<<<<<<<<<<<<<<<<<<<<<<<<<\\sjwf
-      <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\\ctLm
-    <<<<<<<<<<<<<<<<<<\   <<<<<<<<<<<<<\\vv<)
-    <<<<<<<<<<<<<<<<\       <<<<<<<<<<<<<\<<<"""
+                              CCCJwJ
+                           CwCJCCJwJ
+                        CwCJwwCJJJwC
+                       CCwwJJJJJJJwC
+                       CfJJJJJJJJJwC
+<<<<<<<<<<<<<<<        CwJJJJJJJJJwC
+<<<<<<<<<<<<<<<<<      CJJJJJJJJJJwC
+v<<<<<<<<<<<<<<<<<<  \< JwJJJJJJJJwC
+  v<<<<<<<<<<<<<<<<<<<</fCJJJJJJJJwC
+    |<<<<<<<<<<<<<<<<<<< JwJJJJJJJCJJJJJJJJJJJJJJJJJJJC
+      \<<<<<<<<<<<<<<<<<\mCwJJJJJJJCwwwwwwwwwwwwwwwwfwJ
+        <<<<<<<<<<<<<<<<<)FCwJJJJJJJJJJJJJJJJJJJJJJCCJ
+          )<<<<<<<<<<<<<<<)uwwJJJJJJJJJJJJJJJJJJJJwCC
+          <<<<<<<<<<<<<<<<<\sfwJJJJJJJJJJJJJJJJJCwCJ
+        <<<<<<<<<<<<<<<<<<<<\>LwwJJJCwCJJJJJJJJJCwL
+      <<<<<<<<<<<<<<<<<<<<<<<<)luwCCJJCJJJJJCJwJJ
+    ><<<<<<<<<<<<<<<<<<<<<<<<<<\\sjwf
+  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\\ctLm
+<<<<<<<<<<<<<<<<<<\   <<<<<<<<<<<<<\\vv<)
+<<<<<<<<<<<<<<<<\       <<<<<<<<<<<<<\<<<"""
 #__________             ___.                  
 #\______   \_____ ______\_ |__   ____ ___  ___    ▄   ▄
 #|    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  / ▄█▄ █▀█▀█ ▄█▄
