@@ -142,7 +142,7 @@ def settlement_qris(api_key: str, tokens: dict, items: list[PaymentItem],
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            #print_error("❌", "Failed to initiate settlement.")
+            print_error("❌", "Failed to initiate settlement.")
             print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return None
         transaction_id = decrypted_body["data"]["transaction_code"]
