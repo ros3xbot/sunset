@@ -43,7 +43,7 @@ def show_bundle_menu():
             console.print(Panel(table, border_style=theme["border_info"], padding=(0, 1), expand=True))
             console.print(f"[{theme['text_body']}]Total Harga: Rp {get_rupiah(total_price)}[/]")
         else:
-            print_panel("ℹ️", "Keranjang masih kosong.")
+            print_panel("Info", "Keranjang masih kosong.")
 
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
