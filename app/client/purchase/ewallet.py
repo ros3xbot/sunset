@@ -198,7 +198,7 @@ def show_multipayment(api_key: str, tokens: dict, items: list[PaymentItem],
     )
 
     if not settlement_response or settlement_response.get("status") != "SUCCESS":
-        #print_error("❌", "Failed to initiate settlement.")
+        print_error("❌", "Failed to initiate settlement.")
         print_panel("📑 Response", json.dumps(settlement_response, indent=2))
         return
 
