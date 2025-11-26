@@ -80,7 +80,7 @@ def purchase_loop(
     except Exception as e:
         print_panel("❌ Error", f"Exception saat mengambil detail paket: {e}")
         time.sleep(delay)
-        return True  # lanjut loop
+        return True
 
     payment_items = [
         PaymentItem(
@@ -644,5 +644,5 @@ def purchase_n_times_by_option_code(
         for idx, purchase in enumerate(successful_purchases, start=1):
             console.print(f"{idx}. {purchase}")
     console.print("-"*55)
-    pause()
+    #pause()
     return True
