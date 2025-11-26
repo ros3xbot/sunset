@@ -73,8 +73,13 @@ __________             ___.
     )
 
 
+#def pause():
+#    console.print(Panel("⏸️ Press Enter to continue...", border_style=get_theme_style("border_info")))
+#    input()
+    
 def pause():
-    console.print(Panel("⏸️ Press Enter to continue...", border_style=get_theme_style("border_info")))
+    theme = get_theme()
+    console.print(f"\n[bold {theme['border_info']}]Tekan Enter untuk melanjutkan...[/]")
     input()
 
 
