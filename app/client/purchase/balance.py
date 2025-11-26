@@ -187,7 +187,7 @@ def settlement_balance(
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
             print_error("❌", "Failed to initiate settlement.")
-            print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
+            #print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
             return decrypted_body
 
         print_success("✅", "Purchase completed successfully")
