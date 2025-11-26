@@ -79,7 +79,7 @@ __________             ___.
     
 def pause():
     theme = get_theme()
-    console.print(f"\n[bold {theme['border_warning']}]Tekan Enter untuk melanjutkan...[/]")
+    console.print(f"\n[bold {theme['text_sub']}]Tekan Enter untuk melanjutkan...[/]")
     input()
 
 
