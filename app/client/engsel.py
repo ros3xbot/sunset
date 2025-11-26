@@ -191,7 +191,7 @@ def get_package_details(api_key: str, tokens: dict,
 def get_addons(api_key: str, tokens: dict, package_option_code: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/xl-stores/options/addons-pinky-box"
     payload = {"is_enterprise": False, "lang": "en", "package_option_code": package_option_code}
-    res = _with_loading(f"🧩 Mengambil addons {package_option_code}...", send_api_request, use_loading, get_theme(),
+    res = _with_loading(f"🧩 Mengambil addons...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     return res.get("data")
 
@@ -199,7 +199,7 @@ def get_addons(api_key: str, tokens: dict, package_option_code: str, use_loading
 def intercept_page(api_key: str, tokens: dict, option_code: str, is_enterprise: bool = False, use_loading: bool = True) -> dict | None:
     path = "misc/api/v8/utility/intercept-page"
     payload = {"is_enterprise": is_enterprise, "lang": "en", "package_option_code": option_code}
-    return _with_loading(f"🛡️ Mengambil intercept {option_code}...", send_api_request, use_loading, get_theme(),
+    return _with_loading(f"🛡️ Mengambil intercept...", send_api_request, use_loading, get_theme(),
                          api_key, path, payload, tokens["id_token"], "POST")
 
 
