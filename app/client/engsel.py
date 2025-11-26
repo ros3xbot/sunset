@@ -15,7 +15,7 @@ from app.client.encrypt import (
 
 BASE_API_URL = os.getenv("BASE_API_URL")
 if not BASE_API_URL:
-    raise ValueError("BASE_API_URL environment variable not set")
+    raise ValueError("BASE_API_URL environment variable tidak diset")
 UA = os.getenv("UA")
 
 
@@ -58,42 +58,47 @@ def send_api_request(api_key: str, path: str, payload_dict: dict, id_token: str,
         return {"error": f"Gagal decrypt response: {e}", "raw": resp.text}
 
 
-def get_profile(api_key: str, access_token: str, id_token: str) -> dict | None:
+def _with_loading(message: str, func, use_loading: bool, theme, *args, **kwargs):
+    if use_loading:
+        with live_loading(message, theme):
+            return func(*args, **kwargs)
+    return func(*args, **kwargs)
+
+
+def get_profile(api_key: str, access_token: str, id_token: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/profile"
-    raw_payload = {
+    payload = {
         "access_token": access_token,
         "app_version": "8.9.1",
         "is_enterprise": False,
         "lang": "en",
     }
-    with live_loading("📡 Mengambil profil...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, id_token, "POST")
-    return res.get("data")
+    return _with_loading("📡 Mengambil profil...", send_api_request, use_loading, get_theme(),
+                         api_key, path, payload, id_token, "POST").get("data")
 
 
-def get_balance(api_key: str, id_token: str) -> dict | None:
+def get_balance(api_key: str, id_token: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/packages/balance-and-credit"
-    raw_payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("💰 Mengambil saldo...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, id_token, "POST")
-    if isinstance(res, dict) and "data" in res and "balance" in res["data"]:
-        return res["data"]["balance"]
-    return None
+    payload = {"is_enterprise": False, "lang": "en"}
+    res = _with_loading("💰 Mengambil saldo...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, id_token, "POST")
+    return res.get("data", {}).get("balance")
 
 
 def get_family(api_key: str, tokens: dict, family_code: str,
                is_enterprise: bool | None = None,
-               migration_type: str | None = None) -> dict | None:
+               migration_type: str | None = None,
+               use_loading: bool = True) -> dict | None:
     theme = get_theme()
     is_enterprise_list = [False, True] if is_enterprise is None else [is_enterprise]
     migration_type_list = ["NONE", "PRE_TO_PRIOH", "PRIOH_TO_PRIO", "PRIO_TO_PRIOH"] if migration_type is None else [migration_type]
     path = "api/v8/xl-stores/options/list"
     id_token = tokens.get("id_token")
-    family_data = None
-    with live_loading(f"📦 Mengambil family paket {family_code}...", theme):
+
+    def _fetch_family():
         for mt in migration_type_list:
             for ie in is_enterprise_list:
-                payload_dict = {
+                payload = {
                     "is_show_tagging_tab": True,
                     "is_dedicated_event": True,
                     "is_transaction_routine": False,
@@ -106,20 +111,19 @@ def get_family(api_key: str, tokens: dict, family_code: str,
                     "is_migration": False,
                     "lang": "en",
                 }
-                res = send_api_request(api_key, path, payload_dict, id_token, "POST")
+                res = send_api_request(api_key, path, payload, id_token, "POST")
                 if res.get("status") == "SUCCESS":
                     family_name = res["data"]["package_family"].get("name", "")
                     if family_name:
-                        family_data = res["data"]
-                        break
-            if family_data:
-                break
-    return family_data
+                        return res["data"]
+        return None
+
+    return _with_loading(f"📦 Mengambil family paket {family_code}...", _fetch_family, use_loading, theme)
 
 
-def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict | None:
+def get_families(api_key: str, tokens: dict, package_category_code: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/xl-stores/families"
-    payload_dict = {
+    payload = {
         "migration_type": "",
         "is_enterprise": False,
         "is_shareable": False,
@@ -128,19 +132,18 @@ def get_families(api_key: str, tokens: dict, package_category_code: str) -> dict
         "is_migration": False,
         "lang": "en",
     }
-    with live_loading(f"📂 Mengambil families untuk kategori {package_category_code}...", get_theme()):
-        res = send_api_request(api_key, path, payload_dict, tokens["id_token"], "POST")
-    if res.get("status") != "SUCCESS":
-        return None
-    return res["data"]
+    res = _with_loading(f"📂 Mengambil families kategori {package_category_code}...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, tokens["id_token"], "POST")
+    return res.get("data") if res.get("status") == "SUCCESS" else None
 
 
 def get_package(api_key: str, tokens: dict,
                 package_option_code: str,
                 package_family_code: str = "",
-                package_variant_code: str = "") -> dict | None:
+                package_variant_code: str = "",
+                use_loading: bool = True) -> dict | None:
     path = "api/v8/xl-stores/options/detail"
-    raw_payload = {
+    payload = {
         "is_transaction_routine": False,
         "migration_type": "NONE",
         "package_family_code": package_family_code,
@@ -154,118 +157,85 @@ def get_package(api_key: str, tokens: dict,
         "is_upsell_pdp": False,
         "package_variant_code": package_variant_code,
     }
-    with live_loading("📦 Mengambil detail paket...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+    res = _with_loading("📦 Mengambil detail paket...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, tokens["id_token"], "POST")
     return res.get("data")
 
 
-def get_addons(api_key: str, tokens: dict, package_option_code: str) -> dict | None:
+def get_addons(api_key: str, tokens: dict, package_option_code: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/xl-stores/options/addons-pinky-box"
-    raw_payload = {"is_enterprise": False, "lang": "en", "package_option_code": package_option_code}
-    with live_loading(f"🧩 Mengambil addons untuk {package_option_code}...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+    payload = {"is_enterprise": False, "lang": "en", "package_option_code": package_option_code}
+    res = _with_loading(f"🧩 Mengambil addons {package_option_code}...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, tokens["id_token"], "POST")
     return res.get("data")
 
 
-def intercept_page(api_key: str, tokens: dict, option_code: str, is_enterprise: bool = False) -> dict | None:
+def intercept_page(api_key: str, tokens: dict, option_code: str, is_enterprise: bool = False, use_loading: bool = True) -> dict | None:
     path = "misc/api/v8/utility/intercept-page"
-    raw_payload = {"is_enterprise": is_enterprise, "lang": "en", "package_option_code": option_code}
-    with live_loading(f"🛡️ Mengambil intercept page untuk {option_code}...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    return res if isinstance(res, dict) else None
+    payload = {"is_enterprise": is_enterprise, "lang": "en", "package_option_code": option_code}
+    return _with_loading(f"🛡️ Mengambil intercept {option_code}...", send_api_request, use_loading, get_theme(),
+                         api_key, path, payload, tokens["id_token"], "POST")
 
 
-def login_info(api_key: str, tokens: dict, is_enterprise: bool = False) -> dict | None:
+def login_info(api_key: str, tokens: dict, is_enterprise: bool = False, use_loading: bool = True) -> dict | None:
     path = "api/v8/auth/login"
-    raw_payload = {
+    payload = {
         "access_token": tokens["access_token"],
         "is_enterprise": is_enterprise,
         "lang": "en",
     }
-    with live_loading("🔑 Mengambil info login...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+    res = _with_loading("🔑 Mengambil info login...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, tokens["id_token"], "POST")
     return res.get("data")
 
 
-def get_package_details(api_key: str, tokens: dict,
-                        family_code: str, variant_code: str, option_order: int,
-                        is_enterprise: bool | None = None,
-                        migration_type: str | None = None) -> dict | None:
-    family_data = get_family(api_key, tokens, family_code, is_enterprise, migration_type)
-    if not family_data:
-        return None
-    option_code = None
-    for variant in family_data.get("package_variants", []):
-        if variant.get("package_variant_code") == variant_code:
-            for option in variant.get("package_options", []):
-                if option.get("order") == option_order:
-                    option_code = option.get("package_option_code")
-                    break
-    if not option_code:
-        return None
-    return get_package(api_key, tokens, option_code)
-
-
-def get_notifications(api_key: str, tokens: dict) -> dict | None:
+def get_notifications(api_key: str, tokens: dict, use_loading: bool = True) -> dict | None:
     path = "api/v8/notification-non-grouping"
-    raw_payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("🔔 Mengambil notifikasi...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    if isinstance(res, dict) and res.get("status") != "SUCCESS":
-        return None
-    return res
+    payload = {"is_enterprise": False, "lang": "en"}
+    res = _with_loading("🔔 Mengambil notifikasi...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, tokens["id_token"], "POST")
+    return res if res.get("status") == "SUCCESS" else None
 
 
-def get_notification_detail(api_key: str, tokens: dict, notification_id: str) -> dict | None:
+def get_notification_detail(api_key: str, tokens: dict, notification_id: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/notification/detail"
-    raw_payload = {"is_enterprise": False, "lang": "en", "notification_id": notification_id}
-    with live_loading(f"🔔 Mengambil notifikasi {notification_id}...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    if isinstance(res, dict) and res.get("status") != "SUCCESS":
-        return None
-    return res
+    payload = {"is_enterprise": False, "lang": "en", "notification_id": notification_id}
+    res = _with_loading(f"🔔 Mengambil detail notifikasi {notification_id}...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, tokens["id_token"], "POST")
+    return res if res.get("status") == "SUCCESS" else None
 
 
-def get_pending_transaction(api_key: str, tokens: dict) -> dict | None:
+def get_pending_transaction(api_key: str, tokens: dict, use_loading: bool = True) -> dict | None:
     path = "api/v8/profile"
-    raw_payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("⏳ Mengambil transaksi pending...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    if res.get("status") != "SUCCESS":
-        return None
+    payload = {"is_enterprise": False, "lang": "en"}
+    res = _with_loading("⏳ Mengambil transaksi pending...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, tokens["id_token"], "POST")
     data = res.get("data", {})
-    if not data or "pending_payment" not in data:
-        return None
-    return data
+    return data if res.get("status") == "SUCCESS" and "pending_payment" in data else None
 
 
-def get_transaction_history(api_key: str, tokens: dict) -> dict | None:
+def get_transaction_history(api_key: str, tokens: dict, use_loading: bool = True) -> dict | None:
     path = "payments/api/v8/transaction-history"
-    raw_payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("📜 Mengambil riwayat transaksi...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    if res.get("status") != "SUCCESS":
-        return None
+    payload = {"is_enterprise": False, "lang": "en"}
+    res = _with_loading("📜 Mengambil riwayat transaksi...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, tokens["id_token"], "POST")
     data = res.get("data", {})
-    if not data or "list" not in data:
-        return None
-    return data
+    return data if res.get("status") == "SUCCESS" and "list" in data else None
 
 
-def get_tiering_info(api_key: str, tokens: dict) -> dict:
+def get_tiering_info(api_key: str, tokens: dict, use_loading: bool = True) -> dict:
     path = "gamification/api/v8/loyalties/tiering/info"
-    raw_payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("🏆 Mengambil info tiering...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
-    if not res or res.get("status") != "SUCCESS":
-        return {}
-    return res.get("data", {})
+    payload = {"is_enterprise": False, "lang": "en"}
+    res = _with_loading("🏆 Mengambil info tiering...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, tokens["id_token"], "POST")
+    return res.get("data", {}) if res and res.get("status") == "SUCCESS" else {}
 
 
 def unsubscribe(api_key: str, tokens: dict,
-                quota_code: str, product_domain: str, product_subscription_type: str) -> bool:
+                quota_code: str, product_domain: str, product_subscription_type: str,
+                use_loading: bool = True) -> bool:
     path = "api/v8/packages/unsubscribe"
-    raw_payload = {
+    payload = {
         "product_subscription_type": product_subscription_type,
         "quota_code": quota_code,
         "product_domain": product_domain,
@@ -274,21 +244,19 @@ def unsubscribe(api_key: str, tokens: dict,
         "lang": "en",
         "family_member_id": "",
     }
-    with live_loading(f"🚫 Unsubscribe kuota {quota_code}...", get_theme()):
-        res = send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+    res = _with_loading(f"🚫 Unsubscribe kuota {quota_code}...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, tokens["id_token"], "POST")
     return bool(res and res.get("code") == "000")
 
 
-def dashboard_segments(api_key: str, tokens: dict) -> dict:
+def dashboard_segments(api_key: str, tokens: dict, use_loading: bool = True) -> dict:
     path = "dashboard/api/v8/segments"
-    raw_payload = {
-        "access_token": tokens["access_token"],
-    }
-    # Live loading opsional; fungsi ini cenderung dipanggil internal
-    return send_api_request(api_key, path, raw_payload, tokens["id_token"], "POST")
+    payload = {"access_token": tokens["access_token"]}
+    return _with_loading("📊 Mengambil segmen dashboard...", send_api_request, use_loading, get_theme(),
+                         api_key, path, payload, tokens["id_token"], "POST")
 
 
-def dash_segments(api_key: str, id_token: str, access_token: str, balance: int = 0) -> dict | None:
+def dash_segments(api_key: str, id_token: str, access_token: str, balance: int = 0, use_loading: bool = True) -> dict | None:
     path = "dashboard/api/v8/segments"
     payload = {
         "access_token": access_token,
@@ -300,10 +268,8 @@ def dash_segments(api_key: str, id_token: str, access_token: str, balance: int =
         "manufacturer_name": "samsung",
         "model_name": "SM-N935F",
     }
-
-    with live_loading("📊 Mengambil data segmen pengguna...", get_theme()):
-        res = send_api_request(api_key, path, payload, id_token, "POST")
-
+    res = _with_loading("📊 Mengambil data segmen pengguna...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, id_token, "POST")
     if not (isinstance(res, dict) and "data" in res):
         return None
 
@@ -350,17 +316,16 @@ def dash_segments(api_key: str, id_token: str, access_token: str, balance: int =
     }
 
 
-def get_quota(api_key: str, id_token: str) -> dict | None:
+def get_quota(api_key: str, id_token: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/packages/quota-summary"
     payload = {"is_enterprise": False, "lang": "en"}
-    with live_loading("📶 Mengambil ringkasan kuota...", get_theme()):
-        res = send_api_request(api_key, path, payload, id_token, "POST")
-    if isinstance(res, dict):
-        quota = res.get("data", {}).get("quota", {}).get("data")
-        if quota:
-            return {
-                "remaining": quota.get("remaining", 0),
-                "total": quota.get("total", 0),
-                "has_unlimited": quota.get("has_unlimited", False),
-            }
+    res = _with_loading("📶 Mengambil ringkasan kuota...", send_api_request, use_loading, get_theme(),
+                        api_key, path, payload, id_token, "POST")
+    quota = res.get("data", {}).get("quota", {}).get("data")
+    if quota:
+        return {
+            "remaining": quota.get("remaining", 0),
+            "total": quota.get("total", 0),
+            "has_unlimited": quota.get("has_unlimited", False),
+        }
     return None
