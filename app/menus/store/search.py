@@ -75,7 +75,7 @@ def show_store_packages_menu(
     while in_store_packages_menu:
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
-
+        
         store_packages_res = get_store_packages(api_key, tokens, subs_type, is_enterprise)
         if not store_packages_res:
             print_panel("ℹ️ Info", "Tidak ada store packages ditemukan.")
@@ -93,16 +93,17 @@ def show_store_packages_menu(
         ))
         simple_number()
         
-        table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
-        table.add_column("No", justify="right", style=theme["text_key"], width=4)
-        table.add_column("Judul", style=theme["text_body"])
-        table.add_column("Family", style=theme["text_body"])
-        table.add_column("Aktif", style=theme["text_date"])
-        table.add_column("Harga", style=theme["text_money"], justify="right")
-        
-        packages = {}
-        for i, package in enumerate(store_packages, start=1):
-            with live_loading(f"🔄 Menyusun baris {i}", theme):
+        # satu loading spinner sebelum tabel
+        with live_loading("🔄 Menyusun tabel packages...", theme):
+            table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
+            table.add_column("No", justify="right", style=theme["text_key"], width=4)
+            table.add_column("Judul", style=theme["text_body"])
+            table.add_column("Family", style=theme["text_body"])
+            table.add_column("Aktif", style=theme["text_date"])
+            table.add_column("Harga", style=theme["text_money"], justify="right")
+            
+            packages = {}
+            for i, package in enumerate(store_packages, start=1):
                 title = package.get("title","N/A")
                 original_price = package.get("original_price",0)
                 discounted_price = package.get("discounted_price",0)
@@ -142,4 +143,5 @@ def show_store_packages_menu(
                 pause()
         else:
             print_panel("❌ Error", "Pilihan tidak valid.")
+            pause()
             
