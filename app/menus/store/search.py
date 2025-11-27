@@ -17,7 +17,7 @@ def show_family_list_menu(
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        console.print(Panel("🔄 Fetching family list...", border_style=theme["border_info"]))
+        #console.print(Panel("🔄 Fetching family list...", border_style=theme["border_info"]))
         family_list_res = get_family_list(api_key, tokens, subs_type, is_enterprise)
         if not family_list_res:
             print_panel("ℹ️ Info", "Tidak ada family list ditemukan.")
@@ -50,7 +50,8 @@ def show_family_list_menu(
         nav.add_column(style=theme["text_body"])
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
-        console.print(Panel(nav, title=f"[{theme['text_title']}]⚙️ Options[/]", border_style=theme["border_primary"], expand=True))
+        console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
+         #title=f"[{theme['text_title']}]⚙️ Options[/]"
         
         choice = console.input(f"[{theme['text_sub']}]Pilih family (nomor):[/{theme['text_sub']}] ").strip()
         if choice == "00":
