@@ -1,11 +1,8 @@
 from app.client.store.redeemables import get_redeemables
 from app.service.auth import AuthInstance
-from app.menus.util import clear_screen, pause, print_panel, simple_number, get_theme
+from app.menus.util import clear_screen, pause, print_panel, simple_number
 from app.menus.package import show_package_details, get_packages_by_family
-
-from rich.panel import Panel
-from rich.table import Table
-from rich.align import Align
+from app.config.imports import *
 from datetime import datetime
 
 def show_redeemables_menu(is_enterprise: bool = False):
