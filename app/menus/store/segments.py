@@ -43,8 +43,8 @@ def show_store_segments_menu(is_enterprise: bool = False):
             table.add_column("Kode", style=theme["text_key"], width=6)
             table.add_column("Family", style=theme["text_body"])
             table.add_column("Judul", style=theme["text_body"])
+            table.add_column("Aktif", style=theme["text_date"])
             table.add_column("Harga", style=theme["text_money"], justify="right")
-            table.add_column("Masa Aktif", style=theme["text_date"])
             
             if not banners:
                 table.add_row("-", f"{name} (kosong)", "-", "-", "-")
@@ -68,6 +68,7 @@ def show_store_segments_menu(is_enterprise: bool = False):
                 table,
                 title=f"[{theme['text_title']}]📂 Segment: {name}[/]",
                 border_style=theme["border_info"],
+                padding=(0, 0),
                 expand=True
             ))
         
