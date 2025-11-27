@@ -1,224 +1,192 @@
 from datetime import datetime
 import json
-from app.menus.util import pause, clear_screen, format_quota_byte
+from rich.panel import Panel
+from rich.table import Table
+from rich.align import Align
+from rich.text import Text
+from rich.console import Group
+from app.menus.util import pause, clear_screen, format_quota_byte, print_panel, simple_number, nav_range, get_theme
 from app.client.famplan import get_family_data, change_member, remove_member, set_quota_limit, validate_msisdn
 
-WIDTH = 55
-
 def show_family_info(api_key: str, tokens: dict):
+    theme = get_theme()
     in_family_menu = True
     while in_family_menu:
         clear_screen()
         res = get_family_data(api_key, tokens)
         if not res.get("data"):
-            print("Failed to get family data.")
+            print_panel("❌ Error", "Gagal mengambil data family.")
             pause()
             return
         
         family_detail = res["data"]
         plan_type = family_detail["member_info"]["plan_type"]
-        
         if plan_type == "":
-            print("You are not family plan organizer.")
+            print_panel("ℹ️ Info", "Anda bukan organizer family plan.")
             pause()
             return
         
         parent_msisdn = family_detail["member_info"]["parent_msisdn"]
         members = family_detail["member_info"]["members"]
-        empyt_slots = [slot for slot in members if slot.get("msisdn") == ""]
+        empty_slots = [slot for slot in members if slot.get("msisdn") == ""]
         
-        total_quota_byte = family_detail["member_info"].get("total_quota", 0)
-        remaining_quota_byte = family_detail["member_info"].get("remaining_quota", 0)
-        
-        total_quota_human = format_quota_byte(total_quota_byte)
-        remaining_quota_human = format_quota_byte(remaining_quota_byte)
-        
+        total_quota_human = format_quota_byte(family_detail["member_info"].get("total_quota", 0))
+        remaining_quota_human = format_quota_byte(family_detail["member_info"].get("remaining_quota", 0))
         end_date_ts = family_detail["member_info"].get("end_date", 0)
         end_date = datetime.fromtimestamp(end_date_ts).strftime("%Y-%m-%d")
         
-        clear_screen()
-        print("-" * WIDTH)
-        print(f"Plan: {plan_type} | Parent: {parent_msisdn}".center(WIDTH))
-        print(f"Shared Quota: {remaining_quota_human} / {total_quota_human} | Exp: {end_date}".center(WIDTH))
-        print("-" * WIDTH)
+        # Header
+        console.print(Panel(
+            Align.center(
+                f"👨‍👩‍👧‍👦 Family Plan: {plan_type}\n"
+                f"📱 Parent: {parent_msisdn}\n"
+                f"📶 Quota: {remaining_quota_human}/{total_quota_human} | Exp: {end_date}",
+                vertical="middle"
+            ),
+            border_style=theme["border_info"],
+            padding=(1,2),
+            expand=True
+        ))
+        simple_number()
         
-        print(f"Members: {len(members) - len(empyt_slots)}/{len(members)}:")
+        # Members table
+        table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
+        table.add_column("No", justify="right", style=theme["text_key"], width=4)
+        table.add_column("MSISDN", style=theme["text_body"])
+        table.add_column("Alias", style=theme["text_body"])
+        table.add_column("Type", style=theme["text_body"])
+        table.add_column("Quota", style=theme["text_money"], justify="right")
+        table.add_column("Add Chances", style=theme["text_body"], justify="center")
+        
         for idx, member in enumerate(members, start=1):
-            print("-" * WIDTH)
-            msisdn = member.get("msisdn", "N/A")
-            formatted_msisdn = f"{msisdn}"
-            if msisdn == "":
-                formatted_msisdn = "<Empty Slot>"
-            
+            msisdn = member.get("msisdn", "")
             alias = member.get("alias", "N/A")
-            slot_id = member.get("slot_id", "N/A")
-            family_member_id = member.get("family_member_id", "N/A")
             member_type = member.get("member_type", "N/A")
-            end_date_ts = member.get("usage", {}).get("quota_expired_at", 0)
-            
-            quota_allocated_byte = member.get("usage", {}).get("quota_allocated", 0)
-            formated_quota_allocated = format_quota_byte(quota_allocated_byte)
-            
-            add_chances = member.get("add_chances", 0)
-            total_add_chances = member.get("total_add_chances", 0)
-            
-            quota_used_byte = member.get("usage", {}).get("quota_used", 0)
-            formated_quota_used = format_quota_byte(quota_used_byte)
-            
-            end_date = datetime.fromtimestamp(end_date_ts).strftime("%Y-%m-%d") if end_date_ts else "N/A"
-            print(f"{idx}. {formatted_msisdn} ({alias}) | {member_type} | Add Chances: {add_chances}/{total_add_chances}")
-            print(f"   Usage: {formated_quota_used} / {formated_quota_allocated}")
-        print("-" * WIDTH)
-        print("")
+            quota_used = format_quota_byte(member.get("usage", {}).get("quota_used", 0))
+            quota_alloc = format_quota_byte(member.get("usage", {}).get("quota_allocated", 0))
+            add_chances = f"{member.get('add_chances',0)}/{member.get('total_add_chances',0)}"
+            table.add_row(str(idx), msisdn or "<Empty Slot>", alias, member_type, f"{quota_used}/{quota_alloc}", add_chances)
         
-        print("-" * WIDTH)
-        print("Options:")
-        print("-" * WIDTH)
-        print("1. Change Member")
+        console.print(Panel(table, title=f"[{theme['text_title']}]👥 Members[/]", border_style=theme["border_info"], expand=True))
         
-        print("-" * WIDTH)
-        print("limit <Slot Number> <Quota limit in MB>. Set Quota limit for member.\n  Example: limit 2 1024 (to set 1024 MB quota for member in slot 2)")
+        # Options
+        nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+        nav.add_column(justify="right", style=theme["text_key"], width=6)
+        nav.add_column(style=theme["text_body"])
+        nav.add_row("1", "🔄 Change Member")
+        nav.add_row("limit <No> <MB>", "📊 Set Quota Limit")
+        nav.add_row("del <No>", "🗑️ Remove Member")
+        nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
-        print("-" * WIDTH)
-        print("del <Slot Number>. Remove member from slot.\n  Example: del 3 (to remove member in slot 3)")
+        console.print(Panel(nav, title=f"[{theme['text_title']}]⚙️ Options[/]", border_style=theme["border_primary"], expand=True))
         
-        print("-" * WIDTH)
-        print("00. Back to Main Menu")
+        choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         
-        print("-" * WIDTH)
-        
-        choice = input("Enter your choice: ").strip()
+        # Change Member
         if choice == "1":
-            slot_idx = input("Enter the slot number: ").strip()
-            target_msisdn = input("Enter the new member's phone number (start with 62): ").strip()
-            parent_alias = input("Enter your alias: ").strip()
-            child_alias = input("Enter the new member's alias: ").strip()
-            
+            slot_idx = console.input("Slot number: ").strip()
+            target_msisdn = console.input("Nomor baru (62...): ").strip()
+            parent_alias = console.input("Alias parent: ").strip()
+            child_alias = console.input("Alias member baru: ").strip()
             try:
                 slot_idx_int = int(slot_idx)
                 if slot_idx_int < 1 or slot_idx_int > len(members):
-                    print("Invalid slot number.")
+                    print_panel("❌ Error", "Nomor slot tidak valid.")
                     pause()
-                    return
-                
+                    continue
                 if members[slot_idx_int - 1].get("msisdn") != "":
-                    print("Selected slot is not empty. Cannot change member.")
+                    print_panel("❌ Error", "Slot sudah terisi.")
                     pause()
-                    return
-                
-                family_member_id = members[slot_idx_int - 1]["family_member_id"]
-                slot_id = members[slot_idx_int - 1]["slot_id"]
-                
-                # Checking MSISDN
+                    continue
                 validation_res = validate_msisdn(api_key, tokens, target_msisdn)
-                if validation_res.get("status").lower() != "success":
-                    print(f"MSISDN validation failed: {json.dumps(validation_res, indent=2)}")
+                if validation_res.get("status","").lower() != "success":
+                    print_panel("❌ Error", f"Validasi gagal: {json.dumps(validation_res, indent=2)}")
                     pause()
-                    return
-                print("MSISDN validation successful.")
-                
-                target_family_plan_role = validation_res["data"].get("family_plan_role", "")
-                if target_family_plan_role != "NO_ROLE":
-                    print(f"{target_msisdn} is already part of another family plan with role {target_family_plan_role}.")
+                    continue
+                if validation_res["data"].get("family_plan_role","") != "NO_ROLE":
+                    print_panel("❌ Error", f"{target_msisdn} sudah tergabung di family lain.")
                     pause()
-                    return
-
-                is_continue = input(f"Are you sure you want to assign {target_msisdn} to slot {slot_idx_int}? (y/n): ").strip().lower()
+                    continue
+                is_continue = console.input(f"Assign {target_msisdn} ke slot {slot_idx_int}? (y/n): ").strip().lower()
                 if is_continue != "y":
-                    print("Operation cancelled by user.")
+                    print_panel("ℹ️ Info", "Dibatalkan.")
                     pause()
-                    return
-                
-                change_member_res = change_member(
-                    api_key,
-                    tokens,
-                    parent_alias,
-                    child_alias,
-                    slot_id,
-                    family_member_id,
-                    target_msisdn,
-                )
-                if change_member_res.get("status") == "SUCCESS":
-                    print("Member changed successfully.")
+                    continue
+                res_change = change_member(api_key, tokens, parent_alias, child_alias,
+                                           members[slot_idx_int-1]["slot_id"],
+                                           members[slot_idx_int-1]["family_member_id"],
+                                           target_msisdn)
+                if res_change.get("status") == "SUCCESS":
+                    print_panel("✅ Success", "Member berhasil diganti.")
                 else:
-                    print(f"Failed to change member: {change_member_res.get('message', 'Unknown error')}")
-                
-                print(json.dumps(change_member_res, indent=4))
+                    print_panel("❌ Error", res_change.get("message","Unknown error"))
+                console.print(json.dumps(res_change, indent=4))
             except ValueError:
-                print("Invalid input. Please enter a valid slot number.")
+                print_panel("❌ Error", "Input slot tidak valid.")
             pause()
+        
+        # Remove Member
         elif choice.startswith("del "):
-            _, slot_num = choice.split(" ", 1)
+            _, slot_num = choice.split(" ",1)
             try:
                 slot_idx_int = int(slot_num)
                 if slot_idx_int < 1 or slot_idx_int > len(members):
-                    print("Invalid slot number.")
+                    print_panel("❌ Error", "Nomor slot tidak valid.")
                     pause()
-                    return
-                
-                member = members[slot_idx_int - 1]
+                    continue
+                member = members[slot_idx_int-1]
                 if member.get("msisdn") == "":
-                    print("Selected slot is already empty.")
+                    print_panel("ℹ️ Info", "Slot kosong.")
                     pause()
-                    return
-                
-                is_continue = input(f"Are you sure you want to remove member {member.get('msisdn')} from slot {slot_idx_int}? (y/n): ").strip().lower()
+                    continue
+                is_continue = console.input(f"Hapus {member.get('msisdn')} dari slot {slot_idx_int}? (y/n): ").strip().lower()
                 if is_continue != "y":
-                    print("Operation cancelled by user.")
+                    print_panel("ℹ️ Info", "Dibatalkan.")
                     pause()
-                    return
-                
-                family_member_id = member["family_member_id"]
-                res = remove_member(
-                    api_key,
-                    tokens,
-                    family_member_id,
-                )
-                if res.get("status") == "SUCCESS":
-                    print("Member removed successfully.")
+                    continue
+                res_del = remove_member(api_key, tokens, member["family_member_id"])
+                if res_del.get("status") == "SUCCESS":
+                    print_panel("✅ Success", "Member berhasil dihapus.")
                 else:
-                    print(f"Failed to remove member: {res.get('message', 'Unknown error')}")
-                
-                print(json.dumps(res, indent=4))
+                    print_panel("❌ Error", res_del.get("message","Unknown error"))
+                console.print(json.dumps(res_del, indent=4))
             except ValueError:
-                print("Invalid input. Please enter a valid slot number.")
+                print_panel("❌ Error", "Input slot tidak valid.")
             pause()
+        
+        # Set Quota Limit
         elif choice.startswith("limit "):
-            _, slot_num, new_quota_mb = choice.split(" ", 2)
             try:
+                _, slot_num, new_quota_mb = choice.split(" ",2)
                 slot_idx_int = int(slot_num)
                 new_quota_mb_int = int(new_quota_mb)
                 if slot_idx_int < 1 or slot_idx_int > len(members):
-                    print("Invalid slot number.")
+                    print_panel("❌ Error", "Nomor slot tidak valid.")
                     pause()
-                    return
-                
-                member = members[slot_idx_int - 1]
+                    continue
+                member = members[slot_idx_int-1]
                 if member.get("msisdn") == "":
-                    print("Selected slot is empty. Cannot set quota limit.")
+                    print_panel("❌ Error", "Slot kosong.")
                     pause()
-                    return
-                
-                family_member_id = member["family_member_id"]
-                original_allocation_byte = member.get("usage", {}).get("quota_allocated", 0)
+                    continue
                 new_allocation_byte = new_quota_mb_int * 1024 * 1024
-                
-                res = set_quota_limit(
-                    api_key,
-                    tokens,
-                    original_allocation_byte,
-                    new_allocation_byte,
-                    family_member_id,
-                )
-                if res.get("status") == "SUCCESS":
-                    print("Quota limit set successfully.")
+                res_limit = set_quota_limit(api_key, tokens,
+                                            member.get("usage",{}).get("quota_allocated",0),
+                                            new_allocation_byte,
+                                            member["family_member_id"])
+                if res_limit.get("status") == "SUCCESS":
+                    print_panel("✅ Success", "Quota limit berhasil diatur.")
                 else:
-                    print(f"Failed to set quota limit: {res.get('message', 'Unknown error')}")
-                
-                print(json.dumps(res, indent=4))
+                    print_panel("❌ Error", res_limit.get("message","Unknown error"))
+                console.print(json.dumps(res_limit, indent=4))
             except ValueError:
-                print("Invalid input. Please enter a valid slot number.")
+                print_panel("❌ Error", "Input tidak valid.")
             pause()
-        elif choice == "00":
+        
+         elif choice == "00":
             in_family_menu = False
             return
+
+        else:
+            print_panel("ℹ️ Info", "Perintah tidak dikenali.")
+            pause()
