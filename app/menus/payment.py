@@ -30,7 +30,7 @@ def show_transaction_history(api_key, tokens):
             history = []
 
         if not history:
-            print_panel("ℹ️ Info", "Tidak ada riwayat transaksi.")
+            print_panel("Info", "Tidak ada riwayat transaksi.")
         else:
             for idx, transaction in enumerate(history, start=1):
                 ts = transaction.get("timestamp", 0)
