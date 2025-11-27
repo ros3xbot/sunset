@@ -4,6 +4,8 @@ from app.menus.util import clear_screen, pause, print_panel, simple_number
 from app.service.auth import AuthInstance
 from app.config.imports import *
 
+console = Console()
+
 
 def show_family_list_menu(
     subs_type: str = "PREPAID",
