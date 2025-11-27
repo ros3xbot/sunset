@@ -15,7 +15,7 @@ def show_store_segments_menu(is_enterprise: bool = False):
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        console.print(Panel("🔄 Fetching store segments...", border_style=theme["border_info"]))
+        #console.print(Panel("🔄 Fetching store segments...", border_style=theme["border_info"]))
         segments_res = get_segments(api_key, tokens, is_enterprise)
         if not segments_res:
             print_panel("ℹ️ Info", "Tidak ada store segments ditemukan.")
@@ -76,7 +76,8 @@ def show_store_segments_menu(is_enterprise: bool = False):
         nav.add_column(style=theme["text_body"])
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
-        console.print(Panel(nav, title=f"[{theme['text_title']}]⚙️ Options[/]", border_style=theme["border_primary"], expand=True))
+        console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
+        #title=f"[{theme['text_title']}]⚙️ Options[/]", 
         
         choice = console.input(f"[{theme['text_sub']}]Pilih banner (misal A1, B2):[/{theme['text_sub']}] ").strip()
         if choice == "00":
