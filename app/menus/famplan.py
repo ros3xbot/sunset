@@ -4,6 +4,8 @@ from app.config.imports import *
 from app.menus.util import pause, clear_screen, format_quota_byte, print_panel, simple_number, nav_range
 from app.client.famplan import get_family_data, change_member, remove_member, set_quota_limit, validate_msisdn
 
+console = Console()
+
 
 def show_family_info(api_key: str, tokens: dict):
     theme = get_theme()
