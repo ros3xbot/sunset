@@ -75,11 +75,8 @@ def show_store_packages_menu(
     while in_store_packages_menu:
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
-        
-        # Tambahkan live loading saat memuat store packages
-        with live_loading("🔄 Memuat store packages...", theme):
-            store_packages_res = get_store_packages(api_key, tokens, subs_type, is_enterprise)
-        
+
+        store_packages_res = get_store_packages(api_key, tokens, subs_type, is_enterprise)
         if not store_packages_res:
             print_panel("ℹ️ Info", "Tidak ada store packages ditemukan.")
             in_store_packages_menu = False
@@ -105,23 +102,23 @@ def show_store_packages_menu(
         
         packages = {}
         for i, package in enumerate(store_packages, start=1):
-            title = package.get("title","N/A")
-            original_price = package.get("original_price",0)
-            discounted_price = package.get("discounted_price",0)
-            validity = package.get("validity","N/A")
-            family_name = package.get("family_name","N/A")
-            action_type = package.get("action_type","")
-            action_param = package.get("action_param","")
-            
-            packages[str(i)] = {"action_type": action_type, "action_param": action_param}
-            
-            # format harga dengan get_rupiah
-            if discounted_price and discounted_price > 0:
-                harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)}"
-            else:
-                harga_str = get_rupiah(original_price)
-            
-            table.add_row(str(i), title, family_name, validity, harga_str)
+            with live_loading(f"🔄 Menyusun baris {i}", theme):
+                title = package.get("title","N/A")
+                original_price = package.get("original_price",0)
+                discounted_price = package.get("discounted_price",0)
+                validity = package.get("validity","N/A")
+                family_name = package.get("family_name","N/A")
+                action_type = package.get("action_type","")
+                action_param = package.get("action_param","")
+                
+                packages[str(i)] = {"action_type": action_type, "action_param": action_param}
+                
+                if discounted_price and discounted_price > 0:
+                    harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)}"
+                else:
+                    harga_str = get_rupiah(original_price)
+                
+                table.add_row(str(i), title, family_name, validity, harga_str)
         
         console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
         
@@ -145,4 +142,4 @@ def show_store_packages_menu(
                 pause()
         else:
             print_panel("❌ Error", "Pilihan tidak valid.")
-            pause()
+            
