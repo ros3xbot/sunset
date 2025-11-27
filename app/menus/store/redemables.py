@@ -5,6 +5,9 @@ from app.menus.package import show_package_details, get_packages_by_family
 from app.config.imports import *
 from datetime import datetime
 
+console = Console()
+
+
 def show_redeemables_menu(is_enterprise: bool = False):
     theme = get_theme()
     in_redeemables_menu = True
