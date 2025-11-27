@@ -67,6 +67,7 @@ def show_redeemables_menu(is_enterprise: bool = False):
                 table,
                 title=f"[{theme['text_title']}]📂 Category: {category_name}[/] (Code: {category_code})",
                 border_style=theme["border_info"],
+                padding=(0, 0),
                 expand=True
             ))
         
