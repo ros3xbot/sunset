@@ -15,7 +15,7 @@ def show_redeemables_menu(is_enterprise: bool = False):
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        console.print(Panel("🔄 Fetching redeemables...", border_style=theme["border_info"]))
+        #console.print(Panel("🔄 Fetching redeemables...", border_style=theme["border_info"]))
         redeemables_res = get_redeemables(api_key, tokens, is_enterprise)
         if not redeemables_res:
             print_panel("ℹ️ Info", "Tidak ada redeemables ditemukan.")
@@ -75,7 +75,8 @@ def show_redeemables_menu(is_enterprise: bool = False):
         nav.add_column(style=theme["text_body"])
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
-        console.print(Panel(nav, title=f"[{theme['text_title']}]⚙️ Options[/]", border_style=theme["border_primary"], expand=True))
+        console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
+        #title=f"[{theme['text_title']}]⚙️ Options[/]", 
         
         choice = console.input(f"[{theme['text_sub']}]Pilih redeemable (misal A1, B2):[/{theme['text_sub']}] ").strip()
         if choice == "00":
