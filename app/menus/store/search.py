@@ -1,6 +1,6 @@
 from app.client.store.search import get_family_list, get_store_packages
 from app.menus.package import get_packages_by_family, show_package_details
-from app.menus.util import clear_screen, pause, print_panel, simple_number
+from app.menus.util import clear_screen, pause, print_panel, simple_number, get_rupiah
 from app.service.auth import AuthInstance
 from app.config.imports import *
 
@@ -17,7 +17,6 @@ def show_family_list_menu(
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        #console.print(Panel("🔄 Fetching family list...", border_style=theme["border_info"]))
         family_list_res = get_family_list(api_key, tokens, subs_type, is_enterprise)
         if not family_list_res:
             print_panel("ℹ️ Info", "Tidak ada family list ditemukan.")
@@ -51,7 +50,6 @@ def show_family_list_menu(
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
         console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
-         #title=f"[{theme['text_title']}]⚙️ Options[/]"
         
         choice = console.input(f"[{theme['text_sub']}]Pilih family (nomor):[/{theme['text_sub']}] ").strip()
         if choice == "00":
@@ -67,6 +65,7 @@ def show_family_list_menu(
             print_panel("❌ Error", "Pilihan tidak valid.")
             pause()
 
+
 def show_store_packages_menu(
     subs_type: str = "PREPAID",
     is_enterprise: bool = False,
@@ -77,7 +76,6 @@ def show_store_packages_menu(
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        #console.print(Panel("🔄 Fetching store packages...", border_style=theme["border_info"]))
         store_packages_res = get_store_packages(api_key, tokens, subs_type, is_enterprise)
         if not store_packages_res:
             print_panel("ℹ️ Info", "Tidak ada store packages ditemukan.")
@@ -107,14 +105,20 @@ def show_store_packages_menu(
             title = package.get("title","N/A")
             original_price = package.get("original_price",0)
             discounted_price = package.get("discounted_price",0)
-            price = discounted_price if discounted_price > 0 else original_price
             validity = package.get("validity","N/A")
             family_name = package.get("family_name","N/A")
             action_type = package.get("action_type","")
             action_param = package.get("action_param","")
             
             packages[str(i)] = {"action_type": action_type, "action_param": action_param}
-            table.add_row(str(i), title, family_name, f"Rp{price}", validity)
+            
+            # format harga dengan get_rupiah
+            if discounted_price and discounted_price > 0:
+                harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)}"
+            else:
+                harga_str = get_rupiah(original_price)
+            
+            table.add_row(str(i), title, family_name, validity, harga_str)
         
         console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
         
@@ -124,7 +128,6 @@ def show_store_packages_menu(
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
         console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
-        #title=f"[{theme['text_title']}]⚙️ Options[/]", 
         
         choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
         if choice == "00":
