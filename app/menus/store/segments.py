@@ -5,6 +5,8 @@ from app.service.auth import AuthInstance
 from app.menus.package import show_package_details
 from app.config.imports import *
 
+console = Console()
+
 
 def show_store_segments_menu(is_enterprise: bool = False):
     theme = get_theme()
