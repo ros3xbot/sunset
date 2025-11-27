@@ -43,7 +43,7 @@ def show_family_list_menu(
         for i, family in enumerate(family_list, start=1):
             table.add_row(str(i), family.get("label","N/A"), family.get("id","N/A"))
         
-        console.print(Panel(table, border_style=theme["border_info"], expand=True))
+        console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
         
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
@@ -77,7 +77,7 @@ def show_store_packages_menu(
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        console.print(Panel("🔄 Fetching store packages...", border_style=theme["border_info"]))
+        #console.print(Panel("🔄 Fetching store packages...", border_style=theme["border_info"]))
         store_packages_res = get_store_packages(api_key, tokens, subs_type, is_enterprise)
         if not store_packages_res:
             print_panel("ℹ️ Info", "Tidak ada store packages ditemukan.")
@@ -99,8 +99,8 @@ def show_store_packages_menu(
         table.add_column("No", justify="right", style=theme["text_key"], width=4)
         table.add_column("Judul", style=theme["text_body"])
         table.add_column("Family", style=theme["text_body"])
+        table.add_column("Aktif", style=theme["text_date"])
         table.add_column("Harga", style=theme["text_money"], justify="right")
-        table.add_column("Masa Aktif", style=theme["text_date"])
         
         packages = {}
         for i, package in enumerate(store_packages, start=1):
@@ -116,14 +116,15 @@ def show_store_packages_menu(
             packages[str(i)] = {"action_type": action_type, "action_param": action_param}
             table.add_row(str(i), title, family_name, f"Rp{price}", validity)
         
-        console.print(Panel(table, border_style=theme["border_info"], expand=True))
+        console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
         
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
         nav.add_column(style=theme["text_body"])
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
-        console.print(Panel(nav, title=f"[{theme['text_title']}]⚙️ Options[/]", border_style=theme["border_primary"], expand=True))
+        console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
+        #title=f"[{theme['text_title']}]⚙️ Options[/]", 
         
         choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
         if choice == "00":
