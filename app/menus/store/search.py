@@ -1,134 +1,140 @@
 from app.client.store.search import get_family_list, get_store_packages
 from app.menus.package import get_packages_by_family, show_package_details
-from app.menus.util import clear_screen, pause
+from app.menus.util import clear_screen, pause, print_panel, simple_number, get_theme
 from app.service.auth import AuthInstance
 
-WIDTH = 55
+from rich.panel import Panel
+from rich.table import Table
+from rich.align import Align
 
 def show_family_list_menu(
     subs_type: str = "PREPAID",
     is_enterprise: bool = False,
 ):
+    theme = get_theme()
     in_family_list_menu = True
     while in_family_list_menu:
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        print("Fetching family list...")
+        console.print(Panel("🔄 Fetching family list...", border_style=theme["border_info"]))
         family_list_res = get_family_list(api_key, tokens, subs_type, is_enterprise)
         if not family_list_res:
-            print("No family list found.")
+            print_panel("ℹ️ Info", "Tidak ada family list ditemukan.")
             in_family_list_menu = False
             continue
         
         family_list = family_list_res.get("data", {}).get("results", [])
-        
         clear_screen()
         
-        print("=" * WIDTH)
-        print("Family List:")
-        print("=" * WIDTH)
+        console.print(Panel(
+            Align.center("👨‍👩‍👧‍👦 Family List", vertical="middle"),
+            border_style=theme["border_info"],
+            padding=(1,2),
+            expand=True
+        ))
+        simple_number()
         
-        for i, family in enumerate(family_list):
-            family_name = family.get("label", "N/A")
-            family_code = family.get("id", "N/A")
-            
-            print(f"{i + 1}. {family_name}")
-            print(f"   Family code: {family_code}")
-            print("-" * WIDTH)
+        table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
+        table.add_column("No", justify="right", style=theme["text_key"], width=4)
+        table.add_column("Nama Family", style=theme["text_body"])
+        table.add_column("Kode", style=theme["border_warning"])
         
-        print("00. Back to Main Menu")
-        print("Input the number to view packages in that family.")
-        choice = input("Enter your choice: ")
+        for i, family in enumerate(family_list, start=1):
+            table.add_row(str(i), family.get("label","N/A"), family.get("id","N/A"))
+        
+        console.print(Panel(table, border_style=theme["border_info"], expand=True))
+        
+        nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+        nav.add_column(justify="right", style=theme["text_key"], width=6)
+        nav.add_column(style=theme["text_body"])
+        nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        
+        console.print(Panel(nav, title=f"[{theme['text_title']}]⚙️ Options[/]", border_style=theme["border_primary"], expand=True))
+        
+        choice = console.input(f"[{theme['text_sub']}]Pilih family (nomor):[/{theme['text_sub']}] ").strip()
         if choice == "00":
             in_family_list_menu = False
-        
-        if choice.isdigit() and int(choice) > 0 and int(choice) <= len(family_list):
-            selected_family = family_list[int(choice) - 1]
-            family_code = selected_family.get("id", "")
-            family_name = selected_family.get("label", "N/A")
-            
-            print(f"Fetching packages for family: {family_name}...")
+            continue
+        if choice.isdigit() and 1 <= int(choice) <= len(family_list):
+            selected_family = family_list[int(choice)-1]
+            family_code = selected_family.get("id","")
+            family_name = selected_family.get("label","N/A")
+            console.print(Panel(f"🔍 Fetching packages for family: {family_name}", border_style=theme["border_info"]))
             get_packages_by_family(family_code)
-    
-    #pause()
+        else:
+            print_panel("❌ Error", "Pilihan tidak valid.")
+            pause()
 
 def show_store_packages_menu(
     subs_type: str = "PREPAID",
     is_enterprise: bool = False,
 ):
+    theme = get_theme()
     in_store_packages_menu = True
     while in_store_packages_menu:
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        print("Fetching store packages...")
+        console.print(Panel("🔄 Fetching store packages...", border_style=theme["border_info"]))
         store_packages_res = get_store_packages(api_key, tokens, subs_type, is_enterprise)
         if not store_packages_res:
-            print("No store packages found.")
+            print_panel("ℹ️ Info", "Tidak ada store packages ditemukan.")
             in_store_packages_menu = False
             continue
         
         store_packages = store_packages_res.get("data", {}).get("results_price_only", [])
-        
         clear_screen()
         
-        print("=" * WIDTH)
-        print("Store Packages:")
-        print("=" * WIDTH)
+        console.print(Panel(
+            Align.center("🛒 Store Packages", vertical="middle"),
+            border_style=theme["border_info"],
+            padding=(1,2),
+            expand=True
+        ))
+        simple_number()
+        
+        table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
+        table.add_column("No", justify="right", style=theme["text_key"], width=4)
+        table.add_column("Judul", style=theme["text_body"])
+        table.add_column("Family", style=theme["text_body"])
+        table.add_column("Harga", style=theme["text_money"], justify="right")
+        table.add_column("Masa Aktif", style=theme["text_date"])
         
         packages = {}
-        for i, package in enumerate(store_packages):
-            title = package.get("title", "N/A")
+        for i, package in enumerate(store_packages, start=1):
+            title = package.get("title","N/A")
+            original_price = package.get("original_price",0)
+            discounted_price = package.get("discounted_price",0)
+            price = discounted_price if discounted_price > 0 else original_price
+            validity = package.get("validity","N/A")
+            family_name = package.get("family_name","N/A")
+            action_type = package.get("action_type","")
+            action_param = package.get("action_param","")
             
-            
-            original_price = package.get("original_price", 0)
-            discounted_price = package.get("discounted_price", 0)
-            
-            price = original_price
-            if discounted_price > 0:
-                price = discounted_price
-            
-            validity = package.get("validity", "N/A")
-            family_name = package.get("family_name", "N/A")
-            
-            action_type = package.get("action_type", "")
-            action_param = package.get("action_param", "")
-            
-            packages[f"{i + 1}"] = {
-                "action_type": action_type,
-                "action_param": action_param
-            }
-            
-            print(f"{i + 1}. {title}")
-            print(f"   Family: {family_name}")
-            print(f"   Price: Rp{price}")
-            print(f"   Validity: {validity}")
-            print("-" * WIDTH)
+            packages[str(i)] = {"action_type": action_type, "action_param": action_param}
+            table.add_row(str(i), title, family_name, f"Rp{price}", validity)
         
-        print("00. Back to Main Menu")
-        print("Input the number to view package details.")
-        choice = input("Enter your choice: ")
+        console.print(Panel(table, border_style=theme["border_info"], expand=True))
+        
+        nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+        nav.add_column(justify="right", style=theme["text_key"], width=6)
+        nav.add_column(style=theme["text_body"])
+        nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        
+        console.print(Panel(nav, title=f"[{theme['text_title']}]⚙️ Options[/]", border_style=theme["border_primary"], expand=True))
+        
+        choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
         if choice == "00":
             in_store_packages_menu = False
+            continue
         elif choice in packages:
-            selected_package = packages[choice]
-            
-            action_type = selected_package["action_type"]
-            action_param = selected_package["action_param"]
-            
-            if action_type == "PDP":
-                _ = show_package_details(
-                        api_key,
-                        tokens,
-                        action_param,
-                        is_enterprise
-                    )
+            selected = packages[choice]
+            if selected["action_type"] == "PDP":
+                show_package_details(api_key, tokens, selected["action_param"], is_enterprise)
             else:
-                print("=" * WIDTH)
-                print("Unhandled Action Type")
-                print(f"Action type: {action_type}\nParam: {action_param}")
+                print_panel("ℹ️ Info", f"Unhandled Action Type: {selected['action_type']}\nParam: {selected['action_param']}")
                 pause()
         else:
-            print("Invalid choice. Please enter a valid package number.")
+            print_panel("❌ Error", "Pilihan tidak valid.")
             pause()
