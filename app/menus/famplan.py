@@ -77,7 +77,8 @@ def show_family_info(api_key: str, tokens: dict):
         nav.add_row("del <No>", "🗑️ Remove Member")
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
-        console.print(Panel(nav, title=f"[{theme['text_title']}]⚙️ Options[/]", border_style=theme["border_primary"], expand=True))
+        console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
+        #title=f"[{theme['text_title']}]⚙️ Options[/]", 
         
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         
