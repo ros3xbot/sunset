@@ -180,7 +180,7 @@ def show_family_info(api_key: str, tokens: dict):
                 print_panel("❌ Error", "Input tidak valid.")
             pause()
         
-         elif choice == "00":
+        elif choice == "00":
             in_family_menu = False
             return
 
