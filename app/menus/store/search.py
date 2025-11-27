@@ -1,11 +1,9 @@
 from app.client.store.search import get_family_list, get_store_packages
 from app.menus.package import get_packages_by_family, show_package_details
-from app.menus.util import clear_screen, pause, print_panel, simple_number, get_theme
+from app.menus.util import clear_screen, pause, print_panel, simple_number
 from app.service.auth import AuthInstance
+from app.config.imports import *
 
-from rich.panel import Panel
-from rich.table import Table
-from rich.align import Align
 
 def show_family_list_menu(
     subs_type: str = "PREPAID",
