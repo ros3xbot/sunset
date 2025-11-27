@@ -62,7 +62,7 @@ def show_store_segments_menu(is_enterprise: bool = False):
                     original_price = banner.get("original_price", 0)
                     discounted_price = banner.get("discounted_price", 0)
                     if discounted_price and discounted_price > 0:
-                        harga_str = f"{get_rupiah(original_price)} → {get_rupiah(discounted_price)}"
+                        harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)}"
                     else:
                         harga_str = get_rupiah(original_price)
                     
