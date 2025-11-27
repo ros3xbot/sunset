@@ -1,6 +1,9 @@
 import json
+from datetime import datetime
 from app.client.store.segments import get_segments
-from app.menus.util import clear_screen, pause, print_panel, simple_number
+from app.menus.util import (
+    clear_screen, pause, print_panel, simple_number, get_rupiah
+)
 from app.service.auth import AuthInstance
 from app.menus.package import show_package_details
 from app.config.imports import *
@@ -15,7 +18,6 @@ def show_store_segments_menu(is_enterprise: bool = False):
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        #console.print(Panel("🔄 Fetching store segments...", border_style=theme["border_info"]))
         segments_res = get_segments(api_key, tokens, is_enterprise)
         if not segments_res:
             print_panel("ℹ️ Info", "Tidak ada store segments ditemukan.")
@@ -50,19 +52,26 @@ def show_store_segments_menu(is_enterprise: bool = False):
                 table.add_row("-", f"{name} (kosong)", "-", "-", "-")
             else:
                 for j, banner in enumerate(banners):
-                    discounted_price = banner.get("discounted_price", "N/A")
                     title = banner.get("title", "N/A")
                     validity = banner.get("validity", "N/A")
                     family_name = banner.get("family_name", "N/A")
                     action_param = banner.get("action_param", "")
                     action_type = banner.get("action_type", "")
                     
+                    # harga: gunakan original + discounted
+                    original_price = banner.get("original_price", 0)
+                    discounted_price = banner.get("discounted_price", 0)
+                    if discounted_price and discounted_price > 0:
+                        harga_str = f"{get_rupiah(original_price)} → {get_rupiah(discounted_price)}"
+                    else:
+                        harga_str = get_rupiah(original_price)
+                    
                     code = f"{letter}{j+1}"
                     packages[code.lower()] = {
                         "action_param": action_param,
                         "action_type": action_type
                     }
-                    table.add_row(code, family_name, title, f"Rp{discounted_price}", validity)
+                    table.add_row(code, family_name, title, validity, harga_str)
             
             console.print(Panel(
                 table,
@@ -78,7 +87,6 @@ def show_store_segments_menu(is_enterprise: bool = False):
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
         console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
-        #title=f"[{theme['text_title']}]⚙️ Options[/]", 
         
         choice = console.input(f"[{theme['text_sub']}]Pilih banner (misal A1, B2):[/{theme['text_sub']}] ").strip()
         if choice == "00":
