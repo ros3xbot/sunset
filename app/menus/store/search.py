@@ -1,6 +1,6 @@
 from app.client.store.search import get_family_list, get_store_packages
 from app.menus.package import get_packages_by_family, show_package_details
-from app.menus.util import clear_screen, pause, print_panel, simple_number, get_rupiah
+from app.menus.util import clear_screen, pause, print_panel, simple_number, get_rupiah, live_loading
 from app.service.auth import AuthInstance
 from app.config.imports import *
 
@@ -76,7 +76,10 @@ def show_store_packages_menu(
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        store_packages_res = get_store_packages(api_key, tokens, subs_type, is_enterprise)
+        # Tambahkan live loading saat memuat store packages
+        with live_loading("🔄 Memuat store packages...", theme):
+            store_packages_res = get_store_packages(api_key, tokens, subs_type, is_enterprise)
+        
         if not store_packages_res:
             print_panel("ℹ️ Info", "Tidak ada store packages ditemukan.")
             in_store_packages_menu = False
