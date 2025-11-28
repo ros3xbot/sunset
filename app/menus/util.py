@@ -12,8 +12,23 @@ from rich.padding import Padding
 from rich import box
 
 from app.config.theme_config import get_theme, get_theme_style
+import app.menus.banner as banner
 
 console = Console()
+
+ascii_art = banner.load("https://d17e22l2uh4h4n.cloudfront.net/corpweb/pub-xlaxiata/2019-03/xl-logo.png", globals())
+
+def clear_screen():
+    try:
+        os.system('cls' if os.name == 'nt' else 'clear')
+    except Exception:
+        print("\n" * 100)
+
+    if ascii_art:
+        try:
+            ascii_art.to_terminal(columns=55)
+        except Exception:
+            pass
 
 
 def print_banner():
@@ -51,7 +66,7 @@ def simple_number():
     ))
 
 
-def clear_screen():
+def clear_screenx():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
 
