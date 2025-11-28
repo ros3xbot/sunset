@@ -4,10 +4,11 @@ load_dotenv()
 import sys, json, random
 from datetime import datetime
 from app.config.imports import *
+from app.menus.util import clear_screenx
 
 
 def show_main_menu(profile: dict, display_quota: str, segments: dict):
-    clear_screen()
+    clear_screenx()
     theme = get_theme()
 
     expired_at_ts = profile.get("balance_expired_at")
