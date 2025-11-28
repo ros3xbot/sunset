@@ -1,6 +1,56 @@
-# How to get environtment Variables
-Go to [OUR TELEGRAM CHANNEL](https://t.me/)
-Copy the provided environment variables and paste it into a text file named `.env` in the same directory as `main.py`.
-You can use nano or any text editor to create the file.
+## 📦 Instalasi di Termux
 
+Ikuti langkah-langkah berikut untuk menginstal dan menjalankan aplikasi:
 
+## 1. Perbarui Termux
+```bash
+pkg update && pkg upgrade -y
+```
+## 2. Instal Git
+```
+pkg install git -y
+```
+## 3. Kloning repositori, Sesuaikan dengan arsitektur android kalian
+cek arsitektur 
+```
+uname -m
+```
+Untuk android ARMv7 (32-bit)
+```
+git clone https://github.com/barbexid/dor7
+```
+Untuk android aarch64/ARMv8 (64-bit)
+```
+git clone https://github.com/barbexid/dor8
+```
+
+## 4. Masuk ke folder
+ARMv7 (32-bit)
+```
+cd dor7
+```
+ARMv8 (64-bit)
+```
+cd dor8
+```
+## 5. Jalankan setup
+```
+bash setup.sh
+```
+## 6. Konfigurasi Environment Variables
+```
+nano .env
+```
+## 7. Jalankan skrip
+```
+python main.py
+```
+# 💡 Masukkan API key saat diminta setelah menjalankan skrip.
+
+---
+
+## ℹ️ Catatan Teknis
+
+> Untuk penyedia layanan internet seluler tertentu
+
+---
