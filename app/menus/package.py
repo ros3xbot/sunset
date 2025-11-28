@@ -19,7 +19,6 @@ console = Console()
 def show_package_details(api_key, tokens, package_option_code, is_enterprise, option_order=-1):
     theme = get_theme()
     clear_screen()
-    ensure_git()
 
     package = get_package(api_key, tokens, package_option_code)
     if not package:
@@ -68,6 +67,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         expand=True
     ))
     simple_number()
+    ensure_git()
 
     info_table = Table.grid(padding=(0, 1))
     info_table.add_column(justify="left", style=theme["border_info"])
