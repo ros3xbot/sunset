@@ -24,6 +24,7 @@ def show_redeemables_menu(is_enterprise: bool = False):
         
         categories = redeemables_res.get("data", {}).get("categories", [])
         clear_screen()
+        ensure_git()
         
         console.print(Panel(
             Align.center("🎁 Redeemables", vertical="middle"),
