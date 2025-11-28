@@ -633,8 +633,8 @@ def fetch_my_packages():
 
                     benefit_table.add_row(name, dt, f"{r_str} / {t_str}")
 
-            with live_loading(f"🔍 {num}", theme):
-                package_details = get_package(api_key, tokens, quota_code)
+            #with live_loading(f"🔍 {num}", theme):
+            package_details = get_package(api_key, tokens, quota_code)
             if package_details:
                 family_code = package_details["package_family"]["package_family_code"]
 
