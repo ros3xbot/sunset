@@ -195,7 +195,7 @@ def main():
         if active_user is not None:
             account_id = active_user["number"]
 
-            with live_loading("🔄 Memuat data akun...", get_theme()):
+            #with live_loading("🔄 Memuat data akun...", get_theme()):
                 # Balance cache per akun (TTL 30 detik)
                 balance = get_cache(account_id, "balance", ttl=90)
                 if not balance:
