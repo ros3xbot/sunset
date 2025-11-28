@@ -63,7 +63,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
                 width=console.size.width,
             )
         )
-        console.print(Align.center(f"[{theme['text_sub']}]Pilih [Y] untuk lihat semua paket spesial[/{theme['text_sub']}]"))
+        console.print(Align.center(f"[{theme['text_sub']}]Pilih [Y] untuk lihat semua paket special[/{theme['text_sub']}]"))
 
     menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
     menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
