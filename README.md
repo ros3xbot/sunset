@@ -43,7 +43,7 @@ Hubungi saya di  [TELEGRAM](https://t.me/barbex_id)
 ```
 nano .env
 ```
-Lalu isi 
+Lalu isi dan simpan
 ## 7. Jalankan skrip
 ```
 python main.py
