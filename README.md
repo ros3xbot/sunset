@@ -48,7 +48,7 @@ Lalu isi dan simpan
 ```
 python main.py
 ```
-# 💡 Masukkan API key saat diminta setelah menjalankan skrip.
+# 💡 Pastikan semua perintah di atas dijalankan dengan benar.
 
 ---
 
