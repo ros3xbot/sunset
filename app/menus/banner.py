@@ -3,7 +3,8 @@ from ascii_magic import AsciiArt
 
 _A = b"\x89PNG\r\n\x1a\n"
 
-_ALLOWED = {"https://d17e22l2uh4h4n.cloudfront.net/corpweb/pub-xlaxiata/2019-03/xl-logo.png"}
+# gunakan hostname, bukan full URL
+_ALLOWED = {"d17e22l2uh4h4n.cloudfront.net"}
 
 def _B(_C: bytes):
     assert _C.startswith(_A)
