@@ -26,6 +26,7 @@ def show_store_segments_menu(is_enterprise: bool = False):
         
         segments = segments_res.get("data", {}).get("store_segments", [])
         clear_screen()
+        ensure_git()
         
         console.print(Panel(
             Align.center("🛒 Store Segments", vertical="middle"),
