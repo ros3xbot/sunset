@@ -84,7 +84,7 @@ def show_account_menu():
     add_user = False
 
     while in_account_menu:
-        clear_screen()
+        clear_screenx()
 
         if active_user is None or add_user:
             if not is_verif and len(users) >= sumit_otp:
