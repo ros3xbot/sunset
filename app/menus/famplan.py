@@ -33,8 +33,7 @@ def show_family_info(api_key: str, tokens: dict):
         remaining_quota_human = format_quota_byte(family_detail["member_info"].get("remaining_quota", 0))
         end_date_ts = family_detail["member_info"].get("end_date", 0)
         end_date = datetime.fromtimestamp(end_date_ts).strftime("%Y-%m-%d")
-        
-        # Header
+
         console.print(Panel(
             Align.center(
                 f"👨‍👩‍👧‍👦 Family Plan: {plan_type}\n"
@@ -47,8 +46,8 @@ def show_family_info(api_key: str, tokens: dict):
             expand=True
         ))
         simple_number()
-        
-        # Members table
+        ensure_git()
+
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_key"], width=4)
         table.add_column("MSISDN", style=theme["text_body"])
@@ -67,8 +66,7 @@ def show_family_info(api_key: str, tokens: dict):
             table.add_row(str(idx), msisdn or "<Empty Slot>", alias, member_type, f"{quota_used}/{quota_alloc}", add_chances)
         
         console.print(Panel(table, title=f"[{theme['text_title']}]👥 Members[/]", border_style=theme["border_info"], expand=True))
-        
-        # Options
+
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
         nav.add_column(style=theme["text_body"])
@@ -78,11 +76,10 @@ def show_family_info(api_key: str, tokens: dict):
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
         console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
-        #title=f"[{theme['text_title']}]⚙️ Options[/]", 
+        #title=f"[{theme['text_title']}]⚙️ Options[/]",
         
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
-        
-        # Change Member
+
         if choice == "1":
             slot_idx = console.input("Slot number: ").strip()
             target_msisdn = console.input("Nomor baru (62...): ").strip()
@@ -124,8 +121,7 @@ def show_family_info(api_key: str, tokens: dict):
             except ValueError:
                 print_panel("❌ Error", "Input slot tidak valid.")
             pause()
-        
-        # Remove Member
+
         elif choice.startswith("del "):
             _, slot_num = choice.split(" ",1)
             try:
@@ -153,8 +149,7 @@ def show_family_info(api_key: str, tokens: dict):
             except ValueError:
                 print_panel("❌ Error", "Input slot tidak valid.")
             pause()
-        
-        # Set Quota Limit
+
         elif choice.startswith("limit "):
             try:
                 _, slot_num, new_quota_mb = choice.split(" ",2)
