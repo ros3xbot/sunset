@@ -29,6 +29,7 @@ def clear_screen():
             ascii_art.to_terminal(columns=55)
         except Exception:
             pass
+    print_banner()
 
 
 def print_banner():
