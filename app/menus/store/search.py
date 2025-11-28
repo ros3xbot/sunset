@@ -25,6 +25,7 @@ def show_family_list_menu(
         
         family_list = family_list_res.get("data", {}).get("results", [])
         clear_screen()
+        ensure_git()
         
         console.print(Panel(
             Align.center("👨‍👩‍👧‍👦 Family List", vertical="middle"),
@@ -84,6 +85,7 @@ def show_store_packages_menu(
         
         store_packages = store_packages_res.get("data", {}).get("results_price_only", [])
         clear_screen()
+        ensure_git()
         
         console.print(Panel(
             Align.center("🛒 Store Packages", vertical="middle"),
@@ -92,8 +94,7 @@ def show_store_packages_menu(
             expand=True
         ))
         simple_number()
-        
-        # satu loading spinner sebelum tabel
+
         with live_loading("🔄 Menyusun tabel packages...", theme):
             table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
             table.add_column("No", justify="right", style=theme["text_key"], width=4)
