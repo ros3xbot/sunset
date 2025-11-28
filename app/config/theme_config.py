@@ -328,7 +328,7 @@ def _load_config():
                 return json.load(f)
         except json.JSONDecodeError:
             pass
-    return {"active_theme": "emerald_glass"}
+    return {"active_theme": "dark_neon"}
 
 def _save_config(config):
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
