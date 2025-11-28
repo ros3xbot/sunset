@@ -85,8 +85,8 @@ def show_special_for_you_menu(tokens: dict):
         table.add_column("No", justify="right", style=theme["text_key"], width=4)
         table.add_column("Nama Paket", style=theme["text_body"])
         table.add_column("Diskon", justify="right", style=theme["text_money"])
-        table.add_column("Harga Normal", justify="right", style=theme["text_err"])
-        table.add_column("Harga Diskon", justify="right", style=theme["text_money"])
+        table.add_column("Normal", justify="right", style=theme["text_err"])
+        table.add_column("Harga", justify="right", style=theme["text_money"])
 
         for idx, pkg in enumerate(special_packages, 1):
             emoji_diskon = "💸" if pkg.get("diskon_percent", 0) >= 50 else ""
