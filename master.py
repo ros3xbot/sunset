@@ -188,171 +188,164 @@ def show_main_menu2(active_user: dict, profile: dict):
 
 
 def main():
-        ensure_git()
-        while True:
-            theme = get_theme()
-            active_user = AuthInstance.get_active_user()
-            if active_user is not None:
-                account_id = active_user["number"]
+    ensure_git()
+    while True:
+        theme = get_theme()
+        active_user = AuthInstance.get_active_user()
+        if active_user is not None:
+            account_id = active_user["number"]
 
-            #with live_loading("🔄 Memuat data akun...", get_theme()):
-                # Balance cache per akun (TTL 30 detik)
-                balance = get_cache(account_id, "balance", ttl=90)
-                if not balance:
-                    balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
-                    set_cache(account_id, "balance", balance)
+            # Balance cache per akun (TTL 30 detik)
+            balance = get_cache(account_id, "balance", ttl=90)
+            if not balance:
+                balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
+                set_cache(account_id, "balance", balance)
 
-                # Quota cache per akun (TTL 30 detik)
-                quota = get_cache(account_id, "quota", ttl=60)
-                if not quota:
-                    quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
-                    set_cache(account_id, "quota", quota)
+            # Quota cache per akun (TTL 30 detik)
+            quota = get_cache(account_id, "quota", ttl=60)
+            if not quota:
+                quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
+                set_cache(account_id, "quota", quota)
 
-                # Segments cache per akun (TTL 300 detik, file-based)
-                segments = get_cache(account_id, "segments", ttl=300, use_file=True)
-                if not segments:
-                    segments = dash_segments(
-                        AuthInstance.api_key,
-                        active_user["tokens"]["id_token"],
-                        active_user["tokens"]["access_token"]
-                    ) or {}
-                    set_cache(account_id, "segments", segments, use_file=True)
+            # Segments cache per akun (TTL 300 detik, file-based)
+            segments = get_cache(account_id, "segments", ttl=300, use_file=True)
+            if not segments:
+                segments = dash_segments(
+                    AuthInstance.api_key,
+                    active_user["tokens"]["id_token"],
+                    active_user["tokens"]["access_token"]
+                ) or {}
+                set_cache(account_id, "segments", segments, use_file=True)
 
-            remaining = quota.get("remaining", 0)
-            total = quota.get("total", 0)
-            has_unlimited = quota.get("has_unlimited", False)
-            if total > 0 or has_unlimited:
-                display_quota = f"{remaining/1e9:.2f} / {total/1e9:.2f} GB" + (" (Unlimited)" if has_unlimited else "")
-            else:
-                display_quota = "-"
-
-            point_info = "Points: N/A | Tier: N/A"
-            if active_user["subscription_type"] == "PREPAID":
-                # Tiering cache per akun (TTL 300 detik)
-                tiering_data = get_cache(account_id, "tiering", ttl=240)
-                if not tiering_data:
-                    tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
-                    set_cache(account_id, "tiering", tiering_data)
-                point_info = f"Points: {tiering_data.get('current_point',0)} | Tier: {tiering_data.get('tier',0)}"
-
-            profile = {
-                "number": active_user["number"],
-                "subscriber_id": active_user["subscriber_id"],
-                "subscription_type": active_user["subscription_type"],
-                "balance": balance.get("remaining"),
-                "balance_expired_at": balance.get("expired_at"),
-                "point_info": point_info,
-            }
-
-            show_main_menu(profile, display_quota, segments)
-
-            choice = console.input(f"[{theme['text_sub']}]👉 Pilih menu:[/{theme['text_sub']}] ").strip()
-
-            if choice.lower() == "t":
-                pause()
-            elif choice == "1":
-                selected_user_number = show_account_menu()
-                if selected_user_number:
-                    AuthInstance.set_active_user(selected_user_number)
-                    print_success("🔐", f"Akun aktif diganti ke {selected_user_number}")
-                else:
-                    print_error("❌", "Tidak ada user terpilih atau gagal memuat user.")
-                continue
-            elif choice == "2":
-                fetch_my_packages()
-                continue
-            elif choice == "3":
-                show_hot_menu()
-            elif choice == "4":
-                show_hot_menu2()
-            elif choice == "5":
-                option_code = console.input(f"[{theme['text_sub']}]🔎 Masukkan option code:[/{theme['text_sub']}] ")
-                if option_code == "99":
-                    continue
-                show_package_details(AuthInstance.api_key, active_user["tokens"], option_code, False)
-            
-            elif choice == "6":
-                family_code = console.input(f"[{theme['text_sub']}]🔎 Masukkan family code:[/{theme['text_sub']}] ")
-                if family_code == "99":
-                    continue
-                get_packages_by_family(family_code)
-            
-            elif choice == "7":
-                family_code = console.input(f"[{theme['text_sub']}]🔎 Masukkan family code:[/{theme['text_sub']}] ")
-                if family_code == "99":
-                    continue
-                start_from_option = console.input(f"[{theme['text_sub']}]Mulai dari option number (default 1):[/{theme['text_sub']}] ")
-                try:
-                    start_from_option = int(start_from_option)
-                except ValueError:
-                    start_from_option = 1
-                use_decoy = console.input(f"[{theme['text_sub']}]Gunakan decoy package? (y/n):[/{theme['text_sub']}] ").lower() == "y"
-                pause_on_success = console.input(f"[{theme['text_sub']}]Pause tiap sukses? (y/n):[/{theme['text_sub']}] ").lower() == "y"
-                delay_seconds = console.input(f"[{theme['text_sub']}]Delay antar pembelian (0 = tanpa delay):[/{theme['text_sub']}] ")
-                try:
-                    delay_seconds = int(delay_seconds)
-                except ValueError:
-                    delay_seconds = 0
-                purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
-
-            elif choice == "8":
-                family_code = console.input(f"[{theme['text_sub']}]Masukkan family code:[/{theme['text_sub']}] ")
-                try:
-                    order = int(console.input(f"[{theme['text_sub']}]Masukkan order number (default 1):[/{theme['text_sub']}] ") or 1)
-                except ValueError:
-                    order = 1
-                try:
-                    delay = int(console.input(f"[{theme['text_sub']}]Masukkan delay (detik) (default 0):[/{theme['text_sub']}] ") or 0)
-                except ValueError:
-                    delay = 0
-                pause_on_success = console.input(f"[{theme['text_sub']}]Aktifkan mode pause? (y/n):[/{theme['text_sub']}] ").lower() == 'y'
-                while True:
-                    should_continue = purchase_loop(
-                        family_code=family_code,
-                        order=order,
-                        use_decoy=True,
-                        delay=delay,
-                        pause_on_success=pause_on_success
-                    )
-                    if not should_continue:
-                        break
-                continue
- 
-            elif choice.lower() == "d":
-                show_bundle_menu()
-            elif choice.lower() == "f":
-                show_family_grup_menu()
-            elif choice.lower() == "b":
-                show_bookmark_menu()
-            elif choice.lower() == "m":
-                show_main_menu2(active_user, profile)
-            elif choice.lower() == "c":
-                clear_cache(account_id)
-                print_success("🧹", f"Cache untuk akun {account_id} berhasil dibersihkan.")
-                pause()
-
-            elif choice == "66":
-                show_info_menu()
-            elif choice == "69":
-                show_theme_menu()
-            elif choice == "99":
-                print_panel("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
-                sys.exit(0)
-
-            elif choice.lower() == "y":
-                show_special_for_you_menu(active_user["tokens"])
-            elif choice.lower() == "s":
-                enter_sentry_mode()
-            else:
-                print_warning("⚠️", "Pilihan tidak valid. Silakan coba lagi.")
-                pause()
+        remaining = quota.get("remaining", 0)
+        total = quota.get("total", 0)
+        has_unlimited = quota.get("has_unlimited", False)
+        if total > 0 or has_unlimited:
+            display_quota = f"{remaining/1e9:.2f} / {total/1e9:.2f} GB" + (" (Unlimited)" if has_unlimited else "")
         else:
+            display_quota = "-"
+
+        point_info = "Points: N/A | Tier: N/A"
+        if active_user["subscription_type"] == "PREPAID":
+            # Tiering cache per akun (TTL 300 detik)
+            tiering_data = get_cache(account_id, "tiering", ttl=240)
+            if not tiering_data:
+                tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
+                set_cache(account_id, "tiering", tiering_data)
+            point_info = f"Points: {tiering_data.get('current_point',0)} | Tier: {tiering_data.get('tier',0)}"
+
+        profile = {
+            "number": active_user["number"],
+            "subscriber_id": active_user["subscriber_id"],
+            "subscription_type": active_user["subscription_type"],
+            "balance": balance.get("remaining"),
+            "balance_expired_at": balance.get("expired_at"),
+            "point_info": point_info,
+        }
+
+        show_main_menu(profile, display_quota, segments)
+
+        choice = console.input(f"[{theme['text_sub']}]👉 Pilih menu:[/{theme['text_sub']}] ").strip()
+
+        if choice.lower() == "t":
+            pause()
+        elif choice == "1":
             selected_user_number = show_account_menu()
             if selected_user_number:
                 AuthInstance.set_active_user(selected_user_number)
                 print_success("🔐", f"Akun aktif diganti ke {selected_user_number}")
             else:
                 print_error("❌", "Tidak ada user terpilih atau gagal memuat user.")
+            continue
+        elif choice == "2":
+            fetch_my_packages()
+            continue
+        elif choice == "3":
+            show_hot_menu()
+        elif choice == "4":
+            show_hot_menu2()
+        elif choice == "5":
+            option_code = console.input(f"[{theme['text_sub']}]🔎 Masukkan option code:[/{theme['text_sub']}] ")
+            if option_code == "99":
+                continue
+            show_package_details(AuthInstance.api_key, active_user["tokens"], option_code, False)
+        elif choice == "6":
+            family_code = console.input(f"[{theme['text_sub']}]🔎 Masukkan family code:[/{theme['text_sub']}] ")
+            if family_code == "99":
+                continue
+            get_packages_by_family(family_code)
+        elif choice == "7":
+            family_code = console.input(f"[{theme['text_sub']}]🔎 Masukkan family code:[/{theme['text_sub']}] ")
+            if family_code == "99":
+                continue
+            start_from_option = console.input(f"[{theme['text_sub']}]Mulai dari option number (default 1):[/{theme['text_sub']}] ")
+            try:
+                start_from_option = int(start_from_option)
+            except ValueError:
+                start_from_option = 1
+            use_decoy = console.input(f"[{theme['text_sub']}]Gunakan decoy package? (y/n):[/{theme['text_sub']}] ").lower() == "y"
+            pause_on_success = console.input(f"[{theme['text_sub']}]Pause tiap sukses? (y/n):[/{theme['text_sub']}] ").lower() == "y"
+            delay_seconds = console.input(f"[{theme['text_sub']}]Delay antar pembelian (0 = tanpa delay):[/{theme['text_sub']}] ")
+            try:
+                delay_seconds = int(delay_seconds)
+            except ValueError:
+                delay_seconds = 0
+            purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
+        elif choice == "8":
+            family_code = console.input(f"[{theme['text_sub']}]Masukkan family code:[/{theme['text_sub']}] ")
+            try:
+                order = int(console.input(f"[{theme['text_sub']}]Masukkan order number (default 1):[/{theme['text_sub']}] ") or 1)
+            except ValueError:
+                order = 1
+            try:
+                delay = int(console.input(f"[{theme['text_sub']}]Masukkan delay (detik) (default 0):[/{theme['text_sub']}] ") or 0)
+            except ValueError:
+                delay = 0
+            pause_on_success = console.input(f"[{theme['text_sub']}]Aktifkan mode pause? (y/n):[/{theme['text_sub']}] ").lower() == 'y'
+            while True:
+                should_continue = purchase_loop(
+                    family_code=family_code,
+                    order=order,
+                    use_decoy=True,
+                    delay=delay,
+                    pause_on_success=pause_on_success
+                )
+                if not should_continue:
+                    break
+            continue
+        elif choice.lower() == "d":
+            show_bundle_menu()
+        elif choice.lower() == "f":
+            show_family_grup_menu()
+        elif choice.lower() == "b":
+            show_bookmark_menu()
+        elif choice.lower() == "m":
+            show_main_menu2(active_user, profile)
+        elif choice.lower() == "c":
+            clear_cache(account_id)
+            print_success("🧹", f"Cache untuk akun {account_id} berhasil dibersihkan.")
+            pause()
+        elif choice == "66":
+            show_info_menu()
+        elif choice == "69":
+            show_theme_menu()
+        elif choice == "99":
+            print_panel("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
+            sys.exit(0)
+        elif choice.lower() == "y":
+            show_special_for_you_menu(active_user["tokens"])
+        elif choice.lower() == "s":
+            enter_sentry_mode()
+        else:
+            print_warning("⚠️", "Pilihan tidak valid. Silakan coba lagi.")
+            pause()
+    else:
+        selected_user_number = show_account_menu()
+        if selected_user_number:
+            AuthInstance.set_active_user(selected_user_number)
+            print_success("🔐", f"Akun aktif diganti ke {selected_user_number}")
+        else:
+            print_error("❌", "Tidak ada user terpilih atau gagal memuat user.")
 
 
 if __name__ == "__main__":
