@@ -1,7 +1,7 @@
 from app.config.imports import *
 from app.client.ciam import get_otp, submit_otp
 from app.service.service import load_status, save_status
-from app.menus.util import clear_screen, simple_number, pause, print_panel, nav_range
+from app.menus.util import clear_screen, clear_screenx, simple_number, pause, print_panel, nav_range
 
 console = Console()
 
@@ -18,7 +18,7 @@ def normalize_number(raw_input: str) -> str:
 
 
 def login_prompt(api_key: str):
-    clear_screen()
+    clear_screex()
     theme = get_theme()
     console.print(Panel(
         Align.center("🔐 Login ke myXL CLI", vertical="middle"),
@@ -68,7 +68,7 @@ def login_prompt(api_key: str):
 
 
 def show_account_menu():
-    clear_screen()
+    clear_screex()
     ensure_git()
     theme = get_theme()
     AuthInstance.load_tokens()
