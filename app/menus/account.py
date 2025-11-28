@@ -18,7 +18,7 @@ def normalize_number(raw_input: str) -> str:
 
 
 def login_prompt(api_key: str):
-    clear_screex()
+    clear_screenx()
     theme = get_theme()
     console.print(Panel(
         Align.center("🔐 Login ke myXL CLI", vertical="middle"),
@@ -68,7 +68,7 @@ def login_prompt(api_key: str):
 
 
 def show_account_menu():
-    clear_screex()
+    clear_screenx()
     ensure_git()
     theme = get_theme()
     AuthInstance.load_tokens()
