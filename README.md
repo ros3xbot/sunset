@@ -38,9 +38,12 @@ cd dor8
 bash setup.sh
 ```
 ## 6. Konfigurasi Environment Variables
+Hubungi saya di  [TELEGRAM](https://t.me/barbex_id)
+ untuk mendapatkan environment variables
 ```
 nano .env
 ```
+Lalu isi 
 ## 7. Jalankan skrip
 ```
 python main.py
