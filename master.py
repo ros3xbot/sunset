@@ -188,12 +188,12 @@ def show_main_menu2(active_user: dict, profile: dict):
 
 
 def main():
-    ensure_git()
-    while True:
-        theme = get_theme()
-        active_user = AuthInstance.get_active_user()
-        if active_user is not None:
-            account_id = active_user["number"]
+        ensure_git()
+        while True:
+            theme = get_theme()
+            active_user = AuthInstance.get_active_user()
+            if active_user is not None:
+                account_id = active_user["number"]
 
             #with live_loading("🔄 Memuat data akun...", get_theme()):
                 # Balance cache per akun (TTL 30 detik)
