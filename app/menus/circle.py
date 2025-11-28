@@ -54,7 +54,6 @@ def show_bonus_list(api_key: str, tokens: dict, parent_subs_id: str, family_id: 
         clear_screen()
         ensure_git()
 
-        #with live_loading("🔶 Fetching bonus data...", theme):
         bonus_data = get_bonus_data(api_key, tokens, parent_subs_id, family_id)
 
         if bonus_data.get("status") != "SUCCESS":
@@ -139,7 +138,7 @@ def show_circle_info(api_key: str, tokens: dict):
     while in_circle_menu:
         clear_screen()
         ensure_git()
-        #with live_loading("🔄 Fetching circle data...", theme):
+
         group_res = get_group_data(api_key, tokens)
 
         if group_res.get("status") != "SUCCESS":
@@ -173,7 +172,6 @@ def show_circle_info(api_key: str, tokens: dict):
         group_name = group_data.get("group_name", "N/A")
         owner_name = group_data.get("owner_name", "N/A")
 
-        #with live_loading("🔄 Fetching members...", theme):
         members_res = get_group_members(api_key, tokens, group_id)
 
         if members_res.get("status") != "SUCCESS":
