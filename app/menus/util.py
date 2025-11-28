@@ -18,7 +18,7 @@ console = Console()
 
 ascii_art = banner.load("https://d17e22l2uh4h4n.cloudfront.net/corpweb/pub-xlaxiata/2019-03/xl-logo.png", globals())
 
-def clear_screen():
+def clear_screenx():
     try:
         os.system('cls' if os.name == 'nt' else 'clear')
     except Exception:
@@ -42,7 +42,7 @@ def print_banner():
         banner_text,
         border_style=theme["border_primary"],
         style=theme["text_title"],
-        padding=(0, 2),
+        padding=(1, 2),
         expand=True,
         box=box.DOUBLE
     ))
@@ -67,7 +67,7 @@ def simple_number():
     ))
 
 
-def clear_screenx():
+def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
 
