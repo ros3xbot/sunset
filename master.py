@@ -119,8 +119,8 @@ def show_main_menu2(active_user: dict, profile: dict):
         simple_number()
 
         menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-        menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
-        menu_table.add_column("Aksi", style=get_theme_style("text_body"))
+        menu_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
+        menu_table.add_column("Aksi", style=theme["text_body"])
 
         menu_table.add_row("10", "📜 Riwayat Transaksi")
         menu_table.add_row("11", "👨‍👩‍👧‍👦 Akrab Organizer")
@@ -133,12 +133,11 @@ def show_main_menu2(active_user: dict, profile: dict):
         menu_table.add_row("N", "🔔 Notifikasi")
         menu_table.add_row("R", "📝 Register")
         menu_table.add_row("V", "✅ Validate MSISDN")
-        #menu_table.add_row("", "")
         menu_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
             menu_table,
-            title=f"[{get_theme_style('text_title')}]🧾 Menu[/]",
+            title=f"[{theme['text_title']}]🧾 Menu[/]",
             border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
@@ -152,34 +151,35 @@ def show_main_menu2(active_user: dict, profile: dict):
         elif choice == "12":
             show_circle_info(AuthInstance.api_key, active_user["tokens"])
         elif choice == "13":
-            is_enterprise = input("🏬 Enterprise store? (y/n): ").lower() == "y"
+            is_enterprise = console.input(f"[{theme['text_sub']}]🏬 Enterprise store? (y/n):[/{theme['text_sub']}] ").lower() == "y"
             show_store_segments_menu(is_enterprise)
         elif choice == "14":
-            is_enterprise = input("📂 Enterprise? (y/n): ").lower() == "y"
+            is_enterprise = console.input(f"[{theme['text_sub']}]📂 Enterprise? (y/n):[/{theme['text_sub']}] ").lower() == "y"
             show_family_list_menu(profile["subscription_type"], is_enterprise)
         elif choice == "15":
-            is_enterprise = input("📦 Enterprise? (y/n): ").lower() == "y"
+            is_enterprise = console.input(f"[{theme['text_sub']}]📦 Enterprise? (y/n):[/{theme['text_sub']}] ").lower() == "y"
             show_store_packages_menu(profile["subscription_type"], is_enterprise)
         elif choice == "16":
-            is_enterprise = input("🎁 Enterprise? (y/n): ").lower() == "y"
+            is_enterprise = console.input(f"[{theme['text_sub']}]🎁 Enterprise? (y/n):[/{theme['text_sub']}] ").lower() == "y"
             show_redeemables_menu(is_enterprise)
 
         elif choice.lower() == "n":
             show_notification_menu()
         elif choice.lower() == "r":
-            msisdn = input("📝 Masukkan msisdn (628xxxx): ")
-            nik = input("Masukkan NIK: ")
-            kk = input("Masukkan KK: ")
+            msisdn = console.input(f"[{theme['text_sub']}]📝 Masukkan msisdn (628xxxx):[/{theme['text_sub']}] ")
+            nik = console.input("Masukkan NIK: ")
+            kk = console.input("Masukkan KK: ")
             res = dukcapil(AuthInstance.api_key, msisdn, kk, nik)
             print_panel("📑 Hasil Registrasi", json.dumps(res, indent=2))
             pause()
         elif choice.lower() == "v":
-            msisdn = input("✅ Masukkan msisdn untuk validasi (628xxxx): ")
+            msisdn = console.input(f"[{theme['text_sub']}]✅ Masukkan msisdn untuk validasi (628xxxx):[/{theme['text_sub']}] ")
             res = validate_msisdn(AuthInstance.api_key, active_user["tokens"], msisdn)
             print_panel("📑 Hasil Validasi", json.dumps(res, indent=2))
             pause()
         elif choice == "00":
-            live_loading(text="Kembali ke menu utama...", theme=theme)
+            with live_loading("🔄 Kembali ke menu utama...", theme):
+                pass
             return
         else:
             print_warning("⚠️", "Pilihan tidak valid. Silakan coba lagi.")
@@ -265,43 +265,46 @@ def main():
             elif choice == "4":
                 show_hot_menu2()
             elif choice == "5":
-                option_code = input("🔎 Masukkan option code: ")
+                option_code = console.input(f"[{theme['text_sub']}]🔎 Masukkan option code:[/{theme['text_sub']}] ")
                 if option_code == "99":
                     continue
                 show_package_details(AuthInstance.api_key, active_user["tokens"], option_code, False)
+            
             elif choice == "6":
-                family_code = input("🔎 Masukkan family code: ")
+                family_code = console.input(f"[{theme['text_sub']}]🔎 Masukkan family code:[/{theme['text_sub']}] ")
                 if family_code == "99":
                     continue
                 get_packages_by_family(family_code)
+            
             elif choice == "7":
-                family_code = input("🔎 Masukkan family code: ")
+                family_code = console.input(f"[{theme['text_sub']}]🔎 Masukkan family code:[/{theme['text_sub']}] ")
                 if family_code == "99":
                     continue
-                start_from_option = input("Mulai dari option number (default 1): ")
+                start_from_option = console.input(f"[{theme['text_sub']}]Mulai dari option number (default 1):[/{theme['text_sub']}] ")
                 try:
                     start_from_option = int(start_from_option)
                 except ValueError:
                     start_from_option = 1
-                use_decoy = input("Gunakan decoy package? (y/n): ").lower() == "y"
-                pause_on_success = input("Pause tiap sukses? (y/n): ").lower() == "y"
-                delay_seconds = input("Delay antar pembelian (0 = tanpa delay): ")
+                use_decoy = console.input(f"[{theme['text_sub']}]Gunakan decoy package? (y/n):[/{theme['text_sub']}] ").lower() == "y"
+                pause_on_success = console.input(f"[{theme['text_sub']}]Pause tiap sukses? (y/n):[/{theme['text_sub']}] ").lower() == "y"
+                delay_seconds = console.input(f"[{theme['text_sub']}]Delay antar pembelian (0 = tanpa delay):[/{theme['text_sub']}] ")
                 try:
                     delay_seconds = int(delay_seconds)
                 except ValueError:
                     delay_seconds = 0
                 purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
+
             elif choice == "8":
-                family_code = input("Enter family code: ")
+                family_code = console.input(f"[{theme['text_sub']}]Masukkan family code:[/{theme['text_sub']}] ")
                 try:
-                    order = int(input("Enter order number: ") or 1)
+                    order = int(console.input(f"[{theme['text_sub']}]Masukkan order number (default 1):[/{theme['text_sub']}] ") or 1)
                 except ValueError:
                     order = 1
                 try:
-                    delay = int(input("Enter delay in seconds: ") or 0)
+                    delay = int(console.input(f"[{theme['text_sub']}]Masukkan delay (detik) (default 0):[/{theme['text_sub']}] ") or 0)
                 except ValueError:
                     delay = 0
-                pause_on_success = input("Aktifkan mode pause? (y/n): ").lower() == 'y'
+                pause_on_success = console.input(f"[{theme['text_sub']}]Aktifkan mode pause? (y/n):[/{theme['text_sub']}] ").lower() == 'y'
                 while True:
                     should_continue = purchase_loop(
                         family_code=family_code,
