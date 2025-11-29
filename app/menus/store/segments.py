@@ -45,8 +45,8 @@ def show_store_segments_menu(is_enterprise: bool = False):
             table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
             table.add_column("Kode", style=theme["text_key"], width=6)
             table.add_column("Family", style=theme["text_body"])
-            table.add_column("Judul Paket", style=theme["text_body"])
-            table.add_column("Aktif Sampai", style=theme["text_date"])
+            table.add_column("Paket", style=theme["text_body"])
+            table.add_column("Aktif", style=theme["text_date"])
             table.add_column("Harga", style=theme["text_money"], justify="right")
             
             if not banners:
@@ -63,7 +63,7 @@ def show_store_segments_menu(is_enterprise: bool = False):
                     original_price = banner.get("original_price", 0)
                     discounted_price = banner.get("discounted_price", 0)
                     if discounted_price and discounted_price > 0:
-                        harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)} 🔥"
+                        harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)}"
                     else:
                         harga_str = get_rupiah(original_price)
                     
