@@ -14,14 +14,14 @@ def show_family_info(api_key: str, tokens: dict):
         clear_screen()
         res = get_family_data(api_key, tokens)
         if not res.get("data"):
-            print_panel("❌ Error", "Gagal mengambil data family.")
+            print_panel("⚠️ Ups", "Gagal ngambil data family bro 🤯")
             pause()
             return
         
         family_detail = res["data"]
         plan_type = family_detail["member_info"]["plan_type"]
         if plan_type == "":
-            print_panel("ℹ️ Info", "Anda bukan organizer family plan.")
+            print_panel("ℹ️ Santuy", "Lo bukan organizer family plan bro 😴")
             pause()
             return
         
@@ -63,50 +63,49 @@ def show_family_info(api_key: str, tokens: dict):
             quota_used = format_quota_byte(member.get("usage", {}).get("quota_used", 0))
             quota_alloc = format_quota_byte(member.get("usage", {}).get("quota_allocated", 0))
             add_chances = f"{member.get('add_chances',0)}/{member.get('total_add_chances',0)}"
-            table.add_row(str(idx), msisdn or "<Empty Slot>", alias, member_type, f"{quota_used}/{quota_alloc}", add_chances)
+            table.add_row(str(idx), msisdn or "<Slot Kosong>", alias, member_type, f"{quota_used}/{quota_alloc}", add_chances)
         
-        console.print(Panel(table, title=f"[{theme['text_title']}]👥 Members[/]", border_style=theme["border_info"], expand=True))
+        console.print(Panel(table, title=f"[{theme['text_title']}]👥 Member Family[/]", border_style=theme["border_info"], expand=True))
 
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
         nav.add_column(style=theme["text_body"])
-        nav.add_row("1", "🔄 Change Member")
-        nav.add_row("limit <No> <MB>", "📊 Set Quota Limit")
-        nav.add_row("del <No>", "🗑️ Remove Member")
-        nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        nav.add_row("1", "🔄 Ganti Member")
+        nav.add_row("limit <No> <MB>", "📊 Set Limit Kuota")
+        nav.add_row("del <No>", "🗑️ Hapus Member")
+        nav.add_row("00", f"[{theme['text_sub']}]⬅️ Cabut balik ke menu utama 🏠[/]")
         
         console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
-        #title=f"[{theme['text_title']}]⚙️ Options[/]",
-        
-        choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
+
+        choice = console.input(f"[{theme['text_sub']}]Pilihan lo bro:[/{theme['text_sub']}] ").strip()
 
         if choice == "1":
-            slot_idx = console.input("Slot number: ").strip()
+            slot_idx = console.input("Nomor slot: ").strip()
             target_msisdn = console.input("Nomor baru (62...): ").strip()
             parent_alias = console.input("Alias parent: ").strip()
             child_alias = console.input("Alias member baru: ").strip()
             try:
                 slot_idx_int = int(slot_idx)
                 if slot_idx_int < 1 or slot_idx_int > len(members):
-                    print_panel("❌ Error", "Nomor slot tidak valid.")
+                    print_panel("⚠️ Ups", "Nomor slot nggak valid bro 🚨")
                     pause()
                     continue
                 if members[slot_idx_int - 1].get("msisdn") != "":
-                    print_panel("❌ Error", "Slot sudah terisi.")
+                    print_panel("⚠️ Ups", "Slot udah terisi bro 🤯")
                     pause()
                     continue
                 validation_res = validate_msisdn(api_key, tokens, target_msisdn)
                 if validation_res.get("status","").lower() != "success":
-                    print_panel("❌ Error", f"Validasi gagal: {json.dumps(validation_res, indent=2)}")
+                    print_panel("⚠️ Ups", f"Validasi gagal bro: {json.dumps(validation_res, indent=2)}")
                     pause()
                     continue
                 if validation_res["data"].get("family_plan_role","") != "NO_ROLE":
-                    print_panel("❌ Error", f"{target_msisdn} sudah tergabung di family lain.")
+                    print_panel("⚠️ Ups", f"{target_msisdn} udah join family lain bro 🚨")
                     pause()
                     continue
                 is_continue = console.input(f"Assign {target_msisdn} ke slot {slot_idx_int}? (y/n): ").strip().lower()
                 if is_continue != "y":
-                    print_panel("ℹ️ Info", "Dibatalkan.")
+                    print_panel("ℹ️ Santuy", "Dibatalkan bro ✌️")
                     pause()
                     continue
                 res_change = change_member(api_key, tokens, parent_alias, child_alias,
@@ -114,12 +113,12 @@ def show_family_info(api_key: str, tokens: dict):
                                            members[slot_idx_int-1]["family_member_id"],
                                            target_msisdn)
                 if res_change.get("status") == "SUCCESS":
-                    print_panel("✅ Success", "Member berhasil diganti.")
+                    print_panel("✅ Mantap", "Member berhasil diganti bro 🚀")
                 else:
-                    print_panel("❌ Error", res_change.get("message","Unknown error"))
+                    print_panel("⚠️ Ups", res_change.get("message","Error bro 🤯"))
                 console.print(json.dumps(res_change, indent=4))
             except ValueError:
-                print_panel("❌ Error", "Input slot tidak valid.")
+                print_panel("⚠️ Ups", "Input slot ngaco bro 🚨")
             pause()
 
         elif choice.startswith("del "):
@@ -127,27 +126,27 @@ def show_family_info(api_key: str, tokens: dict):
             try:
                 slot_idx_int = int(slot_num)
                 if slot_idx_int < 1 or slot_idx_int > len(members):
-                    print_panel("❌ Error", "Nomor slot tidak valid.")
+                    print_panel("⚠️ Ups", "Nomor slot nggak valid bro 🚨")
                     pause()
                     continue
                 member = members[slot_idx_int-1]
                 if member.get("msisdn") == "":
-                    print_panel("ℹ️ Info", "Slot kosong.")
+                    print_panel("ℹ️ Santuy", "Slot kosong bro 😴")
                     pause()
                     continue
                 is_continue = console.input(f"Hapus {member.get('msisdn')} dari slot {slot_idx_int}? (y/n): ").strip().lower()
                 if is_continue != "y":
-                    print_panel("ℹ️ Info", "Dibatalkan.")
+                    print_panel("ℹ️ Santuy", "Penghapusan dibatalin bro ✌️")
                     pause()
                     continue
                 res_del = remove_member(api_key, tokens, member["family_member_id"])
                 if res_del.get("status") == "SUCCESS":
-                    print_panel("✅ Success", "Member berhasil dihapus.")
+                    print_panel("✅ Mantap", "Member berhasil dihapus bro 🚀")
                 else:
-                    print_panel("❌ Error", res_del.get("message","Unknown error"))
+                    print_panel("⚠️ Ups", res_del.get("message","Error bro 🤯"))
                 console.print(json.dumps(res_del, indent=4))
             except ValueError:
-                print_panel("❌ Error", "Input slot tidak valid.")
+                print_panel("⚠️ Ups", "Input slot ngaco bro 🚨")
             pause()
 
         elif choice.startswith("limit "):
@@ -156,12 +155,12 @@ def show_family_info(api_key: str, tokens: dict):
                 slot_idx_int = int(slot_num)
                 new_quota_mb_int = int(new_quota_mb)
                 if slot_idx_int < 1 or slot_idx_int > len(members):
-                    print_panel("❌ Error", "Nomor slot tidak valid.")
+                    print_panel("⚠️ Ups", "Nomor slot nggak valid bro 🚨")
                     pause()
                     continue
                 member = members[slot_idx_int-1]
                 if member.get("msisdn") == "":
-                    print_panel("❌ Error", "Slot kosong.")
+                    print_panel("⚠️ Ups", "Slot kosong bro 😴")
                     pause()
                     continue
                 new_allocation_byte = new_quota_mb_int * 1024 * 1024
@@ -170,12 +169,12 @@ def show_family_info(api_key: str, tokens: dict):
                                             new_allocation_byte,
                                             member["family_member_id"])
                 if res_limit.get("status") == "SUCCESS":
-                    print_panel("✅ Success", "Quota limit berhasil diatur.")
+                    print_panel("✅ Mantap", "Limit kuota berhasil diatur bro 🚀")
                 else:
-                    print_panel("❌ Error", res_limit.get("message","Unknown error"))
+                    print_panel("⚠️ Ups", res_limit.get("message","Error bro 🤯"))
                 console.print(json.dumps(res_limit, indent=4))
             except ValueError:
-                print_panel("❌ Error", "Input tidak valid.")
+                print_panel("⚠️ Ups", "Input quota ngaco bro 🚨")
             pause()
         
         elif choice == "00":
@@ -183,5 +182,5 @@ def show_family_info(api_key: str, tokens: dict):
             return
 
         else:
-            print_panel("ℹ️ Info", "Perintah tidak dikenali.")
+            print_panel("ℹ️ Santuy", "Perintah lo nggak dikenali bro 🤨")
             pause()
