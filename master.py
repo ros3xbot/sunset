@@ -71,18 +71,19 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
 
     menu_table.add_row("1", "🔐 Login/Ganti akun")
     menu_table.add_row("2", "📑 Cek paket gue")
-    menu_table.add_row("3", "🔥 Gas Hot Promo")
-    menu_table.add_row("4", "🔥 Gas Hot Promo-2")
-    menu_table.add_row("5", "💴 Beli via Option Code (kode rahasia)")
-    menu_table.add_row("6", "💵 Beli via Family Code (kode keluarga)")
-    menu_table.add_row("7", "🔁 Borong semua paket di Family Code")
-    menu_table.add_row("8", "🔂 Auto repeat beli paket Family Code")
+    menu_table.add_row("3", "📜 Jejak Transaksi")
+    menu_table.add_row("4", "🔥 Gas Hot Promo")
+    menu_table.add_row("5", "🔥 Gas Hot Promo-2")
+    menu_table.add_row("6", "💴 Beli via Option Code (kode rahasia)")
+    menu_table.add_row("7", "💵 Beli via Family Code (kode keluarga)")
+    menu_table.add_row("8", "🔁 Borong semua paket di Family Code")
+    menu_table.add_row("9", "🔂 Auto repeat beli paket Family Code")
     menu_table.add_row("", "")
-    menu_table.add_row("D", "🎭 Bikin bundle paket ala decoy")
-    menu_table.add_row("F", "💾 Save/Kelola Family Code lo")
-    menu_table.add_row("B", "📌 Bookmark paket favorit")
-    menu_table.add_row("C", f"[{theme['text_body']}]🧹 Bersihin cache akun biar enteng[/]")
-    menu_table.add_row("M", f"[{theme['text_body']}]☕ Lanjut ke menu berikutnya bro...[/]")
+    menu_table.add_row("[D]", "🎭 Bikin bundle paket ala decoy")
+    menu_table.add_row("[F]", "💾 Save/Kelola Family Code lo")
+    menu_table.add_row("[B]", "📌 Bookmark paket favorit")
+    menu_table.add_row("[C]", f"[{theme['text_body']}]🧹 Bersihin cache akun biar enteng[/]")
+    menu_table.add_row("[M]", f"[{theme['text_body']}]☕ Lanjut ke menu berikutnya bro...[/]")
     menu_table.add_row("", "")
     menu_table.add_row("66", f"[{theme['border_warning']}]📢 Info kode unlock rahasia[/]")
     menu_table.add_row("69", f"[{theme['text_sub']}]🎨 Ganti tema CLI biar kece[/]")
@@ -123,7 +124,6 @@ def show_main_menu2(active_user: dict, profile: dict):
         menu_table.add_column("Kode", justify="right", style=theme["text_key"], width=6)
         menu_table.add_column("Aksi", style=theme["text_body"])
 
-        menu_table.add_row("10", "📜 Jejak Transaksi Gue")
         menu_table.add_row("11", "👨‍👩‍👧‍👦 Akrab Squad Organizer")
         menu_table.add_row("12", "👥 Circle Nongkrong")
         menu_table.add_row("13", "🏬 Segmen Store (lapak)")
@@ -131,9 +131,9 @@ def show_main_menu2(active_user: dict, profile: dict):
         menu_table.add_row("15", "📦 Paket Store")
         menu_table.add_row("16", "🎁 Redeem Reward/Bonus")
         menu_table.add_row("", "")
-        menu_table.add_row("N", "🔔 Cek Notifikasi Bro")
-        menu_table.add_row("R", "📝 Registrasi MSISDN")
-        menu_table.add_row("V", "✅ Validasi Nomor (MSISDN)")
+        menu_table.add_row("[N]", "🔔 Cek Notifikasi Bro")
+        menu_table.add_row("[R]", "📝 Registrasi MSISDN")
+        menu_table.add_row("[V]", "✅ Validasi Nomor (MSISDN)")
         menu_table.add_row("00", f"[{theme['text_sub']}]Balik ke menu utama bro ✌️[/]")
 
         console.print(Panel(
@@ -145,9 +145,7 @@ def show_main_menu2(active_user: dict, profile: dict):
         ))
 
         choice = console.input(f"[{theme['text_sub']}]👉 Pilih menu bro:[/{theme['text_sub']}] ").strip()
-        if choice == "10":
-            show_transaction_history(AuthInstance.api_key, active_user["tokens"])
-        elif choice == "11":
+        if choice == "11":
             show_family_info(AuthInstance.api_key, active_user["tokens"])
         elif choice == "12":
             show_circle_info(AuthInstance.api_key, active_user["tokens"])
@@ -260,20 +258,22 @@ def main():
                 fetch_my_packages()
                 continue
             elif choice == "3":
-                show_hot_menu()
+                show_transaction_history(AuthInstance.api_key, active_user["tokens"])
             elif choice == "4":
-                show_hot_menu2()
+                show_hot_menu()
             elif choice == "5":
+                show_hot_menu2()
+            elif choice == "6":
                 option_code = console.input(f"[{theme['text_sub']}]🔎 Masukin option code bro:[/{theme['text_sub']}] ")
                 if option_code == "99":
                     continue
                 show_package_details(AuthInstance.api_key, active_user["tokens"], option_code, False)
-            elif choice == "6":
+            elif choice == "7":
                 family_code = console.input(f"[{theme['text_sub']}]🔎 Masukin family code bro:[/{theme['text_sub']}] ")
                 if family_code == "99":
                     continue
                 get_packages_by_family(family_code)
-            elif choice == "7":
+            elif choice == "8":
                 family_code = console.input(f"[{theme['text_sub']}]🔎 Masukin family code bro:[/{theme['text_sub']}] ")
                 if family_code == "99":
                     continue
@@ -290,7 +290,7 @@ def main():
                 except ValueError:
                     delay_seconds = 0
                 purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
-            elif choice == "8":
+            elif choice == "9":
                 family_code = console.input(f"[{theme['text_sub']}]Masukin family code bro:[/{theme['text_sub']}] ")
                 try:
                     order = int(console.input(f"[{theme['text_sub']}]Masukin order number (default 1):[/{theme['text_sub']}] ") or 1)
