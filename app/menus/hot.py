@@ -24,7 +24,7 @@ def show_hot_menu():
         ensure_git()
         
         console.print(Panel(
-            Align.center("🔥 Paket Hot 🔥", vertical="middle"),
+            Align.center("🔥 Paket Hot Promo 🤙", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -35,7 +35,7 @@ def show_hot_menu():
             with open("hot_data/hot.json", "r", encoding="utf-8") as f:
                 hot_packages = json.load(f)
         except Exception as e:
-            print_panel("❌ Error", f"Gagal memuat hot.json: {e}")
+            print_panel("⚠️ Ups", f"Gagal load hot.json bro: {e} 🤯")
             pause()
             return
 
@@ -50,7 +50,6 @@ def show_hot_menu():
 
         console.print(Panel(
             table,
-            #title=f"[{theme['text_title']}]🔥 Daftar Paket Hot[/]",
             border_style=theme["border_info"],
             padding=(0, 0),
             expand=True
@@ -59,7 +58,7 @@ def show_hot_menu():
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        nav_table.add_row("00", f"[{theme['text_sub']}]⬅️ Cabut balik ke menu utama 🏠[/]")
 
         console.print(Panel(
             nav_table,
@@ -68,7 +67,7 @@ def show_hot_menu():
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor) bro 👉:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             in_hot_menu = False
             return None
@@ -80,7 +79,7 @@ def show_hot_menu():
             
             family_data = get_family(api_key, tokens, family_code, is_enterprise)
             if not family_data:
-                print_panel("❌ Error", "Gagal mengambil data family.")
+                print_panel("⚠️ Ups", "Gagal ngambil data family bro 🤯")
                 pause()
                 continue
             
@@ -96,12 +95,13 @@ def show_hot_menu():
             if option_code:
                 show_package_details(api_key, tokens, option_code, is_enterprise)
             else:
-                print_panel("❌ Error", "Option code tidak ditemukan.")
+                print_panel("⚠️ Ups", "Option code nggak ketemu bro 🚨")
                 pause()
         else:
-            print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
+            print_panel("⚠️ Ups", "Input lo ngaco bro, coba lagi 🚨")
             pause()
             continue
+
 
 
 def show_hot_menu2():
@@ -116,7 +116,7 @@ def show_hot_menu2():
         main_package_detail = {}
 
         console.print(Panel(
-            Align.center("🔥 Paket Hot 2 🔥", vertical="middle"),
+            Align.center("🔥 Paket Hot Promo 2  🤙", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -128,12 +128,12 @@ def show_hot_menu2():
             with open("hot_data/hot2.json", "r", encoding="utf-8") as f:
                 hot_packages = json.load(f)
         except Exception as e:
-            print_panel("❌ Error", f"Gagal memuat hot2.json: {e}")
+            print_panel("⚠️ Ups", f"Gagal load hot2.json bro: {e} 🤯")
             pause()
             return None
 
         if not hot_packages:
-            print_panel("⚠️ Error", "Tidak ada data paket tersedia.")
+            print_panel("ℹ️ Santuy", "Sepi cuy, nggak ada data paket 😴")
             pause()
             return None
 
@@ -151,10 +151,10 @@ def show_hot_menu2():
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        nav_table.add_row("00", f"[{theme['text_sub']}]⬅️ Cabut balik ke menu utama 🏠[/]")
         console.print(Panel(nav_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
-        choice = console.input(f"[{theme['text_sub']}]Pilih paket:[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Pilih paket bro 👉:[/{theme['text_sub']}] ").strip()
         if choice == "00":
             in_bookmark_menu = False
             return None
@@ -163,7 +163,7 @@ def show_hot_menu2():
             selected_package = hot_packages[int(choice) - 1]
             packages = selected_package.get("packages", [])
             if len(packages) == 0:
-                print_panel("⚠️ Error", "Paket tidak tersedia.")
+                print_panel("⚠️ Ups", "Paket nggak tersedia bro 🚨")
                 pause()
                 continue
 
@@ -183,7 +183,7 @@ def show_hot_menu2():
                     main_package_detail = detail
 
                 if not detail:
-                    print_panel("❌ Error", f"Gagal mengambil detail paket untuk {package['family_code']}.")
+                    print_panel("⚠️ Ups", f"Gagal ngambil detail paket buat {package['family_code']} 🤯")
                     return None
 
                 payment_items.append(PaymentItem(
@@ -236,7 +236,7 @@ def show_hot_menu2():
                 method_table.add_row("1", "💰 Balance")
                 method_table.add_row("2", "💳 E-Wallet")
                 method_table.add_row("3", "📱 QRIS")
-                method_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+                method_table.add_row("00", f"[{theme['text_sub']}]⬅️ Balik ke menu sebelumnya[/]")
 
                 console.print(Panel(
                     method_table,
@@ -246,17 +246,17 @@ def show_hot_menu2():
                     expand=True
                 ))
 
-                input_method = console.input(f"[{theme['text_sub']}]Pilih metode:[/{theme['text_sub']}] ").strip()
+                input_method = console.input(f"[{theme['text_sub']}]Pilih metode bro 👉:[/{theme['text_sub']}] ").strip()
 
                 if input_method == "1":
                     if overwrite_amount == -1:
                         last_price = payment_items[-1].item_price if hasattr(payment_items[-1], "item_price") else payment_items[-1]["item_price"]
                         warn_price_str = get_rupiah(last_price) if isinstance(last_price, (int, float)) else str(last_price)
-                        console.print(f"[{theme['text_warn']}]Pastikan sisa balance KURANG DARI Rp{warn_price_str}!!![/]")
+                        console.print(f"[{theme['text_warn']}]⚠️ Pastikan sisa balance KURANG DARI Rp{warn_price_str} bro!!![/]")
 
-                        balance_answer = console.input(f"[{theme['text_sub']}]Apakah anda yakin ingin melanjutkan pembelian? (y/n):[/{theme['text_sub']}] ").strip()
+                        balance_answer = console.input(f"[{theme['text_sub']}]Gas lanjut pembelian? (y/n):[/{theme['text_sub']}] ").strip()
                         if balance_answer.lower() != "y":
-                            print_panel("ℹ️ Info", "Pembelian dibatalkan oleh user.")
+                            print_panel("ℹ️ Santuy", "Pembelian dibatalin bro ✌️")
                             pause()
                             in_payment_menu = False
                             continue
@@ -271,7 +271,7 @@ def show_hot_menu2():
                         token_confirmation_idx=token_confirmation_idx,
                         amount_idx=amount_idx,
                     )
-                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+                    console.input(f"[{theme['text_sub']}]✅ Pembelian kelar bro, tekan enter...[/{theme['text_sub']}] ")
                     in_payment_menu = False
                     in_bookmark_menu = False
 
@@ -286,7 +286,7 @@ def show_hot_menu2():
                         token_confirmation_idx,
                         amount_idx,
                     )
-                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+                    console.input(f"[{theme['text_sub']}]✅ Pembelian kelar bro, tekan enter...[/{theme['text_sub']}] ")
                     in_payment_menu = False
                     in_bookmark_menu = False
 
@@ -301,7 +301,7 @@ def show_hot_menu2():
                         token_confirmation_idx,
                         amount_idx,
                     )
-                    console.input(f"[{theme['text_sub']}]Tekan enter untuk kembali...[/{theme['text_sub']}] ")
+                    console.input(f"[{theme['text_sub']}]✅ Pembelian kelar bro, tekan enter...[/{theme['text_sub']}] ")
                     in_payment_menu = False
                     in_bookmark_menu = False
 
@@ -310,11 +310,11 @@ def show_hot_menu2():
                     continue
 
                 else:
-                    print_panel("⚠️ Error", "Metode tidak valid. Silahkan coba lagi.")
+                    print_panel("⚠️ Ups", "Metode nggak valid bro 🚨")
                     pause()
                     continue
 
         else:
-            print_panel("⚠️ Error", "Input tidak valid. Silahkan coba lagi.")
+            print_panel("⚠️ Ups", "Input lo ngaco bro 🚨")
             pause()
             continue
