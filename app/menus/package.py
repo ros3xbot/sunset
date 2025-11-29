@@ -376,7 +376,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         return True
 
     elif choice.lower() == "ba":
-        destination_msisdn = console.input("Masukin nomor tujuan bonus (62xxx): ").strip()
+        destination_msisdn = console.input("Masukin nomor tujuan bonus bro (62xxx): ").strip()
         bounty_allotment(
             api_key=api_key,
             tokens=tokens,
