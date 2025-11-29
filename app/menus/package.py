@@ -186,19 +186,19 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
     elif choice == "1":
         settlement_balance(api_key, tokens, payment_items, payment_for, True)
-        print_panel("✅ Mantap", "Pembelian via pulsa sukses bro 🚀")
+        #print_panel("✅ Mantap", "Pembelian via pulsa sukses bro 🚀")
         pause()
         return True
 
     elif choice == "2":
         show_multipayment(api_key, tokens, payment_items, payment_for, True)
-        print_panel("✅ Mantap", "Pembayaran via e-wallet sukses bro 🚀")
+        #print_panel("✅ Mantap", "Pembayaran via e-wallet sukses bro 🚀")
         pause()
         return True
 
     elif choice == "3":
         show_qris_payment(api_key, tokens, payment_items, payment_for, True)
-        print_panel("✅ Mantap", "QRIS jalan lancar bro 🚀")
+        #print_panel("✅ Mantap", "QRIS jalan lancar bro 🚀")
         pause()
         return True
 
