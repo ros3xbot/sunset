@@ -12,7 +12,7 @@ def show_notification_menu():
         clear_screen()
         ensure_git()
         console.print(Panel(
-            Align.center("📢 Notif Tongkrongan 🤙", vertical="middle"),
+            Align.center("📢 Notifikasi 🤙", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
