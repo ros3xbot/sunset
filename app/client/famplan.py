@@ -14,7 +14,7 @@ def get_family_data(api_key: str, tokens: dict) -> dict | None:
     if not res or res.get("status") != "SUCCESS":
         print_panel("⚠️ Ups", "Gagal ambil data family bro 🚨")
         return None
-    print_panel("✅ Mantap", "Data family berhasil diambil 🚀")
+    #print_panel("✅ Mantap", "Data family berhasil diambil 🚀")
     return res
 
 
