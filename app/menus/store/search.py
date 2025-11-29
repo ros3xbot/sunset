@@ -19,7 +19,7 @@ def show_family_list_menu(
         
         family_list_res = get_family_list(api_key, tokens, subs_type, is_enterprise)
         if not family_list_res:
-            print_panel("ℹ️ Info", "Tidak ada family list ditemukan.")
+            print_panel("ℹ️ Info", "Sepi cuy, nggak ada family list 😴")
             in_family_list_menu = False
             continue
         
@@ -28,7 +28,7 @@ def show_family_list_menu(
         ensure_git()
         
         console.print(Panel(
-            Align.center("👨‍👩‍👧‍👦 Family List", vertical="middle"),
+            Align.center("👨‍👩‍👧‍👦 Family List 🤙", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1,2),
             expand=True
@@ -48,11 +48,11 @@ def show_family_list_menu(
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
         nav.add_column(style=theme["text_body"])
-        nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        nav.add_row("00", f"[{theme['text_sub']}]Cabut balik ke menu utama 🏠[/]")
         
         console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
         
-        choice = console.input(f"[{theme['text_sub']}]Pilih family (nomor):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Mau pilih family nomor berapa bro 👉 [/{theme['text_sub']}] ").strip()
         if choice == "00":
             in_family_list_menu = False
             continue
@@ -60,10 +60,10 @@ def show_family_list_menu(
             selected_family = family_list[int(choice)-1]
             family_code = selected_family.get("id","")
             family_name = selected_family.get("label","N/A")
-            console.print(Panel(f"🔍 Fetching packages for family: {family_name}", border_style=theme["border_info"]))
+            console.print(Panel(f"🔍 Lagi nyari paket buat family: {family_name} 🚀", border_style=theme["border_info"]))
             get_packages_by_family(family_code)
         else:
-            print_panel("❌ Error", "Pilihan tidak valid.")
+            print_panel("❌ Ups", "Pilihan lo ngaco bro 🤯")
             pause()
 
 
@@ -79,7 +79,7 @@ def show_store_packages_menu(
         
         store_packages_res = get_store_packages(api_key, tokens, subs_type, is_enterprise)
         if not store_packages_res:
-            print_panel("ℹ️ Info", "Tidak ada store packages ditemukan.")
+            print_panel("ℹ️ Info", "Sepi cuy, nggak ada paket di store 😴")
             in_store_packages_menu = False
             continue
         
@@ -88,19 +88,19 @@ def show_store_packages_menu(
         ensure_git()
         
         console.print(Panel(
-            Align.center("🛒 Store Packages", vertical="middle"),
+            Align.center("🛒 Store Packages 🤙", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1,2),
             expand=True
         ))
         simple_number()
 
-        with live_loading("🔄 Menyusun tabel packages...", theme):
+        with live_loading("🔄 Lagi nyusun tabel paket bro...", theme):
             table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
             table.add_column("No", justify="right", style=theme["text_key"], width=4)
-            table.add_column("Judul", style=theme["text_body"])
+            table.add_column("Judul Paket", style=theme["text_body"])
             table.add_column("Family", style=theme["text_body"])
-            table.add_column("Aktif", style=theme["text_date"])
+            table.add_column("Aktif Sampai", style=theme["text_date"])
             table.add_column("Harga", style=theme["text_money"], justify="right")
             
             packages = {}
@@ -116,7 +116,7 @@ def show_store_packages_menu(
                 packages[str(i)] = {"action_type": action_type, "action_param": action_param}
                 
                 if discounted_price and discounted_price > 0:
-                    harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)}"
+                    harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)} 🔥"
                 else:
                     harga_str = get_rupiah(original_price)
                 
@@ -127,11 +127,11 @@ def show_store_packages_menu(
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
         nav.add_column(style=theme["text_body"])
-        nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        nav.add_row("00", f"[{theme['text_sub']}]Cabut balik ke menu utama 🏠[/]")
         
         console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
         
-        choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Mau pilih paket nomor berapa bro 👉 [/{theme['text_sub']}] ").strip()
         if choice == "00":
             in_store_packages_menu = False
             continue
@@ -140,9 +140,8 @@ def show_store_packages_menu(
             if selected["action_type"] == "PDP":
                 show_package_details(api_key, tokens, selected["action_param"], is_enterprise)
             else:
-                print_panel("ℹ️ Info", f"Unhandled Action Type: {selected['action_type']}\nParam: {selected['action_param']}")
+                print_panel("ℹ️ Info", f"Belum ada aksi buat tipe ini bro: {selected['action_type']}\nParam: {selected['action_param']}")
                 pause()
         else:
-            print_panel("❌ Error", "Pilihan tidak valid.")
+            print_panel("❌ Ups", "Pilihan lo ngaco bro 🤯")
             pause()
-            
