@@ -13,7 +13,7 @@ def show_theme_menu():
         theme_names = list(presets.keys())
 
         console.print(Panel(
-            Align.center("🎨 Pilih Tema CLI", vertical="middle"),
+            Align.center("🎨 Pilih Tema CLI 🤙", vertical="middle"),
             style=theme["text_title"],
             border_style=theme["border_info"],
             padding=(1, 2),
@@ -42,11 +42,11 @@ def show_theme_menu():
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        nav_table.add_row("00", f"[{theme['text_sub']}]⬅️ Cabut balik ke menu utama 🏠[/]")
 
         console.print(Panel(nav_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
-        choice = console.input(f"[{theme['text_title']}]Pilih nomor tema:[/{theme['text_title']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilih nomor tema bro 👉:[/{theme['text_title']}] ").strip()
 
         if choice == "00":
             return
@@ -56,7 +56,7 @@ def show_theme_menu():
             selected_preset = presets[selected_theme]
 
             preview_panel = Panel(
-                Align.center(f"Preview Tema: {selected_theme.replace('_', ' ').title()}"),
+                Align.center(f"👀 Preview Tema: {selected_theme.replace('_', ' ').title()}"),
                 border_style=selected_preset["border_primary"],
                 style=selected_preset["text_title"],
                 padding=(1, 2),
@@ -65,7 +65,7 @@ def show_theme_menu():
             console.print(preview_panel)
 
             confirm = console.input(
-                f"[{theme['text_sub']}]Gunakan tema '{selected_theme.replace('_', ' ').title()}'? (y/n):[/{theme['text_sub']}] "
+                f"[{theme['text_sub']}]Gas pake tema '{selected_theme.replace('_', ' ').title()}'? (y/n):[/{theme['text_sub']}] "
             ).strip().lower()
 
             if confirm == "y":
@@ -75,7 +75,7 @@ def show_theme_menu():
                 pause()
                 return
         else:
-            print_panel("⚠️ Error", "Pilihan tidak valid.")
+            print_panel("⚠️ Ups", "Pilihan lo ngaco bro 🚨")
             pause()
 
 
@@ -83,7 +83,7 @@ def print_theme_changed(theme_name):
     theme = get_theme()
     terminal_width = console.size.width
     message_text = (
-        f"[{theme['text_ok']}]✅ Tema Diubah[/]\n"
+        f"[{theme['text_ok']}]✅ Tema Udah Diganti Bro 🚀[/]\n"
         f"[{theme['text_sub']}]Tema sekarang: {theme_name.replace('_', ' ').title()}[/]"
     )
     panel = Panel(
@@ -94,3 +94,4 @@ def print_theme_changed(theme_name):
         width=terminal_width
     )
     console.print(panel)
+
