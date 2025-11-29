@@ -217,7 +217,7 @@ def get_new_token(api_key: str, refresh_token: str, subscriber_id: str) -> dict 
         print_panel("⚠️ Ups", "Token baru gagal diambil 🚨")
         return None
 
-    print_panel("✅ Mantap", "Token baru berhasil diambil 🚀")
+    #print_panel("✅ Mantap", "Token baru berhasil diambil 🚀")
     return body
 
 
