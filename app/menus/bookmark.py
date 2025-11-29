@@ -14,7 +14,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
         clear_screen()
         ensure_git()
         console.print(Panel(
-            Align.center("📌 Daftar Bookmark Paket", vertical="middle"),
+            Align.center("📌 Bookmark Paket 🤙", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -23,7 +23,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
 
         bookmarks = BookmarkInstance.get_bookmarks()
         if not bookmarks:
-            print_panel("Info", "Tidak ada bookmark tersimpan.")
+            print_panel("ℹ️ Santuy", "Belum ada bookmark tersimpan bro 😴")
             pause()
             return (None, None) if return_package_detail else None
 
@@ -40,18 +40,18 @@ def show_bookmark_menu(return_package_detail: bool = False):
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
         nav.add_column(justify="left", style=theme["text_body"])
-        nav.add_row("00", f"[{theme['text_sub']}]⬅️ Kembali ke menu awal[/]")
-        nav.add_row("000", f"[{theme['text_err']}]🗑️ Hapus Bookmark[/]")
+        nav.add_row("00", f"[{theme['text_sub']}]⬅️ Cabut balik ke menu awal 🏠[/]")
+        nav.add_row("000", f"[{theme['text_err']}]🗑️ Hapus Bookmark cuy[/]")
 
         console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
 
-        choice = console.input(f"[{theme['text_title']}]Pilih bookmark (nomor):[/{theme['text_title']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilih bookmark (nomor): 👉 [/{theme['text_title']}] ").strip()
 
         if choice == "00":
             return (None, None) if return_package_detail else None
 
         elif choice == "000":
-            del_choice = console.input("Masukkan nomor bookmark yang ingin dihapus: ").strip()
+            del_choice = console.input("Masukin nomor bookmark yang mau dihapus: ").strip()
             if del_choice.isdigit() and 1 <= int(del_choice) <= len(bookmarks):
                 del_bm = bookmarks[int(del_choice) - 1]
                 BookmarkInstance.remove_bookmark(
@@ -60,9 +60,9 @@ def show_bookmark_menu(return_package_detail: bool = False):
                     del_bm["variant_name"],
                     del_bm["order"],
                 )
-                print_panel("✅ Info", "Bookmark berhasil dihapus.")
+                print_panel("✅ Mantap", "Bookmark udah gue hapus bro 🚀")
             else:
-                print_panel("⚠️ Error", "Input tidak valid. Silakan coba lagi.")
+                print_panel("⚠️ Ups", "Input lo ngaco, coba lagi cuy 🤯")
             pause()
             continue
 
@@ -73,7 +73,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
 
             family_data = get_family(api_key, tokens, family_code, is_enterprise)
             if not family_data:
-                print_panel("⚠️ Error", "Gagal mengambil data family.")
+                print_panel("⚠️ Ups", "Gagal ngambil data family bro 🚨")
                 pause()
                 continue
 
@@ -88,7 +88,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
                             break
 
             if not option_code or not variant_code:
-                print_panel("⚠️ Error", "Paket tidak ditemukan.")
+                print_panel("⚠️ Ups", "Paket nggak ketemu bro 🤯")
                 pause()
                 continue
 
@@ -104,12 +104,12 @@ def show_bookmark_menu(return_package_detail: bool = False):
                     name = f"{selected_bm['family_name']} - {selected_bm['variant_name']} - {selected_bm['option_name']}"
                     return detail, name
                 else:
-                    print_panel("⚠️ Error", "Gagal mengambil detail paket.")
+                    print_panel("⚠️ Ups", "Gagal ngambil detail paket bro 🚨")
                     pause()
                     return (None, None)
             else:
                 show_package_details(api_key, tokens, option_code, is_enterprise)
 
         else:
-            print_panel("⚠️ Error", "Input tidak valid. Silakan coba lagi.")
+            print_panel("⚠️ Ups", "Input lo ngaco bro, coba lagi 🚨")
             pause()
