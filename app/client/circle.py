@@ -13,7 +13,7 @@ def get_group_data(api_key: str, tokens: dict) -> dict | None:
     if not res or res.get("status") != "SUCCESS":
         print_panel("⚠️ Ups", "Gagal ambil detail Circle 🚨")
         return None
-    print_panel("✅ Mantap", "Detail Circle berhasil diambil 🚀")
+    #print_panel("✅ Mantap", "Detail Circle berhasil diambil 🚀")
     return res
 
 
