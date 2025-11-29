@@ -17,8 +17,8 @@ def git_pull_rebase():
 
     if is_rebase_in_progress():
         text = Text.from_markup(
-            "[bold yellow]⚠️ Rebase sebelumnya belum selesai[/]\n\n"
-            f"[{get_theme_style('text_warning')}]Selesaikan dengan `git rebase --continue` atau batalkan dengan `git rebase --abort`[/]"
+            "[bold yellow]⚠️ Bro, masih ada rebase yang belum kelar[/]\n\n"
+            f"[{get_theme_style('text_warning')}]Selesaikan dulu pake `git rebase --continue` atau batalin pake `git rebase --abort`[/]"
         )
         console.print(Panel(
             text,
@@ -66,12 +66,12 @@ def git_pull_rebase():
             result["status"] = "reset_fail"
             result["error"] = str(e)
 
-    with live_loading("🔄 Menarik update dari repository...", theme):
+    with live_loading("🔄 Lagi narik update dari repo bro...", theme):
         run_git_pull()
 
     if result["status"] == "success":
         text = Text.from_markup(
-            f"[bold {get_theme_style('text_date')}]✅ Git pull berhasil[/]\n\n[{get_theme_style('text_body')}]{result['output']}[/]"
+            f"[bold {get_theme_style('text_date')}]✅ Mantap, git pull sukses bro 🚀[/]\n\n[{get_theme_style('text_body')}]{result['output']}[/]"
         )
         console.print(Panel(
             text,
@@ -83,7 +83,7 @@ def git_pull_rebase():
 
     elif result["status"] == "fail":
         text = Text.from_markup(
-            f"[bold {get_theme_style('text_error')}]❌ Git pull gagal[/]\n\n[{get_theme_style('text_error')}]{result['error']}[/]\n\n[{get_theme_style('text_warning')}]Mencoba reset paksa...[/]"
+            f"[bold {get_theme_style('text_error')}]⚠️ Ups, git pull gagal bro 🚨[/]\n\n[{get_theme_style('text_error')}]{result['error']}[/]\n\n[{get_theme_style('text_warning')}]Coba reset paksa dulu bro...[/]"
         )
         console.print(Panel(
             text,
@@ -93,12 +93,12 @@ def git_pull_rebase():
             expand=True
         ))
 
-        with live_loading("🧹 Menjalankan git reset --hard...", theme):
+        with live_loading("🧹 Lagi nge-reset ke origin bro...", theme):
             run_git_reset()
 
         if result["status"] == "reset":
             text = Text.from_markup(
-                f"[bold {get_theme_style('text_success')}]✅ Reset berhasil, CLI disinkronkan ke origin[/]\n\n[{get_theme_style('text_body')}]{result['output']}[/]"
+                f"[bold {get_theme_style('text_success')}]✅ Reset sukses, repo udah sinkron sama origin bro ✨[/]\n\n[{get_theme_style('text_body')}]{result['output']}[/]"
             )
             console.print(Panel(
                 text,
@@ -109,7 +109,7 @@ def git_pull_rebase():
             ))
         else:
             text = Text.from_markup(
-                f"[bold {get_theme_style('text_error')}]❌ Reset gagal[/]\n\n[{get_theme_style('text_error')}]{result['error']}[/]"
+                f"[bold {get_theme_style('text_error')}]⚠️ Reset gagal bro 🚨[/]\n\n[{get_theme_style('text_error')}]{result['error']}[/]"
             )
             console.print(Panel(
                 text,
@@ -123,7 +123,7 @@ def git_pull_rebase():
 
     else:
         text = Text.from_markup(
-            f"[bold {get_theme_style('text_warning')}]⚠️ Error saat menjalankan git pull[/]\n\n[{get_theme_style('text_warning')}]{result['error']}[/]"
+            f"[bold {get_theme_style('text_warning')}]⚠️ Ada error pas git pull bro[/]\n\n[{get_theme_style('text_warning')}]{result['error']}[/]"
         )
         console.print(Panel(
             text,
