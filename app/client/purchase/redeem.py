@@ -69,7 +69,7 @@ def settlement_bounty(api_key: str, tokens: dict,
     }
 
     url = f"{BASE_API_URL}/{path}"
-    with live_loading("🎯 Sending bounty request...", get_theme()):
+    with live_loading("🎯 Lagi kirim bounty request bro...", get_theme()):
         resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
 
     try:
@@ -77,19 +77,11 @@ def settlement_bounty(api_key: str, tokens: dict,
         status = decrypted_body.get("status", "UNKNOWN")
         message = decrypted_body.get("message", "")
 
-        print_panel("🧾 Bounty Status", f"Status: {status}\nMessage: {message}")
-        return {
-            "status": status,
-            "message": message,
-            "data": decrypted_body
-        }
+        print_panel("🧾 Bounty Status", f"Status: {status}\nPesan: {message}")
+        return {"status": status, "message": message, "data": decrypted_body}
     except Exception as e:
-        print_panel("🧾 Bounty Status", f"Status: ERROR\nMessage: Decrypt error: {e}")
-        return {
-            "status": "ERROR",
-            "message": f"Decrypt error: {e}",
-            "data": None
-        }
+        print_panel("🧾 Bounty Status", f"⚠️ Ups\nPesan: Error decrypt bro 🤯 {e}")
+        return {"status": "ERROR", "message": f"Decrypt error: {e}", "data": None}
 
 
 def settlement_loyalty(api_key: str, tokens: dict,
@@ -127,7 +119,7 @@ def settlement_loyalty(api_key: str, tokens: dict,
     }
 
     url = f"{BASE_API_URL}/{path}"
-    with live_loading("🏅 Sending loyalty request...", get_theme()):
+    with live_loading("🏅 Lagi kirim loyalty request bro...", get_theme()):
         resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
 
     try:
@@ -135,19 +127,11 @@ def settlement_loyalty(api_key: str, tokens: dict,
         status = decrypted_body.get("status", "UNKNOWN")
         message = decrypted_body.get("message", "")
 
-        print_panel("🏆 Loyalty Status", f"Status: {status}\nMessage: {message}")
-        return {
-            "status": status,
-            "message": message,
-            "data": decrypted_body
-        }
+        print_panel("🏆 Loyalty Status", f"Status: {status}\nPesan: {message}")
+        return {"status": status, "message": message, "data": decrypted_body}
     except Exception as e:
-        print_panel("🏆 Loyalty Status", f"Status: ERROR\nMessage: Decrypt error: {e}")
-        return {
-            "status": "ERROR",
-            "message": f"Decrypt error: {e}",
-            "data": None
-        }
+        print_panel("🏆 Loyalty Status", f"⚠️ Ups\nPesan: Error decrypt bro 🤯 {e}")
+        return {"status": "ERROR", "message": f"Decrypt error: {e}", "data": None}
 
 
 def bounty_allotment(api_key: str, tokens: dict,
@@ -188,7 +172,7 @@ def bounty_allotment(api_key: str, tokens: dict,
     }
 
     url = f"{BASE_API_URL}/{path}"
-    with live_loading("🎯 Sending bounty allotment request...", get_theme()):
+    with live_loading("🎯 Lagi kirim bounty allotment bro...", get_theme()):
         resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
 
     try:
@@ -196,16 +180,8 @@ def bounty_allotment(api_key: str, tokens: dict,
         status = decrypted_body.get("status", "UNKNOWN")
         message = decrypted_body.get("message", "")
 
-        print_panel("🎁 Bounty Allotment Status", f"Status: {status}\nMessage: {message}")
-        return {
-            "status": status,
-            "message": message,
-            "data": decrypted_body
-        }
+        print_panel("🎁 Bounty Allotment Status", f"Status: {status}\nPesan: {message}")
+        return {"status": status, "message": message, "data": decrypted_body}
     except Exception as e:
-        print_panel("🎁 Bounty Allotment Status", f"Status: ERROR\nMessage: Decrypt error: {e}")
-        return {
-            "status": "ERROR",
-            "message": f"Decrypt error: {e}",
-            "data": None
-        }
+        print_panel("🎁 Bounty Allotment Status", f"⚠️ Ups\nPesan: Error decrypt bro 🤯 {e}")
+        return {"status": "ERROR", "message": f"Decrypt error: {e}", "data": None}
