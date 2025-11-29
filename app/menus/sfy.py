@@ -41,14 +41,14 @@ def fetch_special_for_you(api_key: str, id_token: str, access_token: str, balanc
                     "kuota_gb": pkg.get("kuota_gb", 0),
                 })
             except Exception as e:
-                print_panel("⚠️ Error", f"Gagal parse paket: {e}")
+                print_panel("⚠️ Ups", f"Gagal parse paket bro: {e} 🤯")
                 continue
 
         special_packages.sort(key=lambda x: x["diskon_percent"], reverse=True)
         return special_packages
 
     except Exception as e:
-        print_panel("⚠️ Error", f"Gagal mengambil data SFY: {e}")
+        print_panel("⚠️ Ups", f"Gagal ngambil data SFY bro: {e} 🤯")
         return []
 
 
@@ -67,12 +67,12 @@ def show_special_for_you_menu(tokens: dict):
         ensure_git()
 
         if not special_packages:
-            print_panel("ℹ️ Info", "Tidak ada paket spesial tersedia saat ini.")
+            print_panel("ℹ️ Santuy", "Sepi cuy, nggak ada paket spesial 😴")
             pause()
             return
 
         info_text = Align.center(
-            f"[{theme['text_body']}]🔥 Daftar Paket Special For You 🔥[/{theme['text_body']}]"
+            f"[{theme['text_body']}]🔥 Paket Special For You 🤙🔥[/{theme['text_body']}]"
         )
         console.print(Panel(
             info_text,
@@ -108,7 +108,7 @@ def show_special_for_you_menu(tokens: dict):
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu sebelumnya[/]")
+        nav_table.add_row("00", f"[{theme['text_sub']}]⬅️ Cabut balik ke menu sebelumnya 🏠[/]")
 
         console.print(Panel(
             nav_table,
@@ -117,13 +117,13 @@ def show_special_for_you_menu(tokens: dict):
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_title']}]Pilih paket (nomor):[/{theme['text_title']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilih paket (nomor) bro 👉:[/{theme['text_title']}] ").strip()
 
         if choice == "00":
             return "BACK"
 
         if not choice.isdigit():
-            print_panel("⚠️ Error", "Input tidak valid. Masukkan angka yang sesuai.")
+            print_panel("⚠️ Ups", "Input lo ngaco bro, masukin angka 🚨")
             pause()
             continue
 
@@ -136,5 +136,5 @@ def show_special_for_you_menu(tokens: dict):
             if result == "MAIN":
                 return "MAIN"
         else:
-            print_panel("⚠️ Error", "Nomor paket tidak valid.")
+            print_panel("⚠️ Ups", "Nomor paket nggak valid bro 🚨")
             pause()
