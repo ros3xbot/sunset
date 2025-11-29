@@ -4,7 +4,7 @@ import uuid
 import requests
 from datetime import datetime, timezone
 
-from app.menus.util import live_loading
+from app.menus.util import live_loading, print_panel
 from app.config.theme_config import get_theme
 from app.client.encrypt import (
     encryptsign_xdata,
@@ -15,7 +15,7 @@ from app.client.encrypt import (
 
 BASE_API_URL = os.getenv("BASE_API_URL")
 if not BASE_API_URL:
-    raise ValueError("BASE_API_URL environment variable tidak diset")
+    raise ValueError("⚠️ Ups, BASE_API_URL environment variable belum diset bro 🚨")
 UA = os.getenv("UA")
 
 
@@ -55,7 +55,8 @@ def send_api_request(api_key: str, path: str, payload_dict: dict, id_token: str,
     try:
         return decrypt_xdata(api_key, json.loads(resp.text))
     except Exception as e:
-        return {"error": f"Gagal decrypt response: {e}", "raw": resp.text}
+        print_panel("⚠️ Ups", f"Gagal decrypt response bro 🤯: {e}")
+        return {"status": "ERROR", "message": f"Gagal decrypt response: {e}", "raw": resp.text}
 
 
 def _with_loading(message: str, func, use_loading: bool, theme, *args, **kwargs):
@@ -77,14 +78,14 @@ def get_profile(api_key: str, access_token: str, id_token: str, use_loading: boo
         "is_enterprise": False,
         "lang": "en",
     }
-    return _with_loading("📡 Mengambil profil...", send_api_request, use_loading, get_theme(),
+    return _with_loading("📡 Lagi ngambil profil bro...", send_api_request, use_loading, get_theme(),
                          api_key, path, payload, id_token, "POST").get("data")
 
 
 def get_balance(api_key: str, id_token: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/packages/balance-and-credit"
     payload = {"is_enterprise": False, "lang": "en"}
-    res = _with_loading("💰 Mengambil saldo...", send_api_request, use_loading, get_theme(),
+    res = _with_loading("💰 Lagi ngambil saldo bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, id_token, "POST")
     return res.get("data", {}).get("balance")
 
@@ -122,7 +123,7 @@ def get_family(api_key: str, tokens: dict, family_code: str,
                         return res["data"]
         return None
 
-    return _with_loading(f"📦 Mengambil family paket {family_code}...", _fetch_family, use_loading, theme)
+    return _with_loading(f"📦 Lagi ngambil family paket {family_code} bro...", _fetch_family, use_loading, theme)
 
 
 def get_families(api_key: str, tokens: dict, package_category_code: str, use_loading: bool = True) -> dict | None:
@@ -136,7 +137,7 @@ def get_families(api_key: str, tokens: dict, package_category_code: str, use_loa
         "is_migration": False,
         "lang": "en",
     }
-    res = _with_loading(f"📂 Mengambil families kategori {package_category_code}...", send_api_request, use_loading, get_theme(),
+    res = _with_loading(f"📂 Lagi ngambil families kategori {package_category_code} bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     return res.get("data") if res.get("status") == "SUCCESS" else None
 
@@ -161,7 +162,7 @@ def get_package(api_key: str, tokens: dict,
         "is_upsell_pdp": False,
         "package_variant_code": package_variant_code,
     }
-    res = _with_loading("📦 Mengambil detail paket...", send_api_request, use_loading, get_theme(),
+    res = _with_loading("📦 Lagi ngambil detail paket bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     return res.get("data")
 
@@ -173,6 +174,7 @@ def get_package_details(api_key: str, tokens: dict,
                         use_loading: bool = True) -> dict | None:
     family_data = get_family(api_key, tokens, family_code, is_enterprise, migration_type, use_loading)
     if not family_data:
+        print_panel("⚠️ Ups", f"Gagal ambil family {family_code} bro 🚨")
         return None
 
     option_code = None
@@ -183,6 +185,7 @@ def get_package_details(api_key: str, tokens: dict,
                     option_code = option.get("package_option_code")
                     break
     if not option_code:
+        print_panel("⚠️ Ups", "Option code nggak ketemu bro 🚨")
         return None
 
     return get_package(api_key, tokens, option_code, use_loading=use_loading)
@@ -191,7 +194,7 @@ def get_package_details(api_key: str, tokens: dict,
 def get_addons(api_key: str, tokens: dict, package_option_code: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/xl-stores/options/addons-pinky-box"
     payload = {"is_enterprise": False, "lang": "en", "package_option_code": package_option_code}
-    res = _with_loading(f"🧩 Mengambil addons...", send_api_request, use_loading, get_theme(),
+    res = _with_loading("🧩 Lagi ngambil addons bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     return res.get("data")
 
@@ -199,7 +202,7 @@ def get_addons(api_key: str, tokens: dict, package_option_code: str, use_loading
 def intercept_page(api_key: str, tokens: dict, option_code: str, is_enterprise: bool = False, use_loading: bool = True) -> dict | None:
     path = "misc/api/v8/utility/intercept-page"
     payload = {"is_enterprise": is_enterprise, "lang": "en", "package_option_code": option_code}
-    return _with_loading(f"🛡️ Mengambil intercept...", send_api_request, use_loading, get_theme(),
+    return _with_loading("🛡️ Lagi intercept page bro...", send_api_request, use_loading, get_theme(),
                          api_key, path, payload, tokens["id_token"], "POST")
 
 
@@ -210,7 +213,7 @@ def login_info(api_key: str, tokens: dict, is_enterprise: bool = False, use_load
         "is_enterprise": is_enterprise,
         "lang": "en",
     }
-    res = _with_loading("🔑 Mengambil info login...", send_api_request, use_loading, get_theme(),
+    res = _with_loading("🔑 Lagi ngambil info login bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     return res.get("data")
 
@@ -218,7 +221,7 @@ def login_info(api_key: str, tokens: dict, is_enterprise: bool = False, use_load
 def get_notifications(api_key: str, tokens: dict, use_loading: bool = True) -> dict | None:
     path = "api/v8/notification-non-grouping"
     payload = {"is_enterprise": False, "lang": "en"}
-    res = _with_loading("🔔 Mengambil notifikasi...", send_api_request, use_loading, get_theme(),
+    res = _with_loading("🔔 Lagi ngambil notifikasi bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     return res if res.get("status") == "SUCCESS" else None
 
@@ -226,7 +229,7 @@ def get_notifications(api_key: str, tokens: dict, use_loading: bool = True) -> d
 def get_notification_detail(api_key: str, tokens: dict, notification_id: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/notification/detail"
     payload = {"is_enterprise": False, "lang": "en", "notification_id": notification_id}
-    res = _with_loading(f"🔔 Mengambil detail notifikasi {notification_id}...", send_api_request, use_loading, get_theme(),
+    res = _with_loading(f"🔔 Lagi ngambil detail notifikasi {notification_id} bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     return res if res.get("status") == "SUCCESS" else None
 
@@ -234,7 +237,7 @@ def get_notification_detail(api_key: str, tokens: dict, notification_id: str, us
 def get_pending_transaction(api_key: str, tokens: dict, use_loading: bool = True) -> dict | None:
     path = "api/v8/profile"
     payload = {"is_enterprise": False, "lang": "en"}
-    res = _with_loading("⏳ Mengambil transaksi pending...", send_api_request, use_loading, get_theme(),
+    res = _with_loading("⏳ Lagi ngambil transaksi pending bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     data = res.get("data", {})
     return data if res.get("status") == "SUCCESS" and "pending_payment" in data else None
@@ -243,7 +246,7 @@ def get_pending_transaction(api_key: str, tokens: dict, use_loading: bool = True
 def get_transaction_history(api_key: str, tokens: dict, use_loading: bool = True) -> dict | None:
     path = "payments/api/v8/transaction-history"
     payload = {"is_enterprise": False, "lang": "en"}
-    res = _with_loading("📜 Mengambil riwayat transaksi...", send_api_request, use_loading, get_theme(),
+    res = _with_loading("📜 Lagi ngambil riwayat transaksi bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     data = res.get("data", {})
     return data if res.get("status") == "SUCCESS" and "list" in data else None
@@ -252,7 +255,7 @@ def get_transaction_history(api_key: str, tokens: dict, use_loading: bool = True
 def get_tiering_info(api_key: str, tokens: dict, use_loading: bool = True) -> dict:
     path = "gamification/api/v8/loyalties/tiering/info"
     payload = {"is_enterprise": False, "lang": "en"}
-    res = _with_loading("🏆 Mengambil info tiering...", send_api_request, use_loading, get_theme(),
+    res = _with_loading("🏆 Lagi ngambil info tiering bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     return res.get("data", {}) if res and res.get("status") == "SUCCESS" else {}
 
@@ -270,7 +273,7 @@ def unsubscribe(api_key: str, tokens: dict,
         "lang": "en",
         "family_member_id": "",
     }
-    res = _with_loading(f"🚫 Unsubscribe kuota {quota_code}...", send_api_request, use_loading, get_theme(),
+    res = _with_loading(f"🚫 Lagi unsubscribe kuota {quota_code} bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, tokens["id_token"], "POST")
     return bool(res and res.get("code") == "000")
 
@@ -278,7 +281,7 @@ def unsubscribe(api_key: str, tokens: dict,
 def dashboard_segments(api_key: str, tokens: dict, use_loading: bool = True) -> dict:
     path = "dashboard/api/v8/segments"
     payload = {"access_token": tokens["access_token"]}
-    return _with_loading("📊 Mengambil segmen dashboard...", send_api_request, use_loading, get_theme(),
+    return _with_loading("📊 Lagi ngambil segmen dashboard bro...", send_api_request, use_loading, get_theme(),
                          api_key, path, payload, tokens["id_token"], "POST")
 
 
@@ -294,9 +297,10 @@ def dash_segments(api_key: str, id_token: str, access_token: str, balance: int =
         "manufacturer_name": "samsung",
         "model_name": "SM-N935F",
     }
-    res = _with_loading("📊 Mengambil data segmen pengguna...", send_api_request, use_loading, get_theme(),
+    res = _with_loading("📊 Lagi ngambil data segmen pengguna bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, id_token, "POST")
     if not (isinstance(res, dict) and "data" in res):
+        print_panel("⚠️ Ups", "Data segmen kosong bro 🚨")
         return None
 
     data = res["data"]
@@ -345,7 +349,7 @@ def dash_segments(api_key: str, id_token: str, access_token: str, balance: int =
 def get_quota(api_key: str, id_token: str, use_loading: bool = True) -> dict | None:
     path = "api/v8/packages/quota-summary"
     payload = {"is_enterprise": False, "lang": "en"}
-    res = _with_loading("📶 Mengambil ringkasan kuota...", send_api_request, use_loading, get_theme(),
+    res = _with_loading("📶 Lagi ngambil ringkasan kuota bro...", send_api_request, use_loading, get_theme(),
                         api_key, path, payload, id_token, "POST")
     quota = res.get("data", {}).get("quota", {}).get("data")
     if quota:
@@ -354,4 +358,5 @@ def get_quota(api_key: str, id_token: str, use_loading: bool = True) -> dict | N
             "total": quota.get("total", 0),
             "has_unlimited": quota.get("has_unlimited", False),
         }
+    print_panel("⚠️ Ups", "Ringkasan kuota kosong bro 🚨")
     return None
