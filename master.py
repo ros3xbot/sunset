@@ -29,7 +29,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     console.print(
         Panel(
             info_table,
-            title=f"[{get_theme_style('text_title')}]✨ Info Akun Bro ✨[/]",
+            title=f"[{get_theme_style('text_title')}][ Informasi Akun ][/]",
             title_align="center",
             border_style=get_theme_style("border_info"),
             padding=(1, 2),
@@ -201,13 +201,13 @@ def main():
                 set_cache(account_id, "balance", balance)
 
             # Quota cache per akun (TTL 60 detik)
-            quota = get_cache(account_id, "quota", ttl=60)
+            quota = get_cache(account_id, "quota", ttl=70)
             if not quota:
                 quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
                 set_cache(account_id, "quota", quota)
 
             # Segments cache per akun (TTL 300 detik, file-based)
-            segments = get_cache(account_id, "segments", ttl=300, use_file=True)
+            segments = get_cache(account_id, "segments", ttl=290, use_file=True)
             if not segments:
                 segments = dash_segments(
                     AuthInstance.api_key,
@@ -227,7 +227,7 @@ def main():
             point_info = "Points: N/A | Tier: N/A"
             if active_user["subscription_type"] == "PREPAID":
                 # Tiering cache per akun (TTL 240 detik)
-                tiering_data = get_cache(account_id, "tiering", ttl=240)
+                tiering_data = get_cache(account_id, "tiering", ttl=250)
                 if not tiering_data:
                     tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
                     set_cache(account_id, "tiering", tiering_data)
@@ -252,7 +252,7 @@ def main():
                 selected_user_number = show_account_menu()
                 if selected_user_number:
                     AuthInstance.set_active_user(selected_user_number)
-                    print_panel("✅ Mantap", f"Akun aktif diganti ke {selected_user_number}")
+                    #print_panel("✅ Mantap", f"Akun aktif diganti ke {selected_user_number}")
                 else:
                     print_panel("⚠️ Ups", "Nggak ada user terpilih bro 🚨")
                 continue
@@ -342,6 +342,6 @@ def main():
             selected_user_number = show_account_menu()
             if selected_user_number:
                 AuthInstance.set_active_user(selected_user_number)
-                print_panel("✅ Mantap", f"Akun aktif diganti ke {selected_user_number}")
+                #print_panel("✅ Mantap", f"Akun aktif diganti ke {selected_user_number}")
             else:
                 print_panel("⚠️ Ups", "Nggak ada user terpilih bro 🚨")
