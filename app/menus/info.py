@@ -26,11 +26,11 @@ def show_info_menu():
         "6004011361054646563047A81"
     )
 
-    with live_loading("Menyiapkan QRIS...", theme):
+    with live_loading("🔄 Lagi siapin QRIS bro...", theme):
         qr_code_ascii = generate_qr_ascii(qris_url)
 
     console.print(Panel(
-        Align.center("Dukung Pengembangan myXL CLI", vertical="middle"),
+        Align.center("🔥 Dukung Pengembangan myXL CLI 🤙", vertical="middle"),
         border_style=theme["border_info"],
         padding=(1, 2),
         expand=True
@@ -39,21 +39,21 @@ def show_info_menu():
 
     donate_info = Text()
     donate_info.append(
-        "Jika Anda butuh Kode Unlock untuk menambahkan lebih banyak akun, hubungi saya di Telegram (@barbex_id), tebus seikhlasnya 😁\n\n",
+        "Butuh Kode Unlock buat nambah akun lebih banyak? Gas chat gue di Telegram (@barbex_id), tebus seikhlasnya aja bro 😁\n\n",
         style=theme["text_body"]
     )
     donate_info.append(
-        "Dan jika ingin memberikan donasi untuk mendukung pengembangan tool ini, silakan gunakan metode berikut:\n\n",
+        "Kalau mau support pengembangan tool ini, bisa donasi pake metode di bawah:\n\n",
         style=theme["text_body"]
     )
-    donate_info.append("- Dana: 0831-1921-5545\n", style=theme["text_body"])
+    donate_info.append("- 💸 Dana: 0831-1921-5545\n", style=theme["text_body"])
     donate_info.append("  A/N Joko S\n", style=theme["text_body"])
-    donate_info.append("- QRIS tersedia di bawah\n\n", style=theme["text_body"])
-    donate_info.append("Terima kasih atas dukungan Anda! 🙏", style=theme["text_sub"])
+    donate_info.append("- 📱 QRIS juga tersedia di bawah bro\n\n", style=theme["text_body"])
+    donate_info.append("🙏 Makasih banyak atas dukungan lo cuy! 🚀", style=theme["text_sub"])
 
     console.print(Panel(
         Align.left(donate_info),
-        title=f"[{theme['text_title']}]💰 Donasi Seikhlasnya[/]",
+        title=f"[{theme['text_title']}]💰 Donasi Seikhlasnya Bro[/]",
         border_style=theme["border_primary"],
         padding=(1, 2),
         expand=True,
@@ -62,7 +62,7 @@ def show_info_menu():
 
     console.print(Panel(
         Align.center(qr_code_ascii),
-        title=f"[{theme['text_title']}]📱 Scan QRIS[/]",
+        title=f"[{theme['text_title']}]📱 Scan QRIS Tongkrongan[/]",
         border_style=theme["border_success"],
         padding=(1, 2),
         expand=True,
