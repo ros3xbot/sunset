@@ -24,7 +24,7 @@ def settlement_multipayment(
     amount_idx: int = -1,
 ):
     if overwrite_amount == -1 and not ask_overwrite:
-        print_error("❌", "Either ask_overwrite must be True or overwrite_amount must be set.")
+        print_error("⚠️ Ups", "Harus ada overwrite_amount atau flag ask_overwrite bro 🚨")
         return None
 
     token_confirmation = items[token_confirmation_idx]["token_confirmation"]
@@ -36,17 +36,17 @@ def settlement_multipayment(
         amount_int = items[amount_idx]["item_price"]
 
     if ask_overwrite:
-        print_panel("💰 Amount", f"Total amount is {amount_int}. Enter new amount if you need to overwrite.")
-        amount_str = input("Press enter to ignore & use default amount: ")
+        print_panel("💰 Amount", f"Total {amount_int}. Masukin nominal baru kalo mau overwrite bro ✌️")
+        amount_str = input("Enter buat skip & pake default: ")
         if amount_str:
             try:
                 amount_int = int(amount_str)
             except ValueError:
-                print_warning("⚠️", "Invalid overwrite input, using original price.")
+                print_panel("⚠️ Ups", "Input overwrite ngaco, pake harga asli aja 🚨")
 
     intercept_page(api_key, tokens, items[0]["item_code"], False)
 
-    # Get payment methods
+    # Ambil payment methods
     payment_path = "payments/api/v8/payment-methods-option"
     payment_payload = {
         "payment_type": "PURCHASE",
@@ -57,11 +57,11 @@ def settlement_multipayment(
         "token_confirmation": token_confirmation,
     }
 
-    with live_loading("💳 Getting payment methods...", get_theme()):
+    with live_loading("💳 Lagi ngumpulin payment methods bro...", get_theme()):
         payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
 
     if payment_res.get("status") != "SUCCESS":
-        print_error("❌", "Failed to fetch payment methods.")
+        print_panel("⚠️ Ups", "Gagal ambil payment methods bro 🚨")
         print_panel("📑 Response", json.dumps(payment_res, indent=2))
         return None
 
@@ -131,20 +131,20 @@ def settlement_multipayment(
     }
 
     url = f"{BASE_API_URL}/{path}"
-    with live_loading("📤 Sending settlement request...", get_theme()):
+    with live_loading("📤 Lagi kirim settlement request bro...", get_theme()):
         resp = requests.post(url, headers=headers, data=json.dumps(body), timeout=30)
 
     try:
         decrypted_body = decrypt_xdata(api_key, json.loads(resp.text))
         if decrypted_body.get("status") != "SUCCESS":
-            #print_error("❌", "Failed to initiate settlement.")
+            print_panel("⚠️ Ups", "Settlement gagal bro 🚨")
             print_panel("📑 Response", json.dumps(decrypted_body, indent=2))
         else:
-            print_success("✅ Settlement", "Multipayment completed successfully")
+            print_panel("✅ Mantap", "Multipayment sukses bro 🚀")
             print_panel("🧾 Settlement Result", json.dumps(decrypted_body, indent=2))
         return decrypted_body
     except Exception as e:
-        print_error("❌", f"Decrypt error: {e}")
+        print_panel("⚠️ Ups", f"Error decrypt: {e} 🤯")
         print_panel("📑 Raw Response", resp.text)
         return resp.text
 
@@ -162,9 +162,9 @@ def show_multipayment(api_key: str, tokens: dict, items: list[PaymentItem],
         choice = input("Pilih metode pembayaran: ")
         if choice == "1":
             payment_method = "DANA"
-            wallet_number = input("Masukkan nomor DANA (contoh: 08123456789): ")
+            wallet_number = input("Masukin nomor DANA bro (contoh: 08123456789): ")
             if not wallet_number.startswith("08") or not wallet_number.isdigit() or len(wallet_number) < 10 or len(wallet_number) > 13:
-                print_error("❌", "Nomor DANA tidak valid. Pastikan nomor diawali dengan '08' dan panjang benar.")
+                print_panel("⚠️ Ups", "Nomor DANA ngaco bro 🚨")
                 continue
             choosing_payment_method = False
         elif choice == "2":
@@ -175,13 +175,13 @@ def show_multipayment(api_key: str, tokens: dict, items: list[PaymentItem],
             choosing_payment_method = False
         elif choice == "4":
             payment_method = "OVO"
-            wallet_number = input("Masukkan nomor OVO (contoh: 08123456789): ")
+            wallet_number = input("Masukin nomor OVO bro (contoh: 08123456789): ")
             if not wallet_number.startswith("08") or not wallet_number.isdigit() or len(wallet_number) < 10 or len(wallet_number) > 13:
-                print_error("❌", "Nomor OVO tidak valid. Pastikan nomor diawali dengan '08' dan panjang benar.")
+                print_panel("⚠️ Ups", "Nomor OVO ngaco bro 🚨")
                 continue
             choosing_payment_method = False
         else:
-            print_warning("⚠️", "Pilihan tidak valid.")
+            print_panel("⚠️ Ups", "Pilihan nggak valid bro 🚨")
             continue
 
     settlement_response = settlement_multipayment(
@@ -198,14 +198,14 @@ def show_multipayment(api_key: str, tokens: dict, items: list[PaymentItem],
     )
 
     if not settlement_response or settlement_response.get("status") != "SUCCESS":
-        print_error("❌", "Failed to initiate settlement.")
+        print_panel("⚠️ Ups", "Settlement gagal bro 🚨")
         print_panel("📑 Response", json.dumps(settlement_response, indent=2))
         return
 
     if payment_method != "OVO":
         deeplink = settlement_response["data"].get("deeplink", "")
         if deeplink:
-            print_panel("🔗 Payment Link", f"Silahkan selesaikan pembayaran melalui link berikut:\n{deeplink}")
+            print_panel("🔗 Payment Link", f"Gas selesain pembayaran lewat link ini bro:\n{deeplink}")
     else:
-        print_success("✅", "Silahkan buka aplikasi OVO Anda untuk menyelesaikan pembayaran.")
+        print_panel("✅ Mantap", "Buka aplikasi OVO lo buat selesain pembayaran 🚀")
     return
