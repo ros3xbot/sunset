@@ -76,7 +76,7 @@ def show_family_grup_menu(return_package_detail: bool = False):
         theme = get_theme()
 
         console.print(Panel(
-            Align.center("📋 Family Kode Yang Terdaftar", vertical="middle"),
+            Align.center("📋 List Family Code 🤙", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
@@ -101,7 +101,7 @@ def show_family_grup_menu(return_package_detail: bool = False):
             console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
         else:
             console.print(Panel(
-                "[italic]Belum ada family code yang terdaftar.[/italic]",
+                "[italic]Sepi cuy, belum ada family code 😴[/italic]",
                 border_style=theme["border_warning"],
                 padding=(1, 2),
                 expand=True
@@ -110,55 +110,58 @@ def show_family_grup_menu(return_package_detail: bool = False):
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
         nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("T", "Tambah family code")
+        nav_table.add_row("T", "➕ Tambah family code")
         if semua_kode:
-            nav_table.add_row("E", "Edit nama family code")
-            nav_table.add_row("H", f"[{theme['text_err']}]Hapus family code[/]")
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu awal[/]")
+            nav_table.add_row("E", "✏️ Edit nama family code")
+            nav_table.add_row("H", f"[{theme['text_err']}]🗑️ Hapus family code[/]")
+        nav_table.add_row("00", f"[{theme['text_sub']}]⬅️ Cabut balik ke menu awal 🏠[/]")
 
         console.print(Panel(nav_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
-        aksi = console.input(f"[{theme['text_title']}]Pilih aksi atau nomor kode:[/{theme['text_title']}] ").strip().lower()
+        aksi = console.input(f"[{theme['text_title']}]Pilih aksi atau nomor kode bro:[/{theme['text_title']}] ").strip().lower()
 
         if aksi == "t":
-            code = console.input("Masukkan family code: ").strip()
-            name = console.input("Masukkan nama family: ").strip()
+            code = console.input("Masukin family code: ").strip()
+            name = console.input("Masukin nama family: ").strip()
             success = add_family_code(code, name)
-            print_panel("✅ Info" if success else "❌ Error", "Berhasil menambahkan." if success else "Gagal menambahkan, family code sudah ada di daftar.")
+            print_panel("✅ Mantap" if success else "⚠️ Ups", 
+                        "Family code baru udah ditambah bro 🚀" if success else "Gagal nambah, family code udah ada 🤯")
             pause()
 
         elif aksi == "h":
             if not semua_kode:
-                print_panel("Info", "Tidak ada kode untuk dihapus.")
+                print_panel("ℹ️ Santuy", "Nggak ada kode buat dihapus bro 😴")
                 pause()
                 continue
-            idx = console.input("Masukkan nomor kode yang ingin dihapus: ").strip()
+            idx = console.input("Nomor kode yang mau dihapus: ").strip()
             if idx.isdigit() and 1 <= int(idx) <= len(semua_kode):
                 index = int(idx) - 1
                 nama = semua_kode[index]["name"]
                 kode = semua_kode[index]["code"]
-                konfirmasi = console.input(f"Yakin ingin menghapus '{nama}' ({kode})? (y/n): ").strip().lower()
+                konfirmasi = console.input(f"Yakin mau hapus '{nama}' ({kode})? (y/n): ").strip().lower()
                 if konfirmasi == "y":
                     removed = remove_family_code(index)
-                    print_panel("✅ Info" if removed else "❌ Error", f"Berhasil menghapus {removed}." if removed else "Gagal menghapus.")
+                    print_panel("✅ Mantap" if removed else "⚠️ Ups", 
+                                f"Family code {removed} udah gue hapus bro ✌️" if removed else "Gagal hapus 🤯")
                 else:
-                    print_panel("❎ Info", "Penghapusan dibatalkan.")
+                    print_panel("ℹ️ Santuy", "Penghapusan dibatalin bro ✌️")
             else:
-                print_panel("❌ Error", "Nomor tidak valid.")
+                print_panel("⚠️ Ups", "Nomor kode nggak valid bro 🚨")
             pause()
 
         elif aksi == "e":
             if not semua_kode:
-                print_panel("Info", "Tidak ada kode untuk diedit.")
+                print_panel("ℹ️ Santuy", "Nggak ada kode buat diedit bro 😴")
                 pause()
                 continue
-            idx = console.input("Masukkan nomor kode yang ingin diubah namanya: ").strip()
+            idx = console.input("Nomor kode yang mau diubah namanya: ").strip()
             if idx.isdigit() and 1 <= int(idx) <= len(semua_kode):
-                new_name = console.input("Masukkan nama baru: ").strip()
+                new_name = console.input("Masukin nama baru: ").strip()
                 success = edit_family_name(int(idx) - 1, new_name)
-                print_panel("✅ Info" if success else "❌ Error", "Nama berhasil diperbarui." if success else "Gagal memperbarui nama.")
+                print_panel("✅ Mantap" if success else "⚠️ Ups", 
+                            "Nama family code udah diganti bro ✨" if success else "Gagal ganti nama 🤯")
             else:
-                print_panel("❌ Error", "Nomor tidak valid.")
+                print_panel("⚠️ Ups", "Nomor kode nggak valid bro 🚨")
             pause()
 
         elif aksi == "00":
@@ -182,7 +185,7 @@ def show_family_grup_menu(return_package_detail: bool = False):
                     elif result == "BACK":
                         continue
                 except Exception as e:
-                    print_panel("❌ Error", f"Gagal menampilkan paket: {e}")
+                    print_panel("⚠️ Ups", f"Gagal nampilin paket bro: {e}")
             else:
-                print_panel("❌ Error", "Nomor tidak valid.")
+                print_panel("⚠️ Ups", "Nomor kode nggak valid bro 🚨")
             pause()
