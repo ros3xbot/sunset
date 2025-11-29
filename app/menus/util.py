@@ -54,10 +54,10 @@ def simple_number():
     active_user = AuthInstance.get_active_user()
 
     if not active_user:
-        text = f"[bold {theme['text_err']}]Tidak ada akun aktif saat ini.[/]"
+        text = f"[bold {theme['text_err']}]Sepi cuy, nggak ada akun aktif 😴[/]"
     else:
         number = active_user.get("number", "-")
-        text = f"[bold {theme['text_sub']}]Akun (nomor) aktif ✨ {number} ✨[/]"
+        text = f"[bold {theme['text_sub']}]Akun aktif ✨ {number} ✨[/]"
 
     console.print(Panel(
         Align.center(text),
@@ -93,12 +93,11 @@ __________             ___.
 #def pause():
 #    console.print(Panel("⏸️ Press Enter to continue...", border_style=get_theme_style("border_info")))
 #    input()
-    
+
 def pause():
     theme = get_theme()
-    console.print(f"\n[bold {theme['text_sub']}]Tekan Enter untuk melanjutkan...[/]")
+    console.print(f"\n[bold {theme['text_sub']}]⏸️ Tekan Enter buat lanjut bro ✌️[/]")
     input()
-
 
 class HTMLToText(HTMLParser):
     def __init__(self, width=80, bullet="•"):
