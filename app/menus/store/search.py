@@ -98,9 +98,9 @@ def show_store_packages_menu(
         with live_loading("🔄 Lagi nyusun tabel paket bro...", theme):
             table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
             table.add_column("No", justify="right", style=theme["text_key"], width=4)
-            table.add_column("Judul Paket", style=theme["text_body"])
+            table.add_column("Paket", style=theme["text_body"])
             table.add_column("Family", style=theme["text_body"])
-            table.add_column("Aktif Sampai", style=theme["text_date"])
+            table.add_column("Aktif", style=theme["text_date"])
             table.add_column("Harga", style=theme["text_money"], justify="right")
             
             packages = {}
@@ -116,7 +116,7 @@ def show_store_packages_menu(
                 packages[str(i)] = {"action_type": action_type, "action_param": action_param}
                 
                 if discounted_price and discounted_price > 0:
-                    harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)} 🔥"
+                    harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)}"
                 else:
                     harga_str = get_rupiah(original_price)
                 
