@@ -43,8 +43,8 @@ def show_redeemables_menu(is_enterprise: bool = False):
             table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
             table.add_column("Kode", style=theme["text_key"], width=6)
             table.add_column("Nama Barang", style=theme["text_body"])
-            table.add_column("Berlaku Sampai", style=theme["text_date"])
-            table.add_column("Tipe Aksi", style=theme["text_body"])
+            table.add_column("Berlaku", style=theme["text_date"])
+            table.add_column("Tipe", style=theme["text_body"])
             
             if not redeemables:
                 table.add_row("-", f"{category_name} (kosong bro)", "-", "-")
