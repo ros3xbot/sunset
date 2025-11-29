@@ -32,6 +32,7 @@ def validate_contact(contact: str) -> bool:
 
 def get_otp(contact: str) -> str | None:
     if not validate_contact(contact):
+        print_panel("⚠️ Ups", "Nomor nggak valid bro 🚨")
         return None
 
     url = BASE_CIAM_URL + "/realms/xl-ciam/auth/otp"
@@ -54,14 +55,17 @@ def get_otp(contact: str) -> str | None:
         "User-Agent": UA,
     }
 
-    with live_loading("📲 Requesting OTP...", get_theme()):
+    with live_loading(f"📲 Lagi request OTP buat {contact} bro...", get_theme()):
         try:
             response = requests.get(url, headers=headers, params=querystring, timeout=30)
             json_body = response.json()
             if "subscriber_id" not in json_body:
+                print_panel("⚠️ Ups", "OTP gagal diambil 🚨")
                 return None
+            print_panel("✅ Mantap", f"OTP berhasil dikirim ke {contact} 🚀")
             return json_body["subscriber_id"]
         except Exception:
+            print_panel("⚠️ Ups", "Error pas request OTP 🤯")
             return None
 
 
@@ -87,22 +91,27 @@ def extend_session(subscriber_id: str) -> str | None:
         "User-Agent": UA,
     }
 
-    with live_loading("🔄 Extending session...", get_theme()):
+    with live_loading("🔄 Lagi extend session bro...", get_theme()):
         try:
             response = requests.get(url, headers=headers, params=querystring, timeout=30)
             if response.status_code != 200:
+                print_panel("⚠️ Ups", "Extend session gagal 🚨")
                 return None
             data = response.json()
+            print_panel("✅ Mantap", "Session berhasil di-extend 🚀")
             return data.get("data", {}).get("exchange_code")
         except Exception:
+            print_panel("⚠️ Ups", "Error pas extend session 🤯")
             return None
 
 
 def submit_otp(api_key: str, contact_type: str, contact: str, code: str) -> dict | None:
     if contact_type == "SMS":
         if not validate_contact(contact):
+            print_panel("⚠️ Ups", "Nomor nggak valid bro 🚨")
             return None
         if not code or len(code) != 6:
+            print_panel("⚠️ Ups", "Kode OTP nggak valid bro 🚨")
             return None
         final_contact = contact
         final_code = code
@@ -110,6 +119,7 @@ def submit_otp(api_key: str, contact_type: str, contact: str, code: str) -> dict
         final_contact = base64.b64encode(contact.encode()).decode()
         final_code = code
     else:
+        print_panel("⚠️ Ups", "Contact type nggak valid 🚨")
         return None
 
     url = BASE_CIAM_URL + "/realms/xl-ciam/protocol/openid-connect/token"
@@ -133,14 +143,17 @@ def submit_otp(api_key: str, contact_type: str, contact: str, code: str) -> dict
         "User-Agent": UA,
     }
 
-    with live_loading("📩 Submitting OTP...", get_theme()):
+    with live_loading("📩 Lagi submit OTP bro...", get_theme()):
         try:
             response = requests.post(url, data=payload, headers=headers, timeout=30)
             json_body = response.json()
             if "error" in json_body:
+                print_panel("⚠️ Ups", "OTP ditolak 🚨")
                 return None
+            print_panel("✅ Mantap", "OTP berhasil divalidasi 🚀")
             return json_body
         except requests.RequestException:
+            print_panel("⚠️ Ups", "Error pas submit OTP 🤯")
             return None
 
 
@@ -165,10 +178,11 @@ def get_new_token(api_key: str, refresh_token: str, subscriber_id: str) -> dict 
     }
     data = {"grant_type": "refresh_token", "refresh_token": refresh_token}
 
-    with live_loading("🔄 Refreshing token...", get_theme()):
+    with live_loading("🔄 Lagi refresh token bro...", get_theme()):
         try:
             resp = requests.post(url, headers=headers, data=data, timeout=30)
         except requests.RequestException:
+            print_panel("⚠️ Ups", "Error pas refresh token 🤯")
             return None
 
     if resp.status_code == 400:
@@ -182,23 +196,28 @@ def get_new_token(api_key: str, refresh_token: str, subscriber_id: str) -> dict 
             return None
         exchange_code = extend_session(subscriber_id)
         if not exchange_code:
+            print_panel("⚠️ Ups", "Extend session gagal bro 🚨")
             return None
+        print_panel("ℹ️ Santuy", "Session expired, gas submit OTP lagi ✌️")
         return submit_otp(api_key, "DEVICEID", subscriber_id, exchange_code)
 
     try:
         resp.raise_for_status()
     except requests.HTTPError:
+        print_panel("⚠️ Ups", "HTTP error pas refresh token 🚨")
         return None
 
     try:
         body = resp.json()
     except ValueError:
+        print_panel("⚠️ Ups", "Response token ngaco bro 🚨")
         return None
 
-    if "id_token" not in body:
+    if "id_token" not in body or "error" in body:
+        print_panel("⚠️ Ups", "Token baru gagal diambil 🚨")
         return None
-    if "error" in body:
-        return None
+
+    print_panel("✅ Mantap", "Token baru berhasil diambil 🚀")
     return body
 
 
@@ -233,39 +252,41 @@ def get_auth_code(tokens: dict, pin: str, msisdn: str) -> str | None:
         "receiver_msisdn": msisdn,
     }
 
-    with live_loading("🔐 Requesting authorization code...", get_theme()):
+    with live_loading(f"🔐 Lagi request auth code buat {msisdn} bro...", get_theme()):
         try:
             resp = requests.post(url, headers=headers, json=body, timeout=30)
         except requests.RequestException:
+            print_panel("⚠️ Ups", "Error pas request auth code 🤯")
             return None
 
     if resp.status_code != 200:
+        print_panel("⚠️ Ups", "Auth code gagal diambil 🚨")
         return None
 
     try:
         data = resp.json()
     except ValueError:
+        print_panel("⚠️ Ups", "Response auth code nggak valid 🚨")
         return None
 
     if not isinstance(data, dict):
+        print_panel("⚠️ Ups", "Format data auth code ngaco 🚨")
         return None
 
     status = data.get("status", "")
     message = data.get("message", "")
 
-    # ✅ tampilkan status dengan warna
     if status == "Success":
-        colored_status = f"\033[92m{status}\033[0m"  # hijau
+        colored_status = f"✅ {status}"
+        print_panel("✅ Mantap", f"Auth code berhasil diambil 🚀\nPesan: {message}")
     else:
-        colored_status = f"\033[91m{status}\033[0m"  # merah
-
-    print_panel("🔐 Auth Code Status", f"Status: {colored_status}\nMessage: {message}")
-
-    if status != "Success":
+        colored_status = f"⚠️ {status}"
+        print_panel("⚠️ Ups", f"Auth code gagal bro 🚨\nPesan: {message}")
         return None
 
     authorization_code = data.get("data", {}).get("authorization_code")
     if not authorization_code:
+        print_panel("⚠️ Ups", "Auth code kosong bro 🚨")
         return None
 
     return authorization_code
