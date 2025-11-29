@@ -20,7 +20,7 @@ def show_store_segments_menu(is_enterprise: bool = False):
         
         segments_res = get_segments(api_key, tokens, is_enterprise)
         if not segments_res:
-            print_panel("ℹ️ Info", "Tidak ada store segments ditemukan.")
+            print_panel("ℹ️ Info", "Sepi cuy, nggak ada store segments 😴")
             in_store_segments_menu = False
             continue
         
@@ -29,7 +29,7 @@ def show_store_segments_menu(is_enterprise: bool = False):
         ensure_git()
         
         console.print(Panel(
-            Align.center("🛒 Store Segments", vertical="middle"),
+            Align.center("🛒 Store Segments 🤙", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1,2),
             expand=True
@@ -45,12 +45,12 @@ def show_store_segments_menu(is_enterprise: bool = False):
             table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
             table.add_column("Kode", style=theme["text_key"], width=6)
             table.add_column("Family", style=theme["text_body"])
-            table.add_column("Judul", style=theme["text_body"])
-            table.add_column("Aktif", style=theme["text_date"])
+            table.add_column("Judul Paket", style=theme["text_body"])
+            table.add_column("Aktif Sampai", style=theme["text_date"])
             table.add_column("Harga", style=theme["text_money"], justify="right")
             
             if not banners:
-                table.add_row("-", f"{name} (kosong)", "-", "-", "-")
+                table.add_row("-", f"{name} (kosong bro)", "-", "-", "-")
             else:
                 for j, banner in enumerate(banners):
                     title = banner.get("title", "N/A")
@@ -59,11 +59,11 @@ def show_store_segments_menu(is_enterprise: bool = False):
                     action_param = banner.get("action_param", "")
                     action_type = banner.get("action_type", "")
                     
-                    # harga: gunakan original + discounted
+                    # harga: original + discounted
                     original_price = banner.get("original_price", 0)
                     discounted_price = banner.get("discounted_price", 0)
                     if discounted_price and discounted_price > 0:
-                        harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)}"
+                        harga_str = f"{get_rupiah(original_price)} ➡️ {get_rupiah(discounted_price)} 🔥"
                     else:
                         harga_str = get_rupiah(original_price)
                     
@@ -85,18 +85,18 @@ def show_store_segments_menu(is_enterprise: bool = False):
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
         nav.add_column(style=theme["text_body"])
-        nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        nav.add_row("00", f"[{theme['text_sub']}]Cabut balik ke menu utama 🏠[/]")
         
         console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
         
-        choice = console.input(f"[{theme['text_sub']}]Pilih banner (misal A1, B2):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Mau pilih banner mana bro (contoh A1, B2): 👉 [/{theme['text_sub']}] ").strip()
         if choice == "00":
             in_store_segments_menu = False
             continue
         
         selected_pkg = packages.get(choice.lower())
         if not selected_pkg:
-            print_panel("❌ Error", "Pilihan tidak valid.")
+            print_panel("❌ Ups", "Pilihan lo ngaco bro 🤯")
             pause()
             continue
         
@@ -106,5 +106,5 @@ def show_store_segments_menu(is_enterprise: bool = False):
         if action_type == "PDP":
             show_package_details(api_key, tokens, action_param, is_enterprise)
         else:
-            print_panel("ℹ️ Info", f"Unhandled Action Type: {action_type}\nParam: {action_param}")
+            print_panel("ℹ️ Info", f"Belum ada aksi buat tipe ini bro: {action_type}\nParam: {action_param}")
             pause()
