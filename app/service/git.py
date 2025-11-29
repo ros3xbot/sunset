@@ -30,8 +30,8 @@ def ensure_git(strict=True):
     git_config = os.path.join(root_path, ".git", "config")
 
     if not os.path.exists(git_config):
-        print_error("❌", "Script ini hanya bisa dijalankan dari hasil git clone.")
-        print_panel("📑 Info", f"Pastikan Anda meng-clone dari repository resmi:\n  git clone {EXPECTED_URL}")
+        print_error("⚠️ Ups", "Script ini cuma bisa jalan kalo hasil git clone bro 🤯")
+        print_panel("ℹ️ Santuy", f"Gas clone dari repo resmi:\n  git clone {EXPECTED_URL}")
         if strict:
             sys.exit(1)
         return False
@@ -41,13 +41,13 @@ def ensure_git(strict=True):
 
     origin_url = config.get('remote "origin"', 'url', fallback="").strip()
     if origin_url != EXPECTED_URL:
-        print_warning("⚠️", "Repo ini tidak berasal dari sumber resmi.")
-        print_panel("📑 Info", f"URL saat ini: {origin_url}\nSilakan clone ulang dari:\n  git clone {EXPECTED_URL}")
+        print_warning("⚠️ Ups", "Repo ini bukan dari sumber resmi bro 🚨")
+        print_panel("ℹ️ Santuy", f"URL sekarang: {origin_url}\nClone ulang dari:\n  git clone {EXPECTED_URL}")
         if strict:
             sys.exit(1)
         return False
 
-    #print_success("✅", "Repository valid dan berasal dari sumber resmi.")
+    #print_success("✅ Mantap", "Repo valid, asli dari sumber resmi bro 🚀")
     return True
 
 
@@ -77,15 +77,15 @@ def check_for_updates():
         remote = None
 
     if not remote or not local:
-        print_warning("⚠️", "Tidak dapat memeriksa versi terbaru.")
+        print_warning("⚠️ Ups", "Nggak bisa cek versi terbaru bro 😴")
         return False
 
     if local != remote:
-        print_warning("⚠️", f"Versi terbaru tersedia (local {local[:7]} vs remote {remote[:7]})")
-        #print_panel("📑 Info", "Jalankan:\n[bold]git pull --rebase[/] untuk update.")
+        print_warning("🔥 Info", f"Ada update terbaru bro (local {local[:7]} vs remote {remote[:7]}) 🚀")
+        #print_panel("ℹ️ Santuy", "Gas pull rebase:\n[bold]git pull --rebase[/]")
         return True
 
-    #print_success("✅", "Repository sudah dalam versi terbaru.")
+    #print_success("✅ Mantap", "Repo udah versi paling baru bro ✨")
     return False
 
 
