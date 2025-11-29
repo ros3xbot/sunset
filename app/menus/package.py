@@ -357,7 +357,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             pause_on_success=False,
             token_confirmation_idx=1
         )
-        print_panel("✅ Mantap", f"Pembelian {n_times}x sukses bro 🚀")
+        #print_panel("✅ Mantap", f"Pembelian {n_times}x sukses bro 🚀")
         pause()
         return True
 
