@@ -22,8 +22,8 @@ def show_notification_menu():
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
 
-        with live_loading("🔄 Mengambil notifikasi...", theme):
-            notifications_res = dashboard_segments(api_key, tokens)
+        #with live_loading("🔄 Mengambil notifikasi...", theme):
+        notifications_res = dashboard_segments(api_key, tokens)
 
         if not notifications_res:
             print_panel("ℹ️ Info", "No notifications found.")
