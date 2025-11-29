@@ -15,10 +15,9 @@ def show_redeemables_menu(is_enterprise: bool = False):
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
         
-        #console.print(Panel("🔄 Fetching redeemables...", border_style=theme["border_info"]))
         redeemables_res = get_redeemables(api_key, tokens, is_enterprise)
         if not redeemables_res:
-            print_panel("ℹ️ Info", "Tidak ada redeemables ditemukan.")
+            print_panel("ℹ️ Info", "Sepi cuy, nggak ada redeemables masuk 😴")
             in_redeemables_menu = False
             continue
         
@@ -27,7 +26,7 @@ def show_redeemables_menu(is_enterprise: bool = False):
         ensure_git()
         
         console.print(Panel(
-            Align.center("🎁 Redeemables", vertical="middle"),
+            Align.center("🎁 Redeemables 🤙", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1,2),
             expand=True
@@ -43,12 +42,12 @@ def show_redeemables_menu(is_enterprise: bool = False):
             letter = chr(65 + i)
             table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
             table.add_column("Kode", style=theme["text_key"], width=6)
-            table.add_column("Nama", style=theme["text_body"])
-            table.add_column("Valid Until", style=theme["text_date"])
-            table.add_column("Action Type", style=theme["text_body"])
+            table.add_column("Nama Barang", style=theme["text_body"])
+            table.add_column("Berlaku Sampai", style=theme["text_date"])
+            table.add_column("Tipe Aksi", style=theme["text_body"])
             
             if not redeemables:
-                table.add_row("-", f"{category_name} (kosong)", "-", "-")
+                table.add_row("-", f"{category_name} (kosong bro)", "-", "-")
             else:
                 for j, redeemable in enumerate(redeemables):
                     name = redeemable.get("name", "N/A")
@@ -66,7 +65,7 @@ def show_redeemables_menu(is_enterprise: bool = False):
             
             console.print(Panel(
                 table,
-                title=f"[{theme['text_title']}]📂 Category: {category_name}[/] (Code: {category_code})",
+                title=f"[{theme['text_title']}]📂 Kategori: {category_name}[/] (Kode: {category_code})",
                 border_style=theme["border_info"],
                 padding=(0, 0),
                 expand=True
@@ -75,19 +74,18 @@ def show_redeemables_menu(is_enterprise: bool = False):
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
         nav.add_column(style=theme["text_body"])
-        nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+        nav.add_row("00", f"[{theme['text_sub']}]Cabut balik ke menu utama 🏠[/]")
         
         console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
-        #title=f"[{theme['text_title']}]⚙️ Options[/]", 
         
-        choice = console.input(f"[{theme['text_sub']}]Pilih redeemable (misal A1, B2):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_sub']}]Mau pilih redeemable mana bro (contoh A1, B2): 👉 [/{theme['text_sub']}] ").strip()
         if choice == "00":
             in_redeemables_menu = False
             continue
         
         selected_pkg = packages.get(choice.lower())
         if not selected_pkg:
-            print_panel("❌ Error", "Pilihan tidak valid.")
+            print_panel("❌ Ups", "Pilihan lo ngaco bro 🤯")
             pause()
             continue
         
@@ -99,5 +97,5 @@ def show_redeemables_menu(is_enterprise: bool = False):
         elif action_type == "PDP":
             show_package_details(api_key, tokens, action_param, is_enterprise)
         else:
-            print_panel("ℹ️ Info", f"Unhandled Action Type: {action_type}\nParam: {action_param}")
+            print_panel("ℹ️ Info", f"Belum ada aksi buat tipe ini bro: {action_type}\nParam: {action_param}")
             pause()
